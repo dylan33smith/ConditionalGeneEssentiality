@@ -1,0 +1,21 @@
+media,n_organisms
+LB,21
+RCH2_defined_noCarbon,20
+RCH2_defined_Glucose_noNitrogen,11
+M9 minimal media_noCarbon,4
+RCH2_defined_glucose,4
+RCH2_defined_noNitrogen,4
+RCH2_defined_glucose_MES,3
+RCH2_defined_glucose_noVitamin,3
+RCH2_defined_glucose_TAPS,3
+M9+polygalacturonate,2
+M9+sucrose,2
+M9+starch,2
+M9 minimal media_noNitrogen,1
+RCH2_defined,1
+RCH2_Lactate_Nitrate_YE,1
+RCH2_Lactate_1_M_Fe-Cu,1
+M9_1percentGlucose,1
+RCH2_Lactate_YE_1_M_Fe-Cu,1
+RCH2_defined_noCarbon_noVitamins,1
+RCH2_defined_no_vitamin,1

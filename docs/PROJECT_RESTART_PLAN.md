@@ -4,6 +4,120 @@
 **Starting point (minimum):** `data/raw/feba.db`, `data/raw/aaseqs`, and `data/media_composition.xlsx`.  
 **Starting point (recommended, to avoid long recompute):** The above **plus** frozen ProteomeLM tensor bundles (see §1.4). Everything else downstream is rebuilt deliberately.
 
+## Execution progress (milestones §13)
+
+| State | Item | Notes |
+| ----- | ---- | ----- |
+| Done | **M0 — Lock inputs** | SHA-256 manifest committed as [`docs/data_inputs_manifest_M0.json`](data_inputs_manifest_M0.json) (2026-04-05 UTC). Required paths present: `data/raw/feba.db`, `data/raw/aaseqs` (single file), `data/media_composition.xlsx`. Optional bundle recorded: `data/processed/ProtLM_embeddings_layer8/` (48 × `.pt`, layer 8, dim 1152, keys `embeddings` / `group_labels`). |
+| Done | **M1 — Phase 0** (initial pass) | Notebook [`data_analysis/phase0_elucidation.ipynb`](../data_analysis/phase0_elucidation.ipynb); driver script [`data_analysis/run_phase0.py`](../data_analysis/run_phase0.py); figures under [`figures/phase0/`](../figures/phase0/); media workbook audit + DB/Excel join stats in [`data_analysis/outputs/media_composition_audit.md`](../data_analysis/outputs/media_composition_audit.md); numeric summary [`data_analysis/outputs/phase0_summary.json`](../data_analysis/outputs/phase0_summary.json); connected-media degree table [`data_analysis/outputs/connected_media_degree_benchmark.csv`](../data_analysis/outputs/connected_media_degree_benchmark.csv); design log [`data_analysis/DESIGN_DECISIONS_LOG.md`](../data_analysis/DESIGN_DECISIONS_LOG.md). **Follow-ups:** full §1.3.1 spot-checks to literature, robust §12.2 K-organism benchmark (replace prefix heuristic), richer mixed-model variance decomposition (§5.1). |
+| Done | **M2 — Canonical tables** (`canonical_v0`) | Builder [`data_processing/build_canonical_v0.py`](../data_processing/build_canonical_v0.py); outputs under `data/derived/canonical/v0/` (Parquet, local only — `data/` gitignored); committed manifest [`docs/canonical_build_manifest_v0.json`](canonical_build_manifest_v0.json) with SHA-256 and row counts. Long table = `GeneFitness` inner join `Experiment` + `gene_key`, `abs_t`, `has_media_composition`; sidecars = full `experiments`, Excel `Media` + `Media_Components`. **Follow-ups:** explicit `w_row` column if desired; join component chemistry into long form or multi-hot in a later `v1` build. |
+| Done | **M3 — Splits** | Builder [`splits/build_organism_splits.py`](../splits/build_organism_splits.py). **Protocols (organism-axis only):** `organism_single_holdout_largest_v0` — val = largest row-count `orgId` (`Btheta`), test = second-largest (`DvH`), train = other 46; [`splits/organism_single_holdout_largest_v0/protocol.json`](../splits/organism_single_holdout_largest_v0/protocol.json). `organism_looo_v0` — 48 LOOO folds, one fold file per val org under [`splits/organism_looo_v0/`](../splits/organism_looo_v0/). Build metadata [`docs/splits_build_manifest_m3.json`](splits_build_manifest_m3.json). **Re-run** after changing canonical Parquet. **Follow-ups:** benchmark-masked splits; fixed val/test organism sets per project choice; B1 condition-held-out protocols (§7.3). |
+| Done | **M3.5 — Null baselines** | Script [`evaluation/compute_null_baselines.py`](../evaluation/compute_null_baselines.py). Outputs [`evaluation/outputs/null_baselines_m35.json`](../evaluation/outputs/null_baselines_m35.json) and [`evaluation/outputs/null_baselines_m35.csv`](../evaluation/outputs/null_baselines_m35.csv). **Single-holdout:** RMSE for global / per-experiment / per-organism train-mean baselines on val & test (latter two **collapse to global** when val/test organisms are absent from train — documented in JSON). **LOOO:** per-fold RMSE for **global train mean excluding val organism** (48 folds). **Not included:** embedding nearest-neighbour baseline (§7.4) — add when modeling stack reads embeddings. **Re-run** when canonical or split protocols change. |
+| Done | **M4 — Embeddings** | Script [`embeddings/build_embedding_manifest_m4.py`](../embeddings/build_embedding_manifest_m4.py); committed manifest [`docs/embedding_manifest_m4.json`](embedding_manifest_m4.json) (per-file SHA-256, tensor shapes, coverage vs canonical `gene_key`). **Re-run** after changing canonical Parquet or replacing the `.pt` bundle. |
+| Done | **M4.5 — Training harness** | Entrypoint [`modeling/train.py`](../modeling/train.py) (docstring lists smoke flags). Modules: [`modeling/data.py`](../modeling/data.py) (Parquet stream, shuffle buffer, arm A/B row policy), [`modeling/embedding_store.py`](../modeling/embedding_store.py), [`modeling/model.py`](../modeling/model.py), [`modeling/metrics.py`](../modeling/metrics.py), [`modeling/split_protocol.py`](../modeling/split_protocol.py), [`modeling/media_vocab.py`](../modeling/media_vocab.py). Writes `runs/<run_id>/config.json`, `metrics.json`, `model.pt` (**`runs/`** gitignored). **Smoke:** cap train/val rows and vocab scan; **full M5:** remove caps, set `--epochs` / `--batch-size` as needed. |
+| **Next** | **M5 — Experiment 1** (§3.5) | Arm A vs B (same harness, different `--arm` / gates); full val row count; compare to M3.5 null with eyes open on row-set mismatch (see `metrics.json` note). |
+
+---
+
+## Harness — training and evaluation stack (living)
+
+This section is the **contract** for what we build **after M4** and **before** treating M5 as “done.” It stays aligned with §2.2 (weights + loss), §3.4–§3.5 (eval pitfalls, experiment 1), §7 (splits), §11.4 (`run_id`), and §17 (robustness). **Revise** when code paths land (file names, module layout).
+
+### H.1 Purpose — what the harness is and why it exists
+
+**M0–M4** deliver **data, splits, null baselines, and embedding provenance**. None of that **fits model parameters** or produces **val RMSE / within-gene Spearman** for a learned predictor.
+
+The **harness** is the shared code that:
+
+1. **Selects rows** by split protocol (train / val / test `orgId` sets from committed JSON under `splits/`).
+2. **Joins modalities** — `gene_key` → frozen ProteomeLM vector; condition side → initial encoding (e.g. `media` one-hot with **train-only** vocabulary).
+3. **Applies data policy** — §3.5 arm A (row weights from `cor12` and `|t|`) vs arm B (hard row filters); same loss family (Huber vs MSE) chosen and **held fixed** across arms when comparing.
+4. **Trains** one baseline architecture (gene path + condition path; §3.5).
+5. **Evaluates consistently** — val **RMSE**, **within-gene Spearman** + `n_genes_used_for_spearman` (§7.5); compare to **M3.5 nulls** on the **same** val rows and protocol.
+6. **Records provenance** — `run_id`, split protocol id, data arm, seed(s), canonical + embedding manifest hashes or paths as in §11.4.
+
+Without the harness, “experiment 1” remains a **spec**; with it, arm A vs B is an **honest** toggle on one codepath.
+
+### H.2 Scope — in vs out (restart v1)
+
+**In scope for the first harness version**
+
+- Regression on `fit`; frozen embeddings only (§4).
+- Read **`fitness_experiment_long.parquet`** (canonical_v0); optional later: benchmark-masked row filter (§12) as a **config flag**, not a forked script.
+- **Inner-join** on `gene_key` to embedding tensors; **log** counts of dropped rows (finding 7, §17).
+- **PyTorch** training with batched updates; **val** loader must not drop incomplete batches in a way that skews metrics (§3.4: `drop_last=False` on val or batch size 1).
+- Single **CLI + config** entrypoint (YAML/JSON/TOML or typed dataclass); outputs under e.g. `runs/<run_id>/` (`config.json`, `metrics.json`, optional checkpoints).
+
+**Explicitly out of scope until later milestones**
+
+- ProteomeLM fine-tuning (§4).
+- Embedding nearest-neighbour null (§7.4 / M3.5 deferral) — add when lookup is shared with training code.
+- LOOO **orchestration** (48 sequential runs) can be a thin shell script or job array **calling** the same entrypoint with different fold configs; the harness itself is **one run = one protocol file + one seed bundle**.
+
+### H.3 Components — what to implement
+
+**Status:** Initial implementation lives under [`modeling/`](../modeling/) (see execution table M4.5). Extend here when adding benchmark filters, chemistry features, or LOOO driver scripts.
+
+| Piece | Role |
+| ----- | ---- |
+| **Split loader** | Load `protocol.json` (or LOOO fold JSON); expose `train_org_ids`, `val_org_ids`, `test_org_ids` as sets. |
+| **Parquet stream or index** | Iterate canonical rows (batch iterator over columns needed: `orgId`, `gene_key` or `locusId`, `expName`, `fit`, `t`, `cor12`, `media`, …). Filter by split + arm B gates; attach arm A weights. |
+| **Embedding store** | Per `orgId`, load or mmap `*_proteomelm.pt`; map `gene_key` → row index in `embeddings` (build dict from `group_labels` once per org). |
+| **Condition encoder** | Train-only vocabulary for categorical fields; transform val/test with **unk** or mask policy **documented** in config. |
+| **Model** | Baseline MLP (or two-tower / residual baseline per §3.5); input dim = `D_embed + D_cond`. |
+| **Loss** | Huber or MSE; multiply per-sample loss by row weight when arm A. |
+| **Metrics** | Val RMSE; within-gene Spearman over val genes with ≥ `m` conditions (§7.5); store `n_genes_used`, exclusions. |
+| **Logging / run bundle** | Write `run_id`, git commit optional, paths to split + canonical manifests, hyperparameters, final metrics JSON for M6 table. |
+
+### H.4 DataLoader vs “just tensors”
+
+For **~27M** train rows, materialising the full train table in RAM is usually **not** the first step. Prefer:
+
+- **`IterableDataset`** (or equivalent) that **streams** Parquet batches, filters by `orgId` and policy, joins embedding row on the fly, yields `(x, y, weight)` tuples; wrap in **`DataLoader`** with `num_workers` tuned for storage (§3.4 NFS note).
+- **Smoke tests** on a **tiny** subset (one organism, subsampled rows) to verify loss decreases and val metrics match a hand check before scaling.
+
+The point is not a particular class name — it is **batched training** with **correct train shuffle** and **unbiased val enumeration**.
+
+### H.5 One entrypoint, many experiments
+
+Use **one** `train.py` (or `modeling/run_train.py`) and **config-driven** variants:
+
+- **Do not** copy-paste a new script per experiment; that duplicates metrics logic and invites train/val skew.
+- **Do** pass `run_id`, `split_protocol_path`, `data_arm` (`weighted_full` \| `strict_slice`), seeds, and model hyperparameters via config or CLI overrides.
+- **New experiments** (M5b) add configs or flags; shared **data + metrics + split** code lives in a small internal package (e.g. `modeling/`).
+
+### H.6 Deliverable checklist (harness “ready”)
+
+Treat the harness as **ready for M5** when all of the following are true:
+
+1. **Smoke run** — subsampled data, train loss decreases, val RMSE is finite.
+2. **Single-holdout protocol** — `organism_single_holdout_largest_v0`: val RMSE reported for **same** val `orgId` rows as in M3.5 global null (model vs null on **identical** row set).
+3. **Join audit** — log file or stdout: `n_rows_seen`, `n_rows_after_embedding_join`, `n_rows_after_arm_b_filter` (if any).
+4. **Spearman** — implemented with documented `m`; `n_genes_used` printed or in JSON.
+5. **Re-run** — same config + seed → same metrics within floating tolerance (or document non-determinism sources).
+
+**After** this checklist, execute §3.5 table (arm A vs B) and record results in the experiment memory (§3.x) and the future M6 benchmark table.
+
+---
+
+## Findings from M0–M4 (living)
+
+These observations **do not change the scientific goals** of the restart; they **tighten** how later milestones should be executed. Revise as more Phase 0 / modeling work completes.
+
+1. **Media workbook coverage.** On `(orgId, expName)`, **4797 / 7552** DB experiments match a row in the Excel `Experiments` sheet; **2755** have **no** Excel row; where both exist, **`media` strings agree** (see `data_analysis/outputs/phase0_summary.json`). **Implication:** chemistry / composition features (§8.2) must assume **partial join coverage** — explicit **unmapped** handling (flag, bucket, or manual map), not “every row has components.”
+
+2. **Organism imbalance.** Phase 0 sampling shows **very uneven row counts per `orgId`**. **Implication:** organism-level splits (§7) and LOOO need a **minimum val size** policy per organism (§17) or metrics will be **noisy** for sparse species.
+
+3. **Noise and weighting.** Many rows have **small `|t|`**; **`cor12`** is often **modest**; **`cor12` vs `|fit|`** shows **no tight coupling** (hexbin in `figures/phase0/`). **Implication:** **row weights** (`cor12`, `|t|`) and **Huber / robust loss** address **different failure modes** (§2.2). **Strict row filters** (§3.5 arm B) will **shrink** data materially — choose gates from **ECDFs** of `cor12` and `|t|`, not fixed example numbers alone.
+
+4. **Exploratory variance split (sample).** Sequential sum-of-squares on the systematic fitness sample gives **small** marginal fractions for `orgId` and for coarse experiment buckets (see `phase0_summary.json`). **Implication:** supports “hard conditional prediction” **qualitatively**; it is **not** the §5.1 gene × condition variance decomposition — still schedule proper mixed-model / ANOVA-style work when prioritised.
+
+5. **Benchmark (§12).** Under the **§12.1 heuristic**, hub media (e.g. LB / M9 family) **bridge many organisms** in the bipartite view (`figures/phase0/06_…`). **Implication:** reinforces moving to **§12.2** (organism degree ≥ **K** on the graph, documented **K**, before/after counts) as the **versioned** benchmark definition; treat §12.1 as a **starting filter**, not the final spec.
+
+6. **Workflow alignment.** Phase 0 EDA ran from **SQLite** before canonical Parquet existed. **Implication:** when refreshing figures, **prefer reading `canonical_v0`** (`data/derived/canonical/v0/`) so plots match **exactly** what M3 / M5 consume.
+
+7. **Embedding bundle vs canonical gene keys (M4).** All **48** `*_proteomelm.pt` files map to canonical `orgId`s with **no orphan files** either way. Comparing **unique** `orgId:locusId` keys in `fitness_experiment_long.parquet` to each file’s `group_labels`: **~2.5k** canonical keys are **missing** from embeddings (order **10⁻²** of canonical genes per organism in typical cases); embeddings contain **many extra** keys vs the inner-joined fitness table (**~4×10⁴** aggregate — expected if ProteomeLM was run on a **broader** gene catalog than rows surviving GeneFitness ⋈ Experiment). **Implication:** training/eval must **inner-join** on `gene_key` (or define an explicit drop/impute policy); §17 “assert every training row has an embedding” is a **hard gate** to enforce in the dataloader with a logged drop count.
+
 ---
 
 ## 0. Project goal and scientific context
@@ -283,6 +397,8 @@ Regression is **strictly harder** and **not comparable** to classification numbe
 
 ### 3.5 Restart — **experiment 1** (first modeling run after Phase 0)
 
+**Implementation:** Runs **inside** the shared **training harness** (**§Harness**). Arm A vs B is a **config / data-policy** switch on the same codepath, not separate scripts.
+
 **Goal:** Decide empirically whether **keeping noisy rows with smooth weights** helps more than it hurts, before layering fancier losses or architectures.
 
 **Setup (fixed across arms):** One **baseline architecture** with an explicit **gene pathway** and **condition pathway** (e.g. residual / two-tower style: gene embedding → gene-level baseline; condition features → offset; concat or sum — match whatever you adopt as “baseline” in code). Same **split protocol**, **hyperparameters**, **seeds** (or same seed list) wherever possible.
@@ -409,6 +525,18 @@ Gene-cluster (**mmseqs**) splits were used in the old regression harness for “
 
 RMSE/MAE; **Δ vs protocol-specific null RMSE**; within-gene Spearman + **`n_genes_used_for_spearman`**; stratify by minimum condition count in val; per-organism breakdown for LOOO.
 
+**Within-gene Spearman — aggregating across genes (policy).**
+
+- For each gene (typically each `(orgId, locusId)` on **val**), compute Spearman correlation between predicted and true `fit` across **that gene’s** condition-level observations. That yields one **ρ_g** per gene.
+
+- **Dominance issue:** If you **average ρ_g** with **equal weight per gene**, each gene already gets **one vote**; very large genes do **not** get extra votes. If instead you **pool all val rows** into one global Spearman, genes with **more rows dominate** — avoid that as the **primary** readout for “conditional ranking.”
+
+- **Minimum conditions:** Require at least **`m` distinct experiments** (or rows) for a gene on **val** to include it; otherwise Spearman is unstable or undefined. Report **`n_genes_used_for_spearman`** (genes that passed **`m`**).
+
+- **Optional: cap conditions per gene (random subsample).** For genes with **many** val conditions, you may **subsample** down to **`m_max`** conditions (fixed **seed**, documented) and compute ρ_g on that subset. That **changes the estimand** (ranking on a **partial** condition set) but makes high-N genes **comparable** to medium-N genes. Use as a **sensitivity** metric alongside the **full-val** ρ_g.
+
+- **Downweighting by N?** Per-gene weights **inversely proportional** to the number of val conditions are **less standard** and harder to interpret than **equal weight per gene** or an explicit **subsampling** policy. Prefer **equal-weight mean or median of ρ_g** over eligible genes, plus **bootstrap CI across genes** if needed.
+
 ---
 
 ## 8. Condition encoding: chemistry + stressors
@@ -529,6 +657,18 @@ Run these in **CI** on a **tiny fixture** (subset Parquet + fake embeddings) so 
 
 **Intent:** Reduce **organism ↔ medium shortcutting** by restricting to media that appear for **multiple** organisms (exact count **TBD** in Phase 0, e.g. ≥ 2 or ≥ 3 organisms).
 
+### 12.0 What this “benchmark” is (plain language)
+
+- **The problem:** If each bacterium mostly has **its own private medium names**, a model can learn **“which species am I?”** from the condition encoding instead of **how chemistry relates to fitness**. That makes validation **misleading** for the scientific goal (conditional essentiality across **shared** environments).
+
+- **What we call the benchmark here:** A **subset of experiments (and thus fitness rows)** used for **fair comparison** of models — same filters, same train/val rules — not the full Fitness Browser dump. The milestone **M6 “benchmark table”** is the scorecard **on that subset** (and on a named **split protocol**).
+
+- **§12.1 (v1 heuristic):** A **quick, rule-based** subset: e.g. only media whose **name starts with** LB / M9 / RCH2, **`cor12` ≥ 0.2**, drop `plant`, drop Potato Dextrose Broth. It is a **practical starting point** from older work.
+
+- **§12.2 (robust / restart target):** Build the **organism ↔ medium bipartite graph** after quality filters, then keep only media that appear for **at least K different organisms** (choose **K** from the graph — e.g. 2 or 3). **Document K** and **row counts before/after**. Optionally show the **prefix rule** is **redundant** (already implied by K) or **harmful** (drops truly shared media) — then **bump benchmark version** in the manifest when the definition changes.
+
+- **Relation to modeling:** Training and null baselines (§7.4) should **declare which benchmark build** they use (e.g. `benchmark_v1_prefix` vs `benchmark_v2_K3`) so numbers stay comparable.
+
 ### 12.1 v1 heuristic (starting point only)
 
 
@@ -563,7 +703,8 @@ Run these in **CI** on a **tiny fixture** (subset Parquet + fake embeddings) so 
 | M3   | Splits                  | **Organism-level** index files per protocol (no mmseqs in default pipeline) |
 | M3.5 | Null baselines          | **Per protocol**, once — stored table for all models                      |
 | M4   | Embeddings              | Use §1.4 or regenerate + manifest                                         |
-| M5   | **Experiment 1** (§3.5) | Weighted-full vs strict-slice, same gene+condition baseline               |
+| M4.5 | **Training harness**    | §Harness — [`modeling/train.py`](../modeling/train.py): Parquet stream, splits, embeddings, val RMSE + within-gene Spearman vs M3.5 null (see `metrics.json` note) |
+| M5   | **Experiment 1** (§3.5) | Weighted-full vs strict-slice, same gene+condition baseline (inside harness) |
 | M5b  | Baseline + follow-ons   | Other architectures / losses after noise design is clear                  |
 | M6   | Benchmark table         | Nulls + experiment 1 + later models; tag each row with **evaluation protocol** (split + benchmark version) |
 
@@ -578,12 +719,13 @@ Python ≥ 3.10, PyTorch, pandas/pyarrow, scipy, openpyxl; ProteomeLM + GPU for 
 
 ## 15. Open questions
 
-- Functional form for **cor12** and **t** weights (and floors/caps).
-- **K** organisms for “connected medium” and whether prefix filter is **redundant** after graph filter.
-- Chemical vocabulary size and handling of **unmapped** media.
+- Functional form for **cor12** and **t** weights (and floors/caps) — **inform from ECDFs** (Phase 0); example gates in §3.5 are not fixed without data.
+- **K** organisms for “connected medium” and whether prefix filter is **redundant** after graph filter — **priority:** pick **K** from organism–medium degree distribution (§12.2) and version the benchmark.
+- Chemical vocabulary size and handling of **unmapped** media — **now constrained:** ~2755 experiments lack an Excel `Experiments` row; need explicit policy (see **Findings from M0–M4**).
 - Whether to add **temperature / concentration** buckets to the default feature vector.
 - Whether a **second ProteomeLM hidden layer** (separate `.pt` directory) improves over layer 8 for regression or multitask.
-- LOOO feasibility per organism (minimum rows for stable metrics).
+- LOOO feasibility per organism (**minimum rows / genes** for stable metrics) — **elevated:** organism imbalance observed in Phase 0.
+- **Within-gene Spearman:** choose **`m`** (minimum val conditions) and whether to report **subsampled** ρ_g (§7.5).
 - Licensing for additional Tn-Seq sources.
 
 ---
@@ -594,7 +736,7 @@ Success is **always defined relative to the null baseline on the same val set an
 
 1. Phase 0 completes variance decomposition + **visual** elucidation + **verified** media composition + **graph-based** connected-media benchmark.
 2. **Regression:** val RMSE **meaningfully below** **null RMSE** (same split, same rows) — report **absolute Δ** and **relative %** (e.g. “10% reduction vs global mean”). **Do not** hard-code a numeric ceiling such as 0.80; null RMSE **changes** with subset and split.
-3. **Within-gene Spearman** is clearly positive (e.g. ρ above zero with CI or permutation check) with **`n_genes_used_for_spearman`**; optionally compare to a **permutation** or **shuffle** baseline.
+3. **Within-gene Spearman** is clearly positive (e.g. ρ above zero with CI or permutation check) with **`n_genes_used_for_spearman`** and a documented **minimum val conditions per gene** (§7.5); optionally compare to a **permutation** or **shuffle** baseline; optional **subsampled** ρ_g sensitivity as in §7.5.
 4. Reproducible benchmark table: manifest + code + this document.
 
 **Stretch:** B1 condition-held-out; multi-task helps or is neutral; chemistry features beat string one-hot on matched protocols.
@@ -611,9 +753,10 @@ Success is **always defined relative to the null baseline on the same val set an
 - **Class imbalance:** Multitask binary head will be **very imbalanced** (rare “tail” rows); report **AUPRC** / balanced metrics, not accuracy alone.
 - **Embedding coverage:** Assert **every** training row’s `gene_key` exists in the embedding store; log **dropped row count** if not.
 - **Sign / convention:** Confirm `fit` sign convention (negative = defect) matches across **all** merged tables and loss definitions.
-- **Organism-level minimum N:** Before LOOO, define **minimum val rows (or genes)** per organism; exclude or merge sparse organisms so metrics are not noise.
+- **Organism-level minimum N:** Before LOOO, define **minimum val rows (or genes)** per organism; exclude or merge sparse organisms so metrics are not noise (**Phase 0:** strong `orgId` imbalance).
+- **Within-gene Spearman eligibility:** Enforce **minimum val conditions per gene**; document **equal-weight** aggregation across genes vs any **subsampling cap** (§7.5).
 - **Negative controls:** Optional **label shuffle** or **gene↔embedding shuffle** on val to show the model beats a broken baseline.
 
 ---
 
-*Last updated: 2026-04-04. Living document — revise as we learn.*
+*Last updated: 2026-04-05 (M4.5 training harness in `modeling/`). Living document — revise as we learn.*

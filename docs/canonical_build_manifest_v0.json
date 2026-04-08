@@ -1,0 +1,41 @@
+{
+  "manifest_version": 1,
+  "build_id": "canonical_v0",
+  "description": "GeneFitness INNER JOIN Experiment; media composition from Excel sidecars.",
+  "generated_utc": "2026-04-05T20:24:37Z",
+  "chunk_rows": 400000,
+  "max_rowid_effective": 27410721,
+  "inputs_expected_sha256_from_M0": {
+    "data/raw/feba.db": "627f209766c760f9747bda779bdd5e6af13a6195a15765c9e931b5c11183c077",
+    "data/raw/aaseqs": "c6bd3a13ab3019cf19d440b3ddc463b486707f3b8661c86ed58f2483d8c71f61",
+    "data/media_composition.xlsx": "b694685aa5a3a82c8108e869fb07963f15cc5fc9794c9c5005ccc07926c8284a"
+  },
+  "outputs": [
+    {
+      "path": "data/derived/canonical/v0/fitness_experiment_long.parquet",
+      "bytes": 805220433,
+      "sha256": "9b981201deee41a0f34c6ae366dc3f6c955f82589a6dafa56301d9c9ab1bd3b6",
+      "rows": 27410721
+    },
+    {
+      "path": "data/derived/canonical/v0/experiments.parquet",
+      "bytes": 1010017,
+      "sha256": "48d30b10b408ed3c2b99da6eee76c3ebcf528a165ae0cbda5debbe0ed209c704",
+      "rows": 7552
+    },
+    {
+      "path": "data/derived/canonical/v0/media_master.parquet",
+      "bytes": 6330,
+      "sha256": "43f9b2b018a1eae372fa571927e00989179817145063df72451c7c90a5b4de6f",
+      "rows": 45
+    },
+    {
+      "path": "data/derived/canonical/v0/media_components_long.parquet",
+      "bytes": 10677,
+      "sha256": "34886f10a24d4290d51019225c162c3cbd2ebeb9aeafd87b0c3b3481ffb984cb",
+      "rows": 422
+    }
+  ],
+  "dtypes_policy": "SQLite PRAGMA table_info: INT/REAL \u2192 float64; TEXT \u2192 pandas string; derived gene_key text, abs_t float64, has_media_composition bool.",
+  "columns_fitness_long_note": "gf orgId,locusId,expName,fit,t plus all Experiment columns except orgId/expName; plus gene_key, abs_t, has_media_composition."
+}

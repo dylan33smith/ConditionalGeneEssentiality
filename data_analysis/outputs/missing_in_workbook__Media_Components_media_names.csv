@@ -1,0 +1,77 @@
+Media,n_experiments,n_orgs
+Varel_Bryant_medium_Glucose,239,1
+BHIS,129,1
+Varel_Bryant_medium,112,1
+Dv_base_medium,111,1
+MoLS4_no_ammonium,110,1
+MOPS minimal media_Glucose_noNitrogen,104,1
+Mc_defined_H2,86,2
+Mc_defined_formate,76,2
+Mc_H2_N_Free,68,2
+,61,6
+Potato tuber,53,3
+KB,46,2
+McCas_H2_complete,39,2
+Dv_base_Y_medium,36,1
+Mc_formate,36,1
+McCas,34,2
+MG minimal media_noIron,34,1
+M9_1percentGlucose,22,1
+Potato stem,22,1
+RCH2_Lactate_Nitrate_YE,21,1
+Varel_Bryant_medium_noNitrogen,19,1
+Potato Dextrose Broth,18,3
+McCas_H2_Fe_Free,18,2
+McCas_formate_Fe_Free,18,2
+McCas_H2_No_Na2S,17,1
+McCas_formate_complete,15,2
+MoLS4_no_vitamins,15,1
+McCas_MOPS,12,2
+Mc_formate_N_Free,12,2
+RCH2_Lactate_1_M_Fe-Cu,12,1
+RCH2_defined_noCarbon_noVitamins,12,1
+M63_quarter_strength,11,4
+DinoMM_L_lactateCarbon_HighNutrient,11,2
+CPG,10,4
+MoYLS4_no_iron,9,1
+RCH2_defined_glucose_noVitamin,8,4
+Dv_base_medium_no_Mo_no_W,7,1
+M9+polygalacturonate,6,2
+M9+starch,6,2
+M9+sucrose,6,2
+McAA_formate,6,2
+McAA_formate_No_B12,6,2
+McAA_formate_No_CaPantothenate,6,2
+McAA_formate_No_FolicAcid,6,2
+McAA_formate_No_NicotinicAcid,6,2
+McAA_formate_No_Pyroxidine,6,2
+McAA_formate_No_Riboflavin,6,2
+McAA_formate_No_Thiamine,6,2
+McAA_formate_No_biotin,6,2
+McAA_formate_No_lipolicAcid,6,2
+McAA_formate_No_pABA,6,2
+MoLS4_no_B12,6,1
+MoLS4_no_Choline_chloride,6,1
+MoLS4_no_ammonium_no_Mo_no_W,6,1
+MoLS4_no_ammonium_no_W,6,1
+RCH2_Lactate_YE_1_M_Fe-Cu,6,1
+Dv_base_medium_no_W,5,1
+MoLS4_no_Folic_acid,5,1
+MoLS4_no_Pantothenic_acid,5,1
+MoLS4_no_Pyridoxine,5,1
+M63_no_sulfur,4,1
+DinoMM_L_lactateCarbon_HighNutrient_noVitamin,3,2
+Dv_base_medium_no_Mo,3,1
+LS4D,3,1
+McCas_Formate_complete,3,1
+MoLS4_no_Biotin,3,1
+MoLS4_no_Mo,3,1
+MoLS4_no_Mo_no_W,3,1
+MoLS4_no_W,3,1
+MoLS4_no_ammonium_no_Mo,3,1
+MoLS4_no_lipoic_acid,3,1
+MoLS4_no_nicotinic_acid,3,1
+MoLS4_no_sulfide,3,1
+MoLS4_no_thiamine,3,1
+MG minimal media,1,1
+MG minimal media_noCarbon,1,1

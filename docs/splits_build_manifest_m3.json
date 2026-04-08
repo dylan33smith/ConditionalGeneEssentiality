@@ -1,0 +1,16 @@
+{
+  "manifest_version": 1,
+  "milestone": "M3",
+  "generated_utc": "2026-04-05T22:58:31Z",
+  "canonical_fitness_parquet": "data/derived/canonical/v0/fitness_experiment_long.parquet",
+  "canonical_total_rows_read": 27410721,
+  "n_distinct_orgId": 48,
+  "organism_single_holdout_largest_v0": {
+    "protocol_path": "splits/organism_single_holdout_largest_v0/protocol.json",
+    "n_train_orgs": 46
+  },
+  "organism_looo_v0": {
+    "protocol_path": "splits/organism_looo_v0/protocol.json",
+    "n_folds": 48
+  }
+}

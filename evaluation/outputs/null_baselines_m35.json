@@ -1,0 +1,386 @@
+{
+  "manifest_version": 1,
+  "milestone": "M3.5",
+  "generated_utc": "2026-04-05T23:08:42Z",
+  "canonical_fitness_parquet": "data/derived/canonical/v0/fitness_experiment_long.parquet",
+  "canonical_fitness_sha256_expected": "9b981201deee41a0f34c6ae366dc3f6c955f82589a6dafa56301d9c9ab1bd3b6",
+  "baselines_documented": [
+    "global_train_mean",
+    "per_experiment_train_mean_with_fallback",
+    "per_organism_train_mean_with_fallback"
+  ],
+  "organism_single_holdout_largest_v0": {
+    "protocol_path": "splits/organism_single_holdout_largest_v0/protocol.json",
+    "val": {
+      "slice": "val",
+      "n_rows": 2104545,
+      "global_train_mean": -0.0963799214902768,
+      "n_train_rows_used": 23231239,
+      "rmse_global_train_mean": 0.5668274976346587,
+      "rmse_per_experiment_train_mean": 0.5668274976346587,
+      "rmse_per_organism_train_mean": 0.5668274976346587,
+      "n_val_rows_fallback_per_experiment_baseline": 2104545,
+      "n_val_rows_fallback_per_organism_baseline": 2104545,
+      "note": "Fallback = global train mean when no train rows share (orgId, expName) or orgId."
+    },
+    "test": {
+      "slice": "test",
+      "n_rows": 2074937,
+      "global_train_mean": -0.0963799214902768,
+      "n_train_rows_used": 23231239,
+      "rmse_global_train_mean": 0.5762984156679077,
+      "rmse_per_experiment_train_mean": 0.5762984156679077,
+      "rmse_per_organism_train_mean": 0.5762984156679077,
+      "n_val_rows_fallback_per_experiment_baseline": 2074937,
+      "n_val_rows_fallback_per_organism_baseline": 2074937,
+      "note": "Fallback = global train mean when no train rows share (orgId, expName) or orgId."
+    }
+  },
+  "organism_looo_v0": {
+    "note": "LOOO table lists global train mean excluding val organism only. Per-experiment / per-organism baselines coincide with global for organism-cold val rows.",
+    "summary": {
+      "n_folds": 48,
+      "mean_rmse_global_train_mean_across_folds": 0.6280115490474726,
+      "min_rmse": 0.37882239561156256,
+      "max_rmse": 1.2293139595485996
+    },
+    "folds": [
+      {
+        "val_org_id": "ANA3",
+        "n_val_rows": 392476,
+        "train_rows_excluded_val_org": 27018245,
+        "global_train_mean_excluding_val_org": -0.09583079496444098,
+        "rmse_global_train_mean": 0.9552879875720505
+      },
+      {
+        "val_org_id": "BFirm",
+        "n_val_rows": 613364,
+        "train_rows_excluded_val_org": 26797357,
+        "global_train_mean_excluding_val_org": -0.09686381719612075,
+        "rmse_global_train_mean": 0.6211963606325337
+      },
+      {
+        "val_org_id": "Btheta",
+        "n_val_rows": 2104545,
+        "train_rows_excluded_val_org": 25306176,
+        "global_train_mean_excluding_val_org": -0.09660163464171158,
+        "rmse_global_train_mean": 0.5668271426096373
+      },
+      {
+        "val_org_id": "Burk376",
+        "n_val_rows": 154590,
+        "train_rows_excluded_val_org": 27256131,
+        "global_train_mean_excluding_val_org": -0.09680231500775081,
+        "rmse_global_train_mean": 0.5671446284430071
+      },
+      {
+        "val_org_id": "Caulo",
+        "n_val_rows": 655776,
+        "train_rows_excluded_val_org": 26754945,
+        "global_train_mean_excluding_val_org": -0.09863692995224449,
+        "rmse_global_train_mean": 0.8600430943400148
+      },
+      {
+        "val_org_id": "Cola",
+        "n_val_rows": 798708,
+        "train_rows_excluded_val_org": 26612013,
+        "global_train_mean_excluding_val_org": -0.09755197836315505,
+        "rmse_global_train_mean": 0.5093585330084932
+      },
+      {
+        "val_org_id": "Cup4G11",
+        "n_val_rows": 676704,
+        "train_rows_excluded_val_org": 26734017,
+        "global_train_mean_excluding_val_org": -0.09748470729416317,
+        "rmse_global_train_mean": 0.48668535496735493
+      },
+      {
+        "val_org_id": "Dda3937",
+        "n_val_rows": 214890,
+        "train_rows_excluded_val_org": 27195831,
+        "global_train_mean_excluding_val_org": -0.096721893591314,
+        "rmse_global_train_mean": 0.5879664064334298
+      },
+      {
+        "val_org_id": "Ddia6719",
+        "n_val_rows": 116424,
+        "train_rows_excluded_val_org": 27294297,
+        "global_train_mean_excluding_val_org": -0.09685517759505725,
+        "rmse_global_train_mean": 0.42905374349453723
+      },
+      {
+        "val_org_id": "DdiaME23",
+        "n_val_rows": 259509,
+        "train_rows_excluded_val_org": 27151212,
+        "global_train_mean_excluding_val_org": -0.09668042615491801,
+        "rmse_global_train_mean": 0.45793050641189015
+      },
+      {
+        "val_org_id": "Dino",
+        "n_val_rows": 592782,
+        "train_rows_excluded_val_org": 26817939,
+        "global_train_mean_excluding_val_org": -0.0975853409193297,
+        "rmse_global_train_mean": 0.48531938925679124
+      },
+      {
+        "val_org_id": "DvH",
+        "n_val_rows": 2074937,
+        "train_rows_excluded_val_org": 25335784,
+        "global_train_mean_excluding_val_org": -0.09646452484136143,
+        "rmse_global_train_mean": 0.5762980249119859
+      },
+      {
+        "val_org_id": "Dyella79",
+        "n_val_rows": 246500,
+        "train_rows_excluded_val_org": 27164221,
+        "global_train_mean_excluding_val_org": -0.09662451302457584,
+        "rmse_global_train_mean": 0.6456300584966123
+      },
+      {
+        "val_org_id": "HerbieS",
+        "n_val_rows": 372384,
+        "train_rows_excluded_val_org": 27038337,
+        "global_train_mean_excluding_val_org": -0.09668425648282389,
+        "rmse_global_train_mean": 0.6550068306975144
+      },
+      {
+        "val_org_id": "Kang",
+        "n_val_rows": 216324,
+        "train_rows_excluded_val_org": 27194397,
+        "global_train_mean_excluding_val_org": -0.09697078678290481,
+        "rmse_global_train_mean": 0.7985916681080342
+      },
+      {
+        "val_org_id": "Keio",
+        "n_val_rows": 636552,
+        "train_rows_excluded_val_org": 26774169,
+        "global_train_mean_excluding_val_org": -0.09570767789687766,
+        "rmse_global_train_mean": 0.7208082271584718
+      },
+      {
+        "val_org_id": "Korea",
+        "n_val_rows": 549666,
+        "train_rows_excluded_val_org": 26861055,
+        "global_train_mean_excluding_val_org": -0.09681718902810907,
+        "rmse_global_train_mean": 0.5694078570638471
+      },
+      {
+        "val_org_id": "Koxy",
+        "n_val_rows": 958464,
+        "train_rows_excluded_val_org": 26452257,
+        "global_train_mean_excluding_val_org": -0.09634518381604422,
+        "rmse_global_train_mean": 0.7184380297130795
+      },
+      {
+        "val_org_id": "MR1",
+        "n_val_rows": 665632,
+        "train_rows_excluded_val_org": 26745089,
+        "global_train_mean_excluding_val_org": -0.09555474746718998,
+        "rmse_global_train_mean": 0.8605924087238345
+      },
+      {
+        "val_org_id": "Magneto",
+        "n_val_rows": 115956,
+        "train_rows_excluded_val_org": 27294765,
+        "global_train_mean_excluding_val_org": -0.09672237013317896,
+        "rmse_global_train_mean": 0.5052758423399323
+      },
+      {
+        "val_org_id": "Marino",
+        "n_val_rows": 930750,
+        "train_rows_excluded_val_org": 26479971,
+        "global_train_mean_excluding_val_org": -0.09874655359830112,
+        "rmse_global_train_mean": 0.462271737590468
+      },
+      {
+        "val_org_id": "Methanococcus_JJ",
+        "n_val_rows": 178407,
+        "train_rows_excluded_val_org": 27232314,
+        "global_train_mean_excluding_val_org": -0.093677653606207,
+        "rmse_global_train_mean": 1.2293139595485996
+      },
+      {
+        "val_org_id": "Methanococcus_S2",
+        "n_val_rows": 461524,
+        "train_rows_excluded_val_org": 26949197,
+        "global_train_mean_excluding_val_org": -0.09092639103601417,
+        "rmse_global_train_mean": 1.2277264515885893
+      },
+      {
+        "val_org_id": "Miya",
+        "n_val_rows": 450518,
+        "train_rows_excluded_val_org": 26960203,
+        "global_train_mean_excluding_val_org": -0.09677673900305266,
+        "rmse_global_train_mean": 0.6920331027037787
+      },
+      {
+        "val_org_id": "PS",
+        "n_val_rows": 202319,
+        "train_rows_excluded_val_org": 27208402,
+        "global_train_mean_excluding_val_org": -0.09518629780833547,
+        "rmse_global_train_mean": 0.7415909176037184
+      },
+      {
+        "val_org_id": "PV4",
+        "n_val_rows": 481440,
+        "train_rows_excluded_val_org": 26929281,
+        "global_train_mean_excluding_val_org": -0.09698228050389504,
+        "rmse_global_train_mean": 0.8531175193028758
+      },
+      {
+        "val_org_id": "Pedo557",
+        "n_val_rows": 782871,
+        "train_rows_excluded_val_org": 26627850,
+        "global_train_mean_excluding_val_org": -0.09688019054233045,
+        "rmse_global_train_mean": 0.606335159807656
+      },
+      {
+        "val_org_id": "Phaeo",
+        "n_val_rows": 849126,
+        "train_rows_excluded_val_org": 26561595,
+        "global_train_mean_excluding_val_org": -0.09684965142914723,
+        "rmse_global_train_mean": 0.5520703876136411
+      },
+      {
+        "val_org_id": "Ponti",
+        "n_val_rows": 383240,
+        "train_rows_excluded_val_org": 27027481,
+        "global_train_mean_excluding_val_org": -0.09699826080736591,
+        "rmse_global_train_mean": 0.5278670250029927
+      },
+      {
+        "val_org_id": "Putida",
+        "n_val_rows": 1433400,
+        "train_rows_excluded_val_org": 25977321,
+        "global_train_mean_excluding_val_org": -0.0977859934185202,
+        "rmse_global_train_mean": 0.5499800220171052
+      },
+      {
+        "val_org_id": "RalstoniaBSBF1503",
+        "n_val_rows": 30232,
+        "train_rows_excluded_val_org": 27380489,
+        "global_train_mean_excluding_val_org": -0.09671282317675176,
+        "rmse_global_train_mean": 0.45306847106985043
+      },
+      {
+        "val_org_id": "RalstoniaGMI1000",
+        "n_val_rows": 27860,
+        "train_rows_excluded_val_org": 27382861,
+        "global_train_mean_excluding_val_org": -0.0966895818989318,
+        "rmse_global_train_mean": 0.4595241929047242
+      },
+      {
+        "val_org_id": "RalstoniaPSI07",
+        "n_val_rows": 32232,
+        "train_rows_excluded_val_org": 27378489,
+        "global_train_mean_excluding_val_org": -0.09672224918947207,
+        "rmse_global_train_mean": 0.4735791568313468
+      },
+      {
+        "val_org_id": "RalstoniaUW163",
+        "n_val_rows": 22770,
+        "train_rows_excluded_val_org": 27387951,
+        "global_train_mean_excluding_val_org": -0.09671117344868968,
+        "rmse_global_train_mean": 0.37882239561156256
+      },
+      {
+        "val_org_id": "SB2B",
+        "n_val_rows": 592990,
+        "train_rows_excluded_val_org": 26817731,
+        "global_train_mean_excluding_val_org": -0.09589797260917905,
+        "rmse_global_train_mean": 0.7564508943304111
+      },
+      {
+        "val_org_id": "Smeli",
+        "n_val_rows": 461970,
+        "train_rows_excluded_val_org": 26948751,
+        "global_train_mean_excluding_val_org": -0.09678514372055019,
+        "rmse_global_train_mean": 0.7184066945487885
+      },
+      {
+        "val_org_id": "SynE",
+        "n_val_rows": 244971,
+        "train_rows_excluded_val_org": 27165750,
+        "global_train_mean_excluding_val_org": -0.0952017989271781,
+        "rmse_global_train_mean": 0.9370406269830207
+      },
+      {
+        "val_org_id": "SyringaeB728a",
+        "n_val_rows": 198444,
+        "train_rows_excluded_val_org": 27212277,
+        "global_train_mean_excluding_val_org": -0.09683854281547943,
+        "rmse_global_train_mean": 0.4972769637868495
+      },
+      {
+        "val_org_id": "SyringaeB728a_mexBdelta",
+        "n_val_rows": 98486,
+        "train_rows_excluded_val_org": 27312235,
+        "global_train_mean_excluding_val_org": -0.09681269308084586,
+        "rmse_global_train_mean": 0.4264494598293104
+      },
+      {
+        "val_org_id": "WCS417",
+        "n_val_rows": 888219,
+        "train_rows_excluded_val_org": 26522502,
+        "global_train_mean_excluding_val_org": -0.09780638036384051,
+        "rmse_global_train_mean": 0.5333436953967736
+      },
+      {
+        "val_org_id": "acidovorax_3H11",
+        "n_val_rows": 550900,
+        "train_rows_excluded_val_org": 26859821,
+        "global_train_mean_excluding_val_org": -0.09725761232882409,
+        "rmse_global_train_mean": 0.5511356333093459
+      },
+      {
+        "val_org_id": "azobra",
+        "n_val_rows": 439803,
+        "train_rows_excluded_val_org": 26970918,
+        "global_train_mean_excluding_val_org": -0.09698866170850289,
+        "rmse_global_train_mean": 0.5814881245046357
+      },
+      {
+        "val_org_id": "psRCH2",
+        "n_val_rows": 1172150,
+        "train_rows_excluded_val_org": 26238571,
+        "global_train_mean_excluding_val_org": -0.09730586943097945,
+        "rmse_global_train_mean": 0.628295237151265
+      },
+      {
+        "val_org_id": "pseudo13_GW456_L13",
+        "n_val_rows": 461100,
+        "train_rows_excluded_val_org": 26949621,
+        "global_train_mean_excluding_val_org": -0.09633811089277983,
+        "rmse_global_train_mean": 0.6551826980633111
+      },
+      {
+        "val_org_id": "pseudo1_N1B4",
+        "n_val_rows": 637392,
+        "train_rows_excluded_val_org": 26773329,
+        "global_train_mean_excluding_val_org": -0.0974844196359817,
+        "rmse_global_train_mean": 0.4824230386342474
+      },
+      {
+        "val_org_id": "pseudo3_N2E3",
+        "n_val_rows": 1060908,
+        "train_rows_excluded_val_org": 26349813,
+        "global_train_mean_excluding_val_org": -0.09747390137197154,
+        "rmse_global_train_mean": 0.4840284626373888
+      },
+      {
+        "val_org_id": "pseudo5_N2C3_1",
+        "n_val_rows": 955512,
+        "train_rows_excluded_val_org": 26455209,
+        "global_train_mean_excluding_val_org": -0.09708795916725926,
+        "rmse_global_train_mean": 0.5325246284317424
+      },
+      {
+        "val_org_id": "pseudo6_N2E2",
+        "n_val_rows": 965004,
+        "train_rows_excluded_val_org": 26445717,
+        "global_train_mean_excluding_val_org": -0.09759333748227823,
+        "rmse_global_train_mean": 0.576345603091631
+      }
+    ]
+  }
+}

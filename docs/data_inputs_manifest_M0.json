@@ -1,0 +1,280 @@
+{
+  "manifest_version": 1,
+  "milestone": "M0",
+  "description": "Checksum-stable record of raw inputs and optional ProteomeLM layer-8 tensors (paths relative to repo root).",
+  "generated_utc": "2026-04-05T18:53:28Z",
+  "required_inputs": [
+    {
+      "path": "data/raw/feba.db",
+      "bytes": 7355472896,
+      "sha256": "627f209766c760f9747bda779bdd5e6af13a6195a15765c9e931b5c11183c077",
+      "status": "present"
+    },
+    {
+      "path": "data/raw/aaseqs",
+      "bytes": 77765844,
+      "sha256": "c6bd3a13ab3019cf19d440b3ddc463b486707f3b8661c86ed58f2483d8c71f61",
+      "status": "present"
+    },
+    {
+      "path": "data/media_composition.xlsx",
+      "bytes": 474795,
+      "sha256": "b694685aa5a3a82c8108e869fb07963f15cc5fc9794c9c5005ccc07926c8284a",
+      "status": "present"
+    }
+  ],
+  "optional_proteomelm_embeddings": {
+    "relative_directory": "data/processed/ProtLM_embeddings_layer8",
+    "model_note": "v1 used Bitbol-Lab/ProteomeLM-L; restart plan section 1.4",
+    "layer_index": 8,
+    "embedding_dim": 1152,
+    "keys_observed": [
+      "embeddings",
+      "group_labels"
+    ],
+    "file_count": 48,
+    "directory_total_bytes": 515913249,
+    "files": [
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/ANA3_proteomelm.pt",
+        "bytes": 10142369,
+        "sha256": "2c69b70d6e3bdf820470cde2349852ba5d9d92965203ba6c8759ae3da73610e0"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/BFirm_proteomelm.pt",
+        "bytes": 16756584,
+        "sha256": "d1739b684a9421d7bf5dfae4a208f3ebae92e2b52e69b447acd7758bc39b478e"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Btheta_proteomelm.pt",
+        "bytes": 11207855,
+        "sha256": "27a495363dcad47403c1136f6294468c4f0310c2fe1c31a32091ccce39f0ddb4"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Burk376_proteomelm.pt",
+        "bytes": 15320054,
+        "sha256": "d7980a14ddb009760d5664d08ff8b21d48f44826a3c6f3dc29763abe7391e376"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Caulo_proteomelm.pt",
+        "bytes": 9055400,
+        "sha256": "0cfd157e34a7407806cb13e3cf2e15a78c748b74d7498884adfe0be0273455cf"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Cola_proteomelm.pt",
+        "bytes": 10772641,
+        "sha256": "6490fd912b680fa87db90d860e8402843964767f4e93ca4e3919b650f2278662"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Cup4G11_proteomelm.pt",
+        "bytes": 17174582,
+        "sha256": "964dd36ba32981a7fb60f430ee2f795da17563f37b533840572576112579d83f"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Dda3937_proteomelm.pt",
+        "bytes": 9846774,
+        "sha256": "e2aff6328f7ad6e83c27b30b7b920d7262ddf4cb67b9211c0f42f2b8254776af"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Ddia6719_proteomelm.pt",
+        "bytes": 9601981,
+        "sha256": "38747e2f6195976f8d6b3ae248d1a5dae3ad5035b247d9df2e105f2adb1a7d37"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/DdiaME23_proteomelm.pt",
+        "bytes": 9770173,
+        "sha256": "d4ff6156481a434c9b0cad788c2563585837581d169dacb5143bf6d1406e205b"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Dino_proteomelm.pt",
+        "bytes": 9751585,
+        "sha256": "500b3639f697dc153b8420007f81b876806af59551d463c8178239e0a32c9426"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/DvH_proteomelm.pt",
+        "bytes": 7909786,
+        "sha256": "a852ef54d9adb434768957bda884c7dbfa351d7a9b8a3fd9e16c020d6db466a9"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Dyella79_proteomelm.pt",
+        "bytes": 10120253,
+        "sha256": "846724feb7ac8ed392872ef719c7198c501b1b36a4babac7918ffd6763908f97"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/HerbieS_proteomelm.pt",
+        "bytes": 11010550,
+        "sha256": "81f810405e61c6e87f4e1d97dbb70f1b579f4fc325090d7c1f0c09aa2acb0506"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Kang_proteomelm.pt",
+        "bytes": 5756513,
+        "sha256": "4610ac4c7bd497a7a1fad35a003f57da89933b6b4ff0aeaf7395d4d404db170f"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Keio_proteomelm.pt",
+        "bytes": 9636769,
+        "sha256": "f70e6a79aa1a43a26e5823138229007b178d93b0f1e6a6e83756a0e68c2208b0"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Korea_proteomelm.pt",
+        "bytes": 9684776,
+        "sha256": "3b5ac5f981fd1fa99046e384fc53030a0324e0612c4871eca526c2399958eac9"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Koxy_proteomelm.pt",
+        "bytes": 12381601,
+        "sha256": "af97377f936434429f815858ec60fdb4ec742d50e0c4b9afd13a10b162223222"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/MR1_proteomelm.pt",
+        "bytes": 10382298,
+        "sha256": "fd13ef0c3bb9904fc4c041720b707675a8e4fa672fdda895358be23f2bfc595b"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Magneto_proteomelm.pt",
+        "bytes": 10473846,
+        "sha256": "750e0777034acc6360ce9fbe06cfa0f0d7074ab711a488d167fe5811b10ed964"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Marino_proteomelm.pt",
+        "bytes": 10266415,
+        "sha256": "06ba9406f5b7a41ba4459d1fa0909c029bc84173d7d5a4fe49638aedfea72531"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Methanococcus_JJ_proteomelm.pt",
+        "bytes": 4209141,
+        "sha256": "484b076aeb64ab16301e75f0b9f38018cae503bcb4c6fc71254d7ef7e65566f3"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Methanococcus_S2_proteomelm.pt",
+        "bytes": 4078581,
+        "sha256": "4d77793f8f2bed33811df5e9c170e5a9de5a3a5db0913426d3b956883aa62629"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Miya_proteomelm.pt",
+        "bytes": 7397665,
+        "sha256": "ce2b81933dd24b002191eedcba48cff78086bb5d8628ed6d2d1bec7910ae35c0"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/PS_proteomelm.pt",
+        "bytes": 8009363,
+        "sha256": "62f78355336586266aa998ae62138e075de46dc9ff4142783becd301d7d51d7c"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/PV4_proteomelm.pt",
+        "bytes": 8973146,
+        "sha256": "4008e86ea41296d19879c16d359cefedf23082fee83cb63c3bf15bf7176cb81e"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Pedo557_proteomelm.pt",
+        "bytes": 11591926,
+        "sha256": "6278aa7f91a55f73458f1c7f31af696e7dd837d4b1a789fbff817a18f192d9a3"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Phaeo_proteomelm.pt",
+        "bytes": 9017064,
+        "sha256": "666696f0c0ab9b3bcafa01d5857e073a1b18459d3d58a0979915df58db1ff529"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Ponti_proteomelm.pt",
+        "bytes": 9837800,
+        "sha256": "b8928cecd661980ca1f5316ed210a14f44c91bae7de032e247896b8005850bed"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Putida_proteomelm.pt",
+        "bytes": 12951663,
+        "sha256": "dfcd5cb86a993de33c26f30e1a654ee72e674082e97024797a9d963f598a7d1d"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/RalstoniaBSBF1503_proteomelm.pt",
+        "bytes": 10935804,
+        "sha256": "231e39c9fb2d19a120bd4925db6252375869fa83542b7e1ec7d59dd99d3c786e"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/RalstoniaGMI1000_proteomelm.pt",
+        "bytes": 11603125,
+        "sha256": "733c7b8627d8e6d17c329d9bdc865dc0463c5335ff02471e95db1054160be703"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/RalstoniaPSI07_proteomelm.pt",
+        "bytes": 11095207,
+        "sha256": "ba29f5b322aebdffbc1e23a8da30eca58d3419d193bbd1164a243af08e31f52e"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/RalstoniaUW163_proteomelm.pt",
+        "bytes": 11144359,
+        "sha256": "153357293d65da973180e32f72d21125771850ad4e809085b13603149982faca"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/SB2B_proteomelm.pt",
+        "bytes": 8479265,
+        "sha256": "17285b6e9fa14649a6d13b2f15f0ade0212e5663f501f98e17dbd4bc5267f537"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/Smeli_proteomelm.pt",
+        "bytes": 14476776,
+        "sha256": "2bc6eeab06b74d14826ac46f8687186fe4bc178eee5bd39dd3f02c5111a7eafd"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/SynE_proteomelm.pt",
+        "bytes": 6230433,
+        "sha256": "bebec54b1b806432cc332b818b490ab877a40ecc51ed3149d6f6be8792e836e7"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/SyringaeB728a_mexBdelta_proteomelm.pt",
+        "bytes": 11945062,
+        "sha256": "47c1ab97df8ca23c4ad7416d5c758d5026a3fdb66c5b3cb7adcccd7d232ed865"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/SyringaeB728a_proteomelm.pt",
+        "bytes": 11894112,
+        "sha256": "b70a120332fb688e188ba0abb8565f858413870daa5e85707f375c474efe624c"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/WCS417_proteomelm.pt",
+        "bytes": 12817903,
+        "sha256": "86c458badc9771086e00b52b80db96457354f2b86a70541c558e026df7cbafc4"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/acidovorax_3H11_proteomelm.pt",
+        "bytes": 11620782,
+        "sha256": "6079dc875c22669356179338203c4c35e39cb0b7f3e6536ddcbb4b8dd8554d4a"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/azobra_proteomelm.pt",
+        "bytes": 12809967,
+        "sha256": "0ee881478347b5f115509dff1f6672ea7b2f5ba9e0f537b65764f1c5cc681c73"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/psRCH2_proteomelm.pt",
+        "bytes": 9928815,
+        "sha256": "6589c8bbe2e6d4741d7fecc9e0c068f92b6548cf090c966c989fb2c5fc34503b"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/pseudo13_GW456_L13_proteomelm.pt",
+        "bytes": 12096963,
+        "sha256": "3d71e54fabe1527b19febd5c1c81b3d7e6b741e35db3cce467a2bfc617c26fff"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/pseudo1_N1B4_proteomelm.pt",
+        "bytes": 13968537,
+        "sha256": "379f33cd1ce0686f32c378cff262d748afc6c1a90624e98353d2693c2359926c"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/pseudo3_N2E3_proteomelm.pt",
+        "bytes": 13482009,
+        "sha256": "a7ad9bbf7913db8964319cad1ceef02ae1a1e6482ec55e72aebe29306ce8665e"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/pseudo5_N2C3_1_proteomelm.pt",
+        "bytes": 14041127,
+        "sha256": "186937ec7c8453e36c6af4534eea3b0e8a8f6ced95920343ef44951fadcbe8a6"
+      },
+      {
+        "path": "data/processed/ProtLM_embeddings_layer8/pseudo6_N2E2_proteomelm.pt",
+        "bytes": 14253849,
+        "sha256": "c6d32507664da5640bd50a3ea6fda118f407ffdbdf6d613250b270f3a3ad4f9a"
+      }
+    ]
+  }
+}

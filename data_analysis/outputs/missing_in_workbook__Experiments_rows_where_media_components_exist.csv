@@ -1,0 +1,914 @@
+orgId,name,Media,expGroup,condition_1,concentration_1,units_1,condition_2,concentration_2,units_2,condition_3,concentration_3,units_3,condition_4,concentration_4,units_4,temperature,pH,aerobic,shaking,growthMethod,media_in_Media_Components
+ANA3,set5IT004,RCH2_defined_noCarbon,carbon source,Sucrose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+ANA3,set5IT005,RCH2_defined_noCarbon,carbon source,Sucrose,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+ANA3,set5IT006,RCH2_defined_noCarbon,carbon source,Sucrose,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+ANA3,set5IT008,RCH2_defined_noCarbon,carbon source,Sucrose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+ANA3,set5IT009,RCH2_defined_noCarbon,carbon source,Sucrose,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+ANA3,set5IT010,RCH2_defined_noCarbon,carbon source,Sucrose,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+BFirm,set4IT035,RCH2_defined_glucose,nutrient,L-Histidine,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+BFirm,set4IT036,RCH2_defined_glucose,nutrient,L-Histidine,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+BFirm,set4IT037,RCH2_defined_glucose,nutrient,L-Serine,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+BFirm,set4IT038,RCH2_defined_glucose,nutrient,L-Serine,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+BFirm,set4IT039,RCH2_defined_glucose,nutrient,casamino acids,0.25,mg/ml,,,,,,,,,,30,,Aerobic,200 rpm,,True
+BFirm,set4IT040,RCH2_defined_glucose,nutrient,casamino acids,0.25,mg/ml,,,,,,,,,,30,,Aerobic,200 rpm,,True
+BFirm,set4IT041,RCH2_defined_glucose,nutrient,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+BFirm,set4IT042,RCH2_defined_glucose,nutrient,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+BFirm,set5IT075,RCH2_defined_glucose,vitamin,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+BFirm,set5IT076,RCH2_defined_glucose,vitamin,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+BFirm,set6IT053,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+BFirm,set6IT054,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+BFirm,set6IT055,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+BFirm,set6IT056,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+BFirm,set6IT057,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+BFirm,set6IT058,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+BFirm,set6IT059,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-ribonic acid lithium salt,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+BFirm,set8IT022,RCH2_defined_noCarbon,carbon source,Deoxyribonucleic acid from herring sperm,10,mg/mL,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+BFirm,set8IT025,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+BFirm,set8IT027,RCH2_defined_noCarbon,carbon source,Phenylacetic acid,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+BFirm,set8IT028,RCH2_defined_noCarbon,carbon source,2-Deoxyadenosine 5-monophosphate,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+BFirm,set8IT031,RCH2_defined_noCarbon,carbon source,Deoxyribonucleic acid from herring sperm,10,mg/mL,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+BFirm,set8IT034,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+BFirm,set8IT036,RCH2_defined_noCarbon,carbon source,Phenylacetic acid,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set1IT043,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set1IT044,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set1IT045,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set1IT046,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set1IT047,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set1IT048,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set1IT049,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-ribonic acid lithium salt,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set1IT050,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-ribonic acid lithium salt,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT071,RCH2_defined_noCarbon,carbon source,2-Deoxyadenosine 5-monophosphate,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT072,RCH2_defined_noCarbon,carbon source,2-Deoxyadenosine 5-monophosphate,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT073,RCH2_defined_noCarbon,carbon source,2'-Deoxyinosine,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT074,RCH2_defined_noCarbon,carbon source,2'-Deoxyinosine,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT075,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-ribonic acid lithium salt,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT076,RCH2_defined_noCarbon,carbon source,Deoxyribonucleic acid from herring sperm,10,mg/mL,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT077,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT078,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT079,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT080,RCH2_defined_noCarbon,carbon source,2-Deoxyadenosine 5-monophosphate,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT081,RCH2_defined_noCarbon,carbon source,2-Deoxyadenosine 5-monophosphate,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT082,RCH2_defined_noCarbon,carbon source,2'-Deoxyinosine,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT083,RCH2_defined_noCarbon,carbon source,2'-Deoxyinosine,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT084,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-ribonic acid lithium salt,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT085,RCH2_defined_noCarbon,carbon source,Deoxyribonucleic acid from herring sperm,10,mg/mL,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT086,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT087,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set4IT088,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Burk376,set6IT016,RCH2_defined_noCarbon,carbon source,D-Glucose,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Burk376,set6IT018,RCH2_defined_noCarbon,carbon source,Phenylacetic acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Burk376,set6IT034,RCH2_defined_noCarbon,carbon source,D-Glucose,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Burk376,set6IT036,RCH2_defined_noCarbon,carbon source,Phenylacetic acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Caulo,set8IT011,PYE,no stress control,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Caulo,set8IT012,PYE,stress,CHIR-090,2,ug/mL,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Caulo,set8IT023,PYE,no stress control,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Caulo,set8IT024,PYE,stress,CHIR-090,2,ug/mL,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Caulo,set8IT035,PYE,no stress control,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Caulo,set8IT036,PYE,stress,CHIR-090,2,ug/mL,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Cola,set4IT022,DinoMM_noCarbon_HighNutrient,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Cola,set4IT023,DinoMM_noCarbon_HighNutrient,carbon source,Lactulose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Cola,set4IT024,DinoMM_noCarbon_HighNutrient,carbon source,Lactitol,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Cola,set4IT025,DinoMM_noCarbon_HighNutrient,carbon source,Maltitol,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Cola,set4IT026,DinoMM_noCarbon_HighNutrient,carbon source,Methyl-B-D-galactopyranoside,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Cola,set4IT027,DinoMM_noCarbon_HighNutrient,carbon source,D-Trehalose dihydrate,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Cola,set4IT028,DinoMM_noCarbon_HighNutrient,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Cola,set4IT029,DinoMM_noCarbon_HighNutrient,carbon source,Lactulose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Cola,set4IT030,DinoMM_noCarbon_HighNutrient,carbon source,Lactitol,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Cola,set4IT031,DinoMM_noCarbon_HighNutrient,carbon source,Maltitol,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Cola,set4IT032,DinoMM_noCarbon_HighNutrient,carbon source,Methyl-B-D-galactopyranoside,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Cola,set4IT033,DinoMM_noCarbon_HighNutrient,carbon source,D-Trehalose dihydrate,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Cup4G11,set12IT059,RCH2_defined_noCarbon,carbon source,Phenylacetic acid,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Cup4G11,set12IT060,RCH2_defined_noCarbon,carbon source,"Sodium D,L-Lactate",10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Cup4G11,set12IT062,RCH2_defined_noCarbon,carbon source,Phenylacetic acid,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Dda3937,setATCH110,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+Dda3937,setATCH111,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+Dda3937,setATCH112,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+Dda3937,setATCH128,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+Dda3937,setATCH129,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+Dda3937,setATCH130,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+Dda3937,setATCH191,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+Dda3937,setATCH192,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+Dda3937,setATCH197,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+Dda3937,setATCH198,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+Dda3937,setATCH199,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+Dda3937,set9TCH417,LB,control,,,,,,,,,,,,,,,,,,True
+Dda3937,set9TCH418,LB,control,,,,,,,,,,,,,,,,,,True
+Dda3937,set9TCH419,LB,control,,,,,,,,,,,,,,,,,,True
+Dda3937,set9TCH420,LB,control,,,,,,,,,,,,,,,,,,True
+Ddia6719,setATCH203,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+Ddia6719,setATCH204,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+Ddia6719,setATCH206,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+Ddia6719,setATCH207,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+Ddia6719,setATCH214,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+Ddia6719,setATCH215,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+Ddia6719,setATCH216,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+Ddia6719,setATCH217,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+Ddia6719,setATCH218,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+Ddia6719,setATCH219,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+DdiaME23,setATCH113,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+DdiaME23,setATCH114,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+DdiaME23,setATCH115,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+DdiaME23,setATCH131,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+DdiaME23,setATCH132,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+DdiaME23,setATCH133,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+DdiaME23,setATCH240,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+DdiaME23,setATCH241,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+DdiaME23,setATCH242,LB,control,kanamycin,50,ug/ml,,,,,,,,,,,,,,,True
+DdiaME23,setATCH246,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+DdiaME23,setATCH247,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+DdiaME23,setATCH248,M9 minimal media_noCarbon,carbon source,Glycerol,%,0.4,kanamycin,50,ug/ml,,,,,,,,,,,,True
+DdiaME23,set10TCH436,LB,control,,,,,,,,,,,,,,,,,,True
+DdiaME23,set10TCH438,LB,control,,,,,,,,,,,,,,,,,,True
+Dino,set9IT036,DinoMM_noCarbon_HighNutrient,carbon source,Sucrose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Dino,set9IT038,DinoMM_noCarbon_HighNutrient,carbon source,Sucrose,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Dino,set9IT040,DinoMM_noCarbon_HighNutrient,carbon source,Sucrose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Dino,set9IT042,DinoMM_noCarbon_HighNutrient,carbon source,Sucrose,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+DvH,set1S194,MoLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S195,MoLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S196,MoLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S209,MoYLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S210,MoYLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S211,MoYLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S218,MoLS4,nutrient,L-Methionine,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S219,MoLS4,nutrient,L-Methionine,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S220,MoLS4,nutrient,L-Methionine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S221,MoLS4,nutrient,L-Methionine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S222,MoLS4,nutrient,L-Methionine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S223,MoLS4,nutrient,L-Threonine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S224,MoLS4,nutrient,L-Threonine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S225,MoLS4,nutrient,L-Threonine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S226,MoLS4,nutrient,L-Methionine,10,mM,L-Threonine,10,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S227,MoLS4,nutrient,L-Methionine,10,mM,L-Threonine,10,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S228,MoLS4,nutrient,L-Methionine,10,mM,L-Threonine,10,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S247,MoLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S248,MoLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set1S249,MoLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S265,MoLS4,nutrient,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S266,MoLS4,nutrient,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S267,MoLS4,nutrient,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S268,MoYLS4,nutrient,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S269,MoYLS4,nutrient,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S270,MoYLS4,nutrient,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S277,MoYLS4,stress,Sodium Chloride,125,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S278,MoYLS4,stress,Sodium Chloride,125,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S279,MoYLS4,stress,Sodium Chloride,125,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S280,MoYLS4,stress,Sodium Chloride,62.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S281,MoYLS4,stress,Sodium Chloride,62.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S282,MoYLS4,stress,Sodium Chloride,62.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S283,MoYLS4,stress,Sodium nitrate,50,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S284,MoYLS4,stress,Sodium nitrate,50,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S285,MoYLS4,stress,Sodium nitrate,50,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S286,MoYLS4,stress,Sodium Chlorate,6.25,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S290,MoYLS4,stress,Sodium Chlorate,6.25,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S291,MoYLS4,stress,Sodium Chlorate,6.25,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S292,MoYLS4,stress,Sodium Chlorate,3.125,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S293,MoYLS4,stress,Sodium Chlorate,3.125,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S294,MoYLS4,stress,Sodium Chlorate,3.125,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S295,MoYLS4,stress,Spectinomycin dihydrochloride pentahydrate,0.025,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S296,MoYLS4,stress,Spectinomycin dihydrochloride pentahydrate,0.025,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S297,MoYLS4,stress,Spectinomycin dihydrochloride pentahydrate,0.025,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S298,MoYLS4,stress,Piperacillin sodium salt,3,ug/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S299,MoYLS4,stress,Piperacillin sodium salt,3,ug/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S300,MoYLS4,stress,Piperacillin sodium salt,3,ug/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S301,MoYLS4,stress,Cefoxitin sodium salt,5,ug/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S302,MoYLS4,stress,Cefoxitin sodium salt,5,ug/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S303,MoYLS4,stress,Cefoxitin sodium salt,5,ug/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S304,MoYLS4,stress,Dimethyl Sulfoxide,10,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S305,MoYLS4,stress,Dimethyl Sulfoxide,10,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S306,MoYLS4,stress,Dimethyl Sulfoxide,10,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S307,MoYLS4,stress,Dimethyl Sulfoxide,7.5,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S308,MoYLS4,stress,Dimethyl Sulfoxide,7.5,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S309,MoYLS4,stress,Dimethyl Sulfoxide,7.5,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S310,MoYLS4,stress,Dimethyl Sulfoxide,5,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S311,MoYLS4,stress,Dimethyl Sulfoxide,5,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S326,MoYLS4,stress,Spectinomycin dihydrochloride pentahydrate,0.0125,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S327,MoYLS4,stress,Spectinomycin dihydrochloride pentahydrate,0.0125,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set2S328,MoYLS4,stress,Spectinomycin dihydrochloride pentahydrate,0.0125,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S178,MoLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S179,MoLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S180,MoLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S190,MoYLS4,stress,Piperacillin sodium salt,3,ug/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S330,MoYLS4,stress,Sodium nitrite,0.125,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S331,MoYLS4,stress,Sodium nitrite,0.125,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S332,MoYLS4,stress,Sodium nitrite,0.125,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S333,MoYLS4,stress,Chloramphenicol,0.005,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S334,MoYLS4,stress,Chloramphenicol,0.005,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S335,MoYLS4,stress,Chloramphenicol,0.005,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S336,MoYLS4,stress,Tetracycline hydrochloride,0.001,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S337,MoYLS4,stress,Tetracycline hydrochloride,0.001,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S338,MoYLS4,stress,Tetracycline hydrochloride,0.001,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S339,MoYLS4,stress,Sodium nitrate,50,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S340,MoYLS4,stress,Sodium nitrate,50,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S344,MoYLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S345,MoYLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set3S346,MoYLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT004,MoLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT005,MoLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT006,MoLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT007,MoLS4,nutrient,casamino acids,2,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT008,MoLS4,nutrient,casamino acids,2,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT009,MoLS4,nutrient,casamino acids,2,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT010,MoLS4,nutrient,casamino acids,0.5,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT011,MoLS4,nutrient,casamino acids,0.5,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT012,MoLS4,nutrient,casamino acids,0.5,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT040,MoYLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT041,MoYLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT042,MoYLS4,respiratory growth,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT043,MoYLS4,stress,"2,2'-Dipyridyl",75,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT045,MoYLS4,stress,"2,2'-Dipyridyl",75,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT052,MoYLS4,stress,Zinc sulfate heptahydrate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT053,MoYLS4,stress,Zinc sulfate heptahydrate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT054,MoYLS4,stress,Zinc sulfate heptahydrate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT055,MoYLS4,stress,Zinc sulfate heptahydrate,0.1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT056,MoYLS4,stress,Zinc sulfate heptahydrate,0.1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT057,MoYLS4,stress,Zinc sulfate heptahydrate,0.1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT061,MoYLS4,stress,Sodium nitrite,0.025,mg/mL,Zinc sulfate heptahydrate,0.1,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT062,MoYLS4,stress,Sodium nitrite,0.025,mg/mL,Zinc sulfate heptahydrate,0.1,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT063,MoYLS4,stress,Sodium nitrite,0.025,mg/mL,Zinc sulfate heptahydrate,0.1,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT067,MoYLS4,stress,Sodium nitrite,0.125,mg/mL,Zinc sulfate heptahydrate,0.1,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT068,MoYLS4,stress,Sodium nitrite,0.125,mg/mL,Zinc sulfate heptahydrate,0.1,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT069,MoYLS4,stress,Sodium nitrite,0.125,mg/mL,Zinc sulfate heptahydrate,0.1,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT070,MoYLS4,stress,2-n-Heptyl-4-hydroxyquinoline N-oxide,20,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT071,MoYLS4,stress,2-n-Heptyl-4-hydroxyquinoline N-oxide,20,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT072,MoYLS4,stress,2-n-Heptyl-4-hydroxyquinoline N-oxide,20,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT073,MoYLS4,stress,2-n-Heptyl-4-hydroxyquinoline N-oxide,50,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT074,MoYLS4,stress,2-n-Heptyl-4-hydroxyquinoline N-oxide,50,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT075,MoYLS4,stress,2-n-Heptyl-4-hydroxyquinoline N-oxide,50,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT076,MoYLS4,stress,2-n-Heptyl-4-hydroxyquinoline N-oxide,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT077,MoYLS4,stress,2-n-Heptyl-4-hydroxyquinoline N-oxide,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT078,MoYLS4,stress,Ethanol,2,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT079,MoYLS4,stress,2-n-Heptyl-4-hydroxyquinoline N-oxide,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT081,MoYLS4,stress,Ethanol,2,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT082,MoYLS4,stress,Antimycin A,0.2,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT083,MoYLS4,stress,Antimycin A,0.2,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT084,MoYLS4,stress,Antimycin A,0.2,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT085,MoYLS4,stress,Antimycin A,1,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT086,MoYLS4,stress,Antimycin A,1,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT087,MoYLS4,stress,Antimycin A,1,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT088,MoYLS4,stress,Antimycin A,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT089,MoYLS4,stress,Antimycin A,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set4IT090,MoYLS4,stress,Antimycin A,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set5IT049,MoYLS4,stress,Bathophenanthrolinedisulfonic acid disodium salt hydrate,20,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set5IT051,MoYLS4,stress,Bathophenanthrolinedisulfonic acid disodium salt hydrate,20,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set5IT082,MoYLS4,stress,Sodium nitrite,0.025,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set5IT083,MoYLS4,stress,Sodium nitrite,0.025,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set5IT084,MoYLS4,stress,Sodium nitrite,0.025,mg/mL,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set5IT085,MoYLS4,stress,DETA/NO,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set5IT086,MoYLS4,stress,DETA/NO,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set5IT087,MoYLS4,stress,DETA/NO,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set5IT088,MoYLS4,stress,DETA/NO,25,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set5IT089,MoYLS4,stress,DETA/NO,25,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set5IT090,MoYLS4,stress,DETA/NO,25,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set6IT006,MoYLS4,stress,FCCP,2,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set6IT007,MoYLS4,stress,FCCP,2,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set6IT008,MoYLS4,stress,FCCP,2,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set6IT009,MoYLS4,stress,FCCP,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set6IT010,MoYLS4,stress,FCCP,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set6IT011,MoYLS4,stress,FCCP,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set6IT012,MoYLS4,stress,peroxynitrite,200,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set6IT025,MoYLS4,stress,peroxynitrite,200,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set6IT026,MoYLS4,stress,peroxynitrite,200,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT004,MoYLS4,stress,Sodium tungstate dihydrate,4,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT005,MoYLS4,stress,Sodium tungstate dihydrate,4,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT012,MoYLS4,stress,Sodium Chromate,50,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT013,MoYLS4,stress,Sodium Chromate,50,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT018,MoYLS4,stress,Sodium Fluorophosphate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT019,MoYLS4,stress,Sodium Fluorophosphate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT020,MoYLS4,stress,Sodium Fluorophosphate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT024,MoYLS4,stress,Aluminum chloride hydrate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT025,MoYLS4,stress,Aluminum chloride hydrate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT026,MoYLS4,stress,Aluminum chloride hydrate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT033,MoYLS4,stress,Sodium selenate,750,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT034,MoYLS4,stress,Sodium selenate,750,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT035,MoYLS4,stress,Sodium selenate,750,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT057,MoYLS4,stress,mercury (II) chloride,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT058,MoYLS4,stress,mercury (II) chloride,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT059,MoYLS4,stress,mercury (II) chloride,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT060,MoLS4,stress,mercury (II) chloride,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set7IT061,MoLS4,stress,mercury (II) chloride,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set8IT004,MoYLS4,stress,Sodium molybdate,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set8IT005,MoYLS4,stress,Sodium molybdate,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set8IT006,MoYLS4,stress,Sodium molybdate,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT004,MoLS4,nutrient,L-Valine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT005,MoLS4,nutrient,L-Valine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT006,MoLS4,nutrient,L-Valine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT007,MoLS4,nutrient,L-Asparagine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT008,MoLS4,nutrient,L-Asparagine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT009,MoLS4,nutrient,L-Asparagine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT010,MoLS4,nutrient,L-Phenylalanine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT011,MoLS4,nutrient,L-Phenylalanine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT012,MoLS4,nutrient,L-Proline,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT013,MoLS4,nutrient,L-Proline,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT014,MoLS4,nutrient,L-Proline,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT015,MoLS4,nutrient,L-Homoserine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT016,MoLS4,nutrient,L-Homoserine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT017,MoLS4,nutrient,L-Homoserine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT024,MoLS4,nutrient,Glycine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT025,MoLS4,nutrient,Glycine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT026,MoLS4,nutrient,Glycine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT027,MoLS4,nutrient,L-Alanine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT028,MoLS4,nutrient,L-Alanine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT029,MoLS4,nutrient,L-Alanine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT030,MoLS4,nutrient,L-Cysteine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT032,MoLS4,nutrient,L-Cysteine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT035,MoLS4,nutrient,L-Histidine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT036,MoLS4,nutrient,L-Histidine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT037,MoLS4,nutrient,L-Histidine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT038,MoLS4,nutrient,L-Isoleucine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT039,MoLS4,nutrient,L-Isoleucine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT040,MoLS4,nutrient,L-Isoleucine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT041,MoLS4,nutrient,L-Arginine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT042,MoLS4,nutrient,L-Arginine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT043,MoLS4,nutrient,L-Arginine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT068,MoLS4,nutrient,L-Leucine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT069,MoLS4,nutrient,L-Leucine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set9IT070,MoLS4,nutrient,L-Leucine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set10IT074,MoYLS4,stress,Uranyl acetate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set10IT075,MoYLS4,stress,Uranyl acetate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set10IT076,MoYLS4,stress,Uranyl acetate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set10IT077,MoYLS4,stress,Uranyl acetate,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set10IT078,MoYLS4,stress,Uranyl acetate,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set10IT079,MoYLS4,stress,Uranyl acetate,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT004,MoLS4,nutrient,L-Tryptophan,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT005,MoLS4,nutrient,L-Tryptophan,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT006,MoLS4,nutrient,L-tyrosine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT007,MoLS4,nutrient,L-tyrosine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT008,MoLS4,nutrient,L-tyrosine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT009,MoLS4,nutrient,L-Threonine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT010,MoLS4,nutrient,L-Threonine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT011,MoLS4,nutrient,L-Threonine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT012,MoLS4,nutrient,Putrescine Dihydrochloride,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT013,MoLS4,nutrient,Putrescine Dihydrochloride,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT014,MoLS4,nutrient,Putrescine Dihydrochloride,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT015,MoLS4,nutrient,spermidine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT016,MoLS4,nutrient,spermidine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT017,MoLS4,nutrient,spermidine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT018,MoLS4,nutrient,Urea,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT019,MoLS4,nutrient,Urea,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT020,MoLS4,nutrient,Urea,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT021,MoYLS4,stress,Sodium tungstate dihydrate,2,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT022,MoYLS4,stress,Sodium tungstate dihydrate,2,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT023,MoYLS4,stress,Sodium tungstate dihydrate,2,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT024,MoLS4,stress,S-adenosyl Homocysteine,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT025,MoLS4,stress,S-adenosyl Homocysteine,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT026,MoLS4,stress,S-adenosyl Homocysteine,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT027,MoLS4,stress,S-adenosyl Homocysteine,50,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT028,MoLS4,stress,S-adenosyl Homocysteine,50,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT029,MoLS4,stress,S-adenosyl Homocysteine,50,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT030,MoLS4,stress,S-adenosyl Homocysteine,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT031,MoLS4,stress,S-adenosyl Homocysteine,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT032,MoLS4,stress,S-adenosyl Homocysteine,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT083,MoLS4,nutrient,L-Glutamine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT084,MoLS4,nutrient,L-Glutamine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT085,MoLS4,nutrient,L-Glutamine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT086,MoLS4,nutrient,L-Glutamic acid monopotassium salt monohydrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT087,MoLS4,nutrient,L-Glutamic acid monopotassium salt monohydrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT088,MoLS4,nutrient,L-Lysine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT089,MoLS4,nutrient,L-Lysine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT090,MoLS4,nutrient,L-Lysine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT091,MoLS4,nutrient,L-Methionine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT092,MoLS4,nutrient,L-Methionine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT093,MoLS4,nutrient,L-Methionine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT094,MoLS4,nutrient,L-Serine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT095,MoLS4,nutrient,L-Serine,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set11IT096,MoLS4,nutrient,L-Tryptophan,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT036,MoYLS4,stress,Aluminum chloride hydrate,5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT037,MoYLS4,stress,Aluminum chloride hydrate,5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT038,MoYLS4,stress,Aluminum chloride hydrate,5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT039,MoYLS4,stress,Aluminum chloride hydrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT040,MoYLS4,stress,Aluminum chloride hydrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT041,MoYLS4,stress,Aluminum chloride hydrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT042,MoYLS4,stress,Sodium perchlorate monohydrate,6.25,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT043,MoYLS4,stress,Sodium perchlorate monohydrate,6.25,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT044,MoYLS4,stress,Sodium perchlorate monohydrate,6.25,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT045,MoYLS4,stress,Sodium perchlorate monohydrate,12.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT046,MoYLS4,stress,Sodium perchlorate monohydrate,12.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT047,MoYLS4,stress,Sodium perchlorate monohydrate,12.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT048,MoYLS4,stress,sucrose treatment,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT052,MoYLS4,stress,sucrose treatment,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT053,MoYLS4,stress,sucrose treatment,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT054,MoYLS4,stress,sucrose treatment,,,shock,1.8,kV,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT055,MoYLS4,stress,sucrose treatment,,,shock,1.8,kV,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT056,MoYLS4,stress,sucrose treatment,,,shock,1.8,kV,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT057,MoYLS4,stress,Nickel (II) chloride hexahydrate,0.75,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT058,MoYLS4,stress,Nickel (II) chloride hexahydrate,0.75,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT059,MoYLS4,stress,Nickel (II) chloride hexahydrate,0.75,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT060,MoYLS4,stress,Nickel (II) chloride hexahydrate,1.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT061,MoYLS4,stress,Nickel (II) chloride hexahydrate,1.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT062,MoYLS4,stress,Nickel (II) chloride hexahydrate,1.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT063,MoYLS4,stress,Glycerol,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT064,MoYLS4,stress,Glycerol,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT065,MoYLS4,stress,Glycerol,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT066,MoYLS4,stress,Glycerol,50,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT067,MoYLS4,stress,Glycerol,50,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT068,MoYLS4,stress,Glycerol,50,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT069,MoYLS4,stress,Polyethylene glycol,1,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT070,MoYLS4,stress,Polyethylene glycol,1,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT071,MoYLS4,stress,Polyethylene glycol,1,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT072,MoYLS4,stress,Polyethylene glycol,1,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT073,MoYLS4,stress,Polyethylene glycol,5,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT074,MoYLS4,stress,Polyethylene glycol,5,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT075,MoYLS4,stress,Sodium Persulfate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT076,MoYLS4,stress,Sodium Persulfate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set12IT077,MoYLS4,stress,Sodium Persulfate,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT037,MoYLS4,stress,Sodium Chlorite,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT038,MoYLS4,stress,Sodium Chlorite,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT039,MoYLS4,stress,Sodium Chlorite,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT040,MoYLS4,stress,Sodium Chlorite,250,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT041,MoYLS4,stress,Sodium Chlorite,250,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT042,MoYLS4,stress,Sodium Chlorite,250,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT043,MoYLS4,stress,ammonium persulfate,2.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT044,MoYLS4,stress,ammonium persulfate,2.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT045,MoYLS4,stress,ammonium persulfate,2.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT055,MoLS4,nutrient,DL-Isocitric acid trisodium salt hydrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT056,MoLS4,nutrient,DL-Isocitric acid trisodium salt hydrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT057,MoLS4,nutrient,DL-Isocitric acid trisodium salt hydrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT058,MoLS4,nutrient,Sodium succinate dibasic hexahydrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT059,MoLS4,nutrient,Sodium succinate dibasic hexahydrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT060,MoLS4,nutrient,Sodium succinate dibasic hexahydrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT061,MoLS4,nutrient,Citric Acid,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT062,MoLS4,nutrient,Citric Acid,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT063,MoLS4,nutrient,Citric Acid,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT064,MoLS4,nutrient,Sodium Fumarate dibasic,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT065,MoLS4,nutrient,Sodium Fumarate dibasic,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT066,MoLS4,nutrient,Sodium Fumarate dibasic,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT067,MoLS4,nutrient,L-Malic acid disodium salt monohydrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT068,MoLS4,nutrient,L-Malic acid disodium salt monohydrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT069,MoLS4,nutrient,L-Malic acid disodium salt monohydrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT070,MoLS4,nutrient,Sodium pyruvate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT071,MoLS4,nutrient,Sodium pyruvate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT072,MoLS4,nutrient,Sodium pyruvate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT073,MoLS4,nutrient,Sodium butyrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT074,MoLS4,nutrient,Sodium butyrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT075,MoLS4,nutrient,Sodium butyrate,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT076,MoLS4,nutrient,2-oxobutyric acid sodium salt,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT077,MoLS4,nutrient,2-oxobutyric acid sodium salt,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set14IT078,MoLS4,nutrient,2-oxobutyric acid sodium salt,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT004,MoLS4,nutrient,L-Valine (HPLC purified),10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT005,MoLS4,nutrient,L-Valine (HPLC purified),10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT006,MoLS4,nutrient,L-Valine (HPLC purified),10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT007,MoLS4,nutrient,L-Valine (HPLC purified),10,mM,L-Isoleucine,10,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT008,MoLS4,nutrient,L-Valine (HPLC purified),10,mM,L-Isoleucine,10,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT009,MoLS4,nutrient,L-Valine (HPLC purified),10,mM,L-Isoleucine,10,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT010,MoLS4,nutrient,L-Isoleucine,10,mM,L-Leucine,10,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT011,MoLS4,nutrient,L-Isoleucine,10,mM,L-Leucine,10,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT012,MoLS4,nutrient,L-Isoleucine,10,mM,L-Leucine,10,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT013,MoLS4,nutrient,L-Valine (HPLC purified),10,mM,L-Leucine,10,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT014,MoLS4,nutrient,L-Valine (HPLC purified),10,mM,L-Leucine,10,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT015,MoLS4,nutrient,L-Valine (HPLC purified),10,mM,L-Leucine,10,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT016,MoLS4,nutrient,L-Valine (HPLC purified),10,mM,L-Leucine,10,mM,L-Isoleucine,10,mM,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT017,MoLS4,nutrient,L-Valine (HPLC purified),10,mM,L-Leucine,10,mM,L-Isoleucine,10,mM,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT018,MoLS4,nutrient,L-Valine (HPLC purified),10,mM,L-Leucine,10,mM,L-Isoleucine,10,mM,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT019,MoLS4,nutrient,Oxaloacetic acid,2.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT020,MoLS4,nutrient,Oxaloacetic acid,2.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT021,MoLS4,nutrient,Oxaloacetic acid,2.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT022,MoLS4,nutrient,a-Ketoglutaric acid disodium salt hydrate,2.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT023,MoLS4,nutrient,a-Ketoglutaric acid disodium salt hydrate,2.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT024,MoLS4,nutrient,a-Ketoglutaric acid disodium salt hydrate,2.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT025,MoLS4,nutrient,L-Cysteine,5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT026,MoLS4,nutrient,L-Cysteine,5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT027,MoLS4,nutrient,L-Cysteine,5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT028,MoYLS4,stress,copper (II) chloride dihydrate,0.1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT029,MoYLS4,stress,copper (II) chloride dihydrate,0.1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT030,MoYLS4,stress,copper (II) chloride dihydrate,0.1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT031,MoYLS4,stress,Cobalt chloride hexahydrate,20,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT032,MoYLS4,stress,Cobalt chloride hexahydrate,20,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT033,MoYLS4,stress,Cobalt chloride hexahydrate,20,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT034,MoYLS4,stress,Cobalt chloride hexahydrate,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT035,MoYLS4,stress,Cobalt chloride hexahydrate,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT036,MoYLS4,stress,Cobalt chloride hexahydrate,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT037,MoYLS4,stress,Cobalt chloride hexahydrate,250,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT038,MoYLS4,stress,Cobalt chloride hexahydrate,250,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT039,MoYLS4,stress,Cobalt chloride hexahydrate,250,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT040,MoYLS4,stress,2-Furfuraldehyde,0.0625,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT041,MoYLS4,stress,2-Furfuraldehyde,0.0625,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT042,MoYLS4,stress,2-Furfuraldehyde,0.0625,vol%,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT043,MoYLS4,stress,rubidium chloride,25,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT044,MoYLS4,stress,rubidium chloride,25,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT045,MoYLS4,stress,rubidium chloride,25,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT046,MoYLS4,stress,rubidium chloride,100,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT047,MoYLS4,stress,rubidium chloride,100,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT048,MoYLS4,stress,rubidium chloride,100,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT052,MoYLS4,stress,Manganese (II) chloride tetrahydrate,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT053,MoYLS4,stress,Manganese (II) chloride tetrahydrate,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT054,MoYLS4,stress,Manganese (II) chloride tetrahydrate,10,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT055,MoYLS4,stress,Manganese (II) chloride tetrahydrate,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT056,MoYLS4,stress,Manganese (II) chloride tetrahydrate,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT057,MoYLS4,stress,Manganese (II) chloride tetrahydrate,100,uM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT064,MoYLS4,stress,Sodium molybdate,100,uM,Sodium tungstate dihydrate,2,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT065,MoYLS4,stress,Sodium molybdate,100,uM,Sodium tungstate dihydrate,2,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT067,MoLS4,nutrient,L-Aspartic Acid,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT068,MoLS4,nutrient,L-Aspartic Acid,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set15IT069,MoLS4,nutrient,L-Aspartic Acid,10,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT073,MoLS4,nutrient,3-Methyl-2-oxobutanoic acid sodium salt,2.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT074,MoLS4,nutrient,3-Methyl-2-oxobutanoic acid sodium salt,2.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT075,MoLS4,nutrient,3-Methyl-2-oxobutanoic acid sodium salt,2.5,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT076,MoLS4,nutrient,L-Phenylalanine,10,mM,L-tyrosine,10,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT077,MoLS4,nutrient,L-Phenylalanine,10,mM,L-tyrosine,10,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT078,MoLS4,nutrient,L-Phenylalanine,10,mM,L-tyrosine,10,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT085,MoYLS4,stress,Sodium molybdate,100,,Sodium tungstate dihydrate,0.5,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT086,MoYLS4,stress,Sodium molybdate,100,,Sodium tungstate dihydrate,0.5,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT087,MoYLS4,stress,Sodium molybdate,100,,Sodium tungstate dihydrate,0.5,mM,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT088,MoYLS4,respiratory growth,Sodium sulfate,50,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT089,MoYLS4,respiratory growth,Sodium sulfate,50,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT090,MoYLS4,respiratory growth,Sodium sulfate,50,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT091,MoLS4,nutrient,L-Cysteine,10,mM,L-Isoleucine,10,mM,L-Leucine,10,mM,L-Valine,10,mM,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT092,MoLS4,nutrient,L-Cysteine,10,mM,L-Isoleucine,10,mM,L-Leucine,10,mM,L-Valine,10,mM,30,7.2,Anaerobic,0 rpm,,True
+DvH,set16IT093,MoLS4,nutrient,L-Cysteine,10,mM,L-Isoleucine,10,mM,L-Leucine,10,mM,L-Valine,10,mM,30,7.2,Anaerobic,0 rpm,,True
+HerbieS,set4IT045,RCH2_defined_glucose,nutrient,L-Histidine,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+HerbieS,set4IT046,RCH2_defined_glucose,nutrient,L-Histidine,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+HerbieS,set4IT047,RCH2_defined_glucose,nutrient,L-Serine,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+HerbieS,set4IT048,RCH2_defined_glucose,nutrient,L-Serine,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+HerbieS,set4IT057,RCH2_defined_glucose,nutrient,casamino acids,0.25,mg/ml,,,,,,,,,,30,,Aerobic,200 rpm,,True
+HerbieS,set4IT058,RCH2_defined_glucose,nutrient,casamino acids,0.25,mg/ml,,,,,,,,,,30,,Aerobic,200 rpm,,True
+HerbieS,set4IT059,RCH2_defined_glucose,nutrient,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+HerbieS,set4IT060,RCH2_defined_glucose,nutrient,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+HerbieS,set5IT080,RCH2_defined_glucose,vitamin,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+HerbieS,set5IT081,RCH2_defined_glucose,vitamin,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+HerbieS,set6IT086,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+HerbieS,set6IT087,RCH2_defined_noCarbon,carbon source,Phenylacetic acid,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+HerbieS,set6IT093,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+HerbieS,set6IT094,RCH2_defined_noCarbon,carbon source,Phenylacetic acid,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+HerbieS,set12IT032,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set12IT033,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set12IT034,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set12IT038,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set12IT039,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set12IT040,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set13IT043,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set13IT044,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set13IT045,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set13IT046,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set13IT047,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set13IT048,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set13IT052,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set13IT053,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set13IT054,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set13IT061,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI tmk3mutant grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set13IT062,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI tmk3mutant grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+HerbieS,set13IT063,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI tmk3mutant grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Keio,set52IT047,RCH2_defined_noCarbon,carbon source,D-Mannitol,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Keio,set52IT048,RCH2_defined_noCarbon,carbon source,D-Mannitol,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Keio,set52IT049,RCH2_defined_noCarbon,carbon source,D-Mannitol,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Keio,set52IT051,RCH2_defined_noCarbon,carbon source,D-Mannitol,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Keio,set52IT052,RCH2_defined_noCarbon,carbon source,D-Mannitol,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Keio,set52IT053,RCH2_defined_noCarbon,carbon source,D-Mannitol,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Korea,set6IT061,RCH2_defined_noCarbon,carbon source,L-Glutamic acid monopotassium salt monohydrate,10,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Korea,set6IT062,RCH2_defined_noCarbon,carbon source,D-Cellobiose,20,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Korea,set6IT063,RCH2_defined_noCarbon,carbon source,D-Glucose,5,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Korea,set6IT064,RCH2_defined_noCarbon,carbon source,L-Glutamic acid monopotassium salt monohydrate,10,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Korea,set6IT065,RCH2_defined_noCarbon,carbon source,D-Cellobiose,20,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Korea,set6IT066,RCH2_defined_noCarbon,carbon source,D-Glucose,5,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Koxy,set11IT061,RCH2_defined_noCarbon,carbon source,2-Deoxyadenosine 5-monophosphate,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT064,RCH2_defined_noCarbon,carbon source,2'-Deoxycytidine,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT065,RCH2_defined_noCarbon,carbon source,2'-Deoxycytidine,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT066,RCH2_defined_noCarbon,carbon source,2-Deoxyadenosine monohydrate,4,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT067,RCH2_defined_noCarbon,carbon source,2'-Deoxyinosine,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT068,RCH2_defined_noCarbon,carbon source,2'-Deoxyinosine,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT069,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-ribonic acid lithium salt,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT070,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT071,RCH2_defined_noCarbon,carbon source,2-Deoxyadenosine 5-monophosphate,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT074,RCH2_defined_noCarbon,carbon source,2'-Deoxycytidine,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT075,RCH2_defined_noCarbon,carbon source,2'-Deoxycytidine,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT076,RCH2_defined_noCarbon,carbon source,2-Deoxyadenosine monohydrate,4,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT077,RCH2_defined_noCarbon,carbon source,2'-Deoxyinosine,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT078,RCH2_defined_noCarbon,carbon source,2'-Deoxyinosine,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT079,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-ribonic acid lithium salt,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set11IT080,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Koxy,set28IT057,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set28IT058,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set28IT059,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set28IT060,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set28IT061,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set28IT062,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set28IT066,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set28IT067,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set28IT068,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set32IT008,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set32IT009,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set32IT010,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set32IT011,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set32IT012,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set32IT013,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set32IT017,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set32IT018,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set32IT019,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set32IT026,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI tmk3mutant grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set32IT027,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI tmk3mutant grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Koxy,set32IT028,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI tmk3mutant grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Miya,set8IT013,MoLS4,nutrient,"D,L-cysteine",1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+Miya,set8IT014,MoLS4,nutrient,L-Histidine,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+Miya,set8IT015,MoLS4,nutrient,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+Miya,set8IT016,MoLS4,nutrient,L-Serine,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+Miya,set8IT020,MoLS4,nutrient,"D,L-cysteine",1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+Miya,set8IT021,MoLS4,nutrient,"D,L-histidine",1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+Miya,set8IT022,MoLS4,nutrient,,,,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+Miya,set8IT023,MoLS4,nutrient,L-Serine,1,mM,,,,,,,,,,30,7.2,Anaerobic,0 rpm,,True
+Phaeo,set12IT074,DinoMM_noCarbon_HighNutrient,carbon source,L-Ornithine,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Phaeo,set12IT075,DinoMM_noCarbon_HighNutrient,carbon source,L-Ornithine,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Phaeo,set12IT076,DinoMM_noCarbon_HighNutrient,carbon source,L-Citrulline,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Phaeo,set12IT077,DinoMM_noCarbon_HighNutrient,carbon source,L-Citrulline,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Phaeo,set12IT078,DinoMM_noCarbon_HighNutrient,carbon source,D-Glucose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Phaeo,set12IT079,DinoMM_noCarbon_HighNutrient,carbon source,L-Ornithine,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Phaeo,set12IT080,DinoMM_noCarbon_HighNutrient,carbon source,L-Ornithine,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Phaeo,set12IT081,DinoMM_noCarbon_HighNutrient,carbon source,L-Citrulline,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Phaeo,set12IT082,DinoMM_noCarbon_HighNutrient,carbon source,L-Citrulline,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Phaeo,set12IT083,DinoMM_noCarbon_HighNutrient,carbon source,D-Glucose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo1_N1B4,set11IT031,RCH2_defined_noCarbon,carbon source,Sucrose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo1_N1B4,set11IT032,RCH2_defined_noCarbon,carbon source,Sucrose,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo1_N1B4,set11IT033,RCH2_defined_noCarbon,carbon source,Sucrose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo1_N1B4,set11IT034,RCH2_defined_noCarbon,carbon source,Sucrose,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo1_N1B4,set11IT047,RCH2_defined_noCarbon,carbon source,Sucrose,1,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+pseudo1_N1B4,set11IT048,RCH2_defined_noCarbon,carbon source,Sucrose,1,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+pseudo1_N1B4,set11IT049,RCH2_defined_noCarbon,carbon source,Sucrose,0.5,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+pseudo1_N1B4,set11IT051,RCH2_defined_noCarbon,carbon source,Sucrose,0.25,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+pseudo1_N1B4,set11IT052,RCH2_defined_noCarbon,carbon source,Sucrose,0.25,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+pseudo3_N2E3,set15IT087,RCH2_defined_noCarbon,carbon source,L-Ornithine,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo3_N2E3,set15IT088,RCH2_defined_noCarbon,carbon source,L-Ornithine,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo3_N2E3,set15IT089,RCH2_defined_noCarbon,carbon source,L-Citrulline,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo3_N2E3,set15IT090,RCH2_defined_noCarbon,carbon source,L-Citrulline,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo3_N2E3,set15IT091,RCH2_defined_noCarbon,carbon source,D-Glucose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo3_N2E3,set15IT092,RCH2_defined_noCarbon,carbon source,L-Ornithine,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo3_N2E3,set15IT093,RCH2_defined_noCarbon,carbon source,L-Ornithine,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo3_N2E3,set15IT094,RCH2_defined_noCarbon,carbon source,L-Citrulline,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo3_N2E3,set15IT095,RCH2_defined_noCarbon,carbon source,L-Citrulline,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo3_N2E3,set15IT096,RCH2_defined_noCarbon,carbon source,D-Glucose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo5_N2C3_1,set13IT004,RCH2_defined_noCarbon,carbon source,Sucrose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo5_N2C3_1,set13IT005,RCH2_defined_noCarbon,carbon source,Sucrose,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo5_N2C3_1,set13IT006,RCH2_defined_noCarbon,carbon source,Sucrose,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo5_N2C3_1,set13IT007,RCH2_defined_noCarbon,carbon source,D-Mannitol,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo5_N2C3_1,set13IT008,RCH2_defined_noCarbon,carbon source,D-Mannitol,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo5_N2C3_1,set13IT009,RCH2_defined_noCarbon,carbon source,D-Mannitol,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo5_N2C3_1,set13IT012,RCH2_defined_noCarbon,carbon source,Sucrose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo5_N2C3_1,set13IT013,RCH2_defined_noCarbon,carbon source,Sucrose,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo5_N2C3_1,set13IT014,RCH2_defined_noCarbon,carbon source,Sucrose,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo5_N2C3_1,set13IT015,RCH2_defined_noCarbon,carbon source,D-Mannitol,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo5_N2C3_1,set13IT016,RCH2_defined_noCarbon,carbon source,D-Mannitol,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo5_N2C3_1,set13IT017,RCH2_defined_noCarbon,carbon source,D-Mannitol,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo6_N2E2,set12IT085,RCH2_defined_glucose,vitamin,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+pseudo6_N2E2,set12IT086,RCH2_defined_glucose,vitamin,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+pseudo6_N2E2,set23IT023,RCH2_defined_noCarbon,carbon source,Sucrose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo6_N2E2,set23IT024,RCH2_defined_noCarbon,carbon source,Sucrose,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo6_N2E2,set23IT025,RCH2_defined_noCarbon,carbon source,Sucrose,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo6_N2E2,set23IT028,RCH2_defined_noCarbon,carbon source,Sucrose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo6_N2E2,set23IT029,RCH2_defined_noCarbon,carbon source,Sucrose,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+pseudo6_N2E2,set23IT030,RCH2_defined_noCarbon,carbon source,Sucrose,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+psRCH2,set19IT025,RCH2_defined_glucose,nutrient,L-Histidine,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+psRCH2,set19IT026,RCH2_defined_glucose,nutrient,L-Histidine,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+psRCH2,set19IT029,RCH2_defined_glucose,nutrient,L-tyrosine disodium salt,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+psRCH2,set19IT030,RCH2_defined_glucose,nutrient,L-tyrosine disodium salt,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+psRCH2,set19IT031,RCH2_defined_glucose,nutrient,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+psRCH2,set19IT032,RCH2_defined_glucose,nutrient,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+psRCH2,set20IT070,RCH2_defined_glucose,vitamin,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+psRCH2,set20IT071,RCH2_defined_glucose,vitamin,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Pedo557,set4IT005,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Pedo557,set4IT006,RCH2_defined_noCarbon,carbon source,Lactulose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Pedo557,set4IT007,RCH2_defined_noCarbon,carbon source,Lactitol,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Pedo557,set4IT008,RCH2_defined_noCarbon,carbon source,Maltitol,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Pedo557,set4IT009,RCH2_defined_noCarbon,carbon source,Methyl-B-D-galactopyranoside,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Pedo557,set4IT010,RCH2_defined_noCarbon,carbon source,D-Trehalose dihydrate,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Pedo557,set4IT011,RCH2_defined_noCarbon,carbon source,Agro_defined_trehalose,1,x,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Pedo557,set4IT012,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Pedo557,set4IT013,RCH2_defined_noCarbon,carbon source,Lactulose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Pedo557,set4IT014,RCH2_defined_noCarbon,carbon source,Lactitol,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Pedo557,set4IT015,RCH2_defined_noCarbon,carbon source,Maltitol,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Pedo557,set4IT016,RCH2_defined_noCarbon,carbon source,Methyl-B-D-galactopyranoside,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Pedo557,set4IT017,RCH2_defined_noCarbon,carbon source,D-Trehalose dihydrate,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Pedo557,set4IT018,RCH2_defined_noCarbon,carbon source,Agro_defined_trehalose,1,x,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Putida,set1IT078,RCH2_defined_noCarbon,carbon source,D-Glucose,40,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Putida,set1IT079,RCH2_defined_noCarbon,carbon source,D-Glucose,40,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Putida,set1IT080,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Putida,set1IT081,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Putida,set1IT082,RCH2_defined_noCarbon,carbon source,4-Hydroxyvalerate,40,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Putida,set1IT083,RCH2_defined_noCarbon,carbon source,4-Hydroxyvalerate,40,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Putida,set1IT084,RCH2_defined_noCarbon,carbon source,Potassium acetate,20,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Putida,set1IT085,RCH2_defined_noCarbon,carbon source,Potassium acetate,20,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Putida,set1IT086,RCH2_defined_noCarbon,carbon source,Potassium acetate,5,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Putida,set1IT087,RCH2_defined_noCarbon,carbon source,Potassium acetate,5,mM,,,,,,,,,,30,7,Aerobic,200 rpm,,True
+Putida,set5IT075,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Putida,set5IT076,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Putida,set5IT081,RCH2_defined_noCarbon,carbon source,Levulinic Acid,40,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Putida,set5IT082,RCH2_defined_noCarbon,carbon source,Levulinic Acid,40,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Putida,set5IT083,RCH2_defined_noCarbon,carbon source,Levulinic Acid,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Putida,set5IT084,RCH2_defined_noCarbon,carbon source,Levulinic Acid,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+Putida,set5IT085,RCH2_defined_noCarbon,carbon source,Vanillin,5,mM,Dimethyl Sulfoxide,0.5,vol%,,,,,,,30,7,Aerobic,700 rpm,,True
+Putida,set5IT086,RCH2_defined_noCarbon,carbon source,Vanillin,5,mM,Dimethyl Sulfoxide,0.5,vol%,,,,,,,30,7,Aerobic,700 rpm,,True
+Putida,set5IT087,RCH2_defined_noCarbon,carbon source,p-Coumaric acid,5,mM,Dimethyl Sulfoxide,0.5,vol%,,,,,,,30,7,Aerobic,700 rpm,,True
+Putida,set5IT088,RCH2_defined_noCarbon,carbon source,p-Coumaric acid,5,mM,Dimethyl Sulfoxide,0.5,vol%,,,,,,,30,7,Aerobic,700 rpm,,True
+Putida,set6IT057,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set6IT059,MOPS minimal media_noCarbon,carbon source,Ferulic Acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set6IT061,MOPS minimal media_noCarbon,carbon source,benzoic acid,5,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set6IT064,MOPS minimal media_noCarbon,carbon source,2-Piperidinone,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set6IT065,MOPS minimal media_noCarbon,carbon source,D-Glucuronic Acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set7IT042,MOPS minimal media_noCarbon,carbon source,4-Aminobutyric acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set7IT044,MOPS minimal media_noCarbon,carbon source,5-Aminovaleric acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set7IT045,MOPS minimal media_noCarbon,carbon source,2-Piperidinone,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set7IT055,MOPS minimal media_noCarbon,carbon source,L-Lysine,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set7IT056,MOPS minimal media_noCarbon,carbon source,D-Lysine,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set7IT057,MOPS minimal media_noCarbon,carbon source,5-Aminovaleric acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set7IT062,MOPS minimal media_noCarbon,carbon source,D-Lysine,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT006,MOPS minimal media_noCarbon,carbon source,L-Arginine,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT008,MOPS minimal media_noCarbon,carbon source,L-Glutamic acid monopotassium salt monohydrate,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT010,MOPS minimal media_noCarbon,carbon source,L-Histidine,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT017,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Ala,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT018,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Arg,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT019,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Asn,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT020,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Asp,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT021,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Cys,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT022,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Glu,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT023,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Gln,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT024,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Gly,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT025,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_His,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT026,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Ile,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT027,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Leu,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT028,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Lys,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT029,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Met,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT031,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Pro,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT032,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Ser,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT033,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Thr,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT034,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Trp,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT035,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Tyr,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT036,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix_minus_Val,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT037,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,20AA_mix,0.5,X,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT043,MOPS minimal media_noCarbon,carbon source,Sodium succinate dibasic hexahydrate,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT044,MOPS minimal media_noCarbon,carbon source,a-Ketoglutaric acid disodium salt hydrate,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set10IT053,MOPS minimal media_noCarbon,carbon source,Sodium butyrate,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set12IT001,MOPS minimal media_noCarbon,carbon source,Vanillin,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT002,MOPS minimal media_noCarbon,carbon source,"1,2-Propanediol",10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT004,MOPS minimal media_noCarbon,carbon source,Sodium propionate,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT007,MOPS minimal media_noCarbon,carbon source,2-methyl-1-butanol,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT008,MOPS minimal media_noCarbon,carbon source,"1,5-Pentanediol",10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT009,MOPS minimal media_noCarbon,carbon source,"1,4-Butanediol",10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT014,MOPS minimal media_noCarbon,carbon source,Vanillic Acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT015,MOPS minimal media_noCarbon,carbon source,Protocatechuic Acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT016,MOPS minimal media_noCarbon,carbon source,4-Hydroxybenzoic Acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT017,MOPS minimal media_noCarbon,carbon source,Protocatechuic Acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT023,MOPS minimal media_noCarbon,carbon source,L-Lysine,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT024,MOPS minimal media_noCarbon,carbon source,p-Coumaric acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT025,MOPS minimal media_noCarbon,carbon source,benzoic acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT026,MOPS minimal media_noCarbon,carbon source,Ferulic Acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT027,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT028,MOPS minimal media_noCarbon,carbon source,L-Glutamic acid monopotassium salt monohydrate,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT029,MOPS minimal media_noCarbon,carbon source,Phenylacetic acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT031,MOPS minimal media_noCarbon,carbon source,Vanillin,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT032,MOPS minimal media_noCarbon,carbon source,"1,2-Propanediol",10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT034,MOPS minimal media_noCarbon,carbon source,Sodium propionate,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT037,MOPS minimal media_noCarbon,carbon source,2-methyl-1-butanol,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT038,MOPS minimal media_noCarbon,carbon source,"1,5-Pentanediol",10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT039,MOPS minimal media_noCarbon,carbon source,"1,4-Butanediol",10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT044,MOPS minimal media_noCarbon,carbon source,Vanillic Acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT046,MOPS minimal media_noCarbon,carbon source,4-Hydroxybenzoic Acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT053,MOPS minimal media_noCarbon,carbon source,L-Lysine,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT054,MOPS minimal media_noCarbon,carbon source,p-Coumaric acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT055,MOPS minimal media_noCarbon,carbon source,benzoic acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT056,MOPS minimal media_noCarbon,carbon source,Ferulic Acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT057,MOPS minimal media_noCarbon,carbon source,D-Glucose,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT058,MOPS minimal media_noCarbon,carbon source,L-Glutamic acid monopotassium salt monohydrate,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set12IT059,MOPS minimal media_noCarbon,carbon source,Phenylacetic acid,10,mM,Dimethyl Sulfoxide,1,vol%,,,,,,,30,,Aerobic,700rpm,,True
+Putida,set15IT054,MOPS minimal media_noCarbon,carbon source,Butyl stearate,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT057,MOPS minimal media_noCarbon,carbon source,Hexanoic acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT058,MOPS minimal media_noCarbon,carbon source,Decanoic acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT059,MOPS minimal media_noCarbon,carbon source,Lauric acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT060,MOPS minimal media_noCarbon,carbon source,Valeric acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT061,MOPS minimal media_noCarbon,carbon source,Octanoic acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT062,MOPS minimal media_noCarbon,carbon source,Nonanoic acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT063,MOPS minimal media_noCarbon,carbon source,Tween 20,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT064,MOPS minimal media_noCarbon,carbon source,Myristic acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT065,MOPS minimal media_noCarbon,carbon source,Sodium butyrate,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT066,MOPS minimal media_noCarbon,carbon source,Oleic acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT067,MOPS minimal media_noCarbon,carbon source,Heptanoic acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT068,MOPS minimal media_noCarbon,carbon source,Butyl stearate,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT071,MOPS minimal media_noCarbon,carbon source,Hexanoic acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT072,MOPS minimal media_noCarbon,carbon source,Decanoic acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT073,MOPS minimal media_noCarbon,carbon source,Lauric acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT074,MOPS minimal media_noCarbon,carbon source,Valeric acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT075,MOPS minimal media_noCarbon,carbon source,Octanoic acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT076,MOPS minimal media_noCarbon,carbon source,Nonanoic acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT077,MOPS minimal media_noCarbon,carbon source,Tween 20,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT078,MOPS minimal media_noCarbon,carbon source,Myristic acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT079,MOPS minimal media_noCarbon,carbon source,Sodium butyrate,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT080,MOPS minimal media_noCarbon,carbon source,Oleic acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set15IT081,MOPS minimal media_noCarbon,carbon source,Heptanoic acid,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set16IT004,MOPS minimal media_noCarbon,carbon source,Butanol,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set16IT005,MOPS minimal media_noCarbon,carbon source,Butanol,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set16IT006,MOPS minimal media_noCarbon,carbon source,"1,3-Butandiol",10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set16IT007,MOPS minimal media_noCarbon,carbon source,"1,3-Butandiol",10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set16IT008,MOPS minimal media_noCarbon,carbon source,3-methyl-3-butenol,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set16IT009,MOPS minimal media_noCarbon,carbon source,3-methyl-3-butenol,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set16IT010,MOPS minimal media_noCarbon,carbon source,3-methyl-1-butanol,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set16IT011,MOPS minimal media_noCarbon,carbon source,3-methyl-1-butanol,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set16IT012,MOPS minimal media_noCarbon,carbon source,1-Pentanol,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set16IT013,MOPS minimal media_noCarbon,carbon source,1-Pentanol,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set16IT014,MOPS minimal media_noCarbon,carbon source,Ethanol,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set16IT015,MOPS minimal media_noCarbon,carbon source,Ethanol,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set29IT057,MOPS minimal media_noCarbon,carbon source,D-Galacturonic Acid monohydrate,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set29IT058,MOPS minimal media_noCarbon,carbon source,D-Galacturonic Acid monohydrate,10,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Putida,set36IT065,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set36IT066,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set36IT067,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set36IT069,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set36IT071,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.8,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set36IT072,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.8,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set36IT073,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.8,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set36IT074,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set36IT075,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set36IT076,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set36IT083,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI tmk3mutant grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set36IT084,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI tmk3mutant grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set36IT085,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI tmk3mutant grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT007,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT010,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT011,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT013,R2A,r2a control with 0.2x vogels,Vogels_fungal_media,0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT014,R2A,r2a control with 0.2x vogels,Vogels_fungal_media,0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT016,R2A,r2a control with 0.2x vogels,Vogels_fungal_media,0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT018,R2A,r2a control with 0.2x vogels,Vogels_fungal_media,0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT025,R2A,stress,Polymyxin B sulfate,0.001,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT026,R2A,stress,Polymyxin B sulfate,0.001,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT027,R2A,stress,Polymyxin B sulfate,0.001,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT028,R2A,stress,Polymyxin B sulfate,0.001,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT032,R2A,stress,Polymyxin B sulfate,0.002,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT038,R2A,stress,Fusaric acid,120,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT039,R2A,stress,Fusaric acid,120,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT040,R2A,stress,Fusaric acid,120,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT041,R2A,stress,Fusaric acid,120,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT042,R2A,stress,Fusaric acid,120,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT043,R2A,stress,Fusaric acid,240,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT044,R2A,stress,Fusaric acid,240,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT045,R2A,stress,Fusaric acid,240,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT047,R2A,stress,Fusaric acid,240,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT048,R2A,stress,Fusaric acid,240,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT049,R2A,stress,Fusaric acid,480,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT050,R2A,stress,Fusaric acid,480,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT051,R2A,stress,Fusaric acid,480,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT052,R2A,stress,Fusaric acid,480,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT053,R2A,stress,Fusaric acid,480,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT054,R2A,stress,Fusaric acid,480,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT055,R2A,r2a control with 0.2% methanol,Methanol,0.2,vol%,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT056,R2A,r2a control with 0.2% methanol,Methanol,0.2,vol%,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT057,R2A,r2a control with 0.2% methanol,Methanol,0.2,vol%,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT058,R2A,r2a control with 0.2% methanol,Methanol,0.2,vol%,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Putida,set38IT060,R2A,r2a control with 0.2% methanol,Methanol,0.2,vol%,,,,,,,,,,30,,Aerobic,700 rpm,,True
+Smeli,set5IT063,RCH2_defined_glucose,nutrient,L-Histidine,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Smeli,set5IT064,RCH2_defined_glucose,nutrient,L-Histidine,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Smeli,set5IT065,RCH2_defined_glucose,nutrient,L-Lysine,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Smeli,set5IT066,RCH2_defined_glucose,nutrient,L-Lysine,1,mM,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Smeli,set5IT067,RCH2_defined_glucose,nutrient,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+Smeli,set5IT068,RCH2_defined_glucose,nutrient,,,,,,,,,,,,,30,,Aerobic,200 rpm,,True
+WCS417,set6IT092,RCH2_defined_noCarbon,carbon source,D-Glucose,20,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set6IT093,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set6IT094,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set6IT095,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-ribonic acid lithium salt,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set8IT001,RCH2_defined_noCarbon,carbon source,2'-Deoxyinosine,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set8IT002,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-ribonic acid lithium salt,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set8IT003,RCH2_defined_noCarbon,carbon source,Deoxyribonucleic acid from herring sperm,10,mg/mL,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set8IT004,RCH2_defined_noCarbon,carbon source,Deoxyribonucleic acid from herring sperm,5,mg/mL,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set8IT005,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set8IT007,RCH2_defined_noCarbon,carbon source,2'-Deoxyinosine,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set8IT008,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-ribonic acid lithium salt,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set8IT009,RCH2_defined_noCarbon,carbon source,Deoxyribonucleic acid from herring sperm,10,mg/mL,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set8IT010,RCH2_defined_noCarbon,carbon source,Deoxyribonucleic acid from herring sperm,5,mg/mL,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set8IT011,RCH2_defined_noCarbon,carbon source,2-Deoxy-D-Ribose,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set17IT015,RCH2_defined_noCarbon,carbon source,D-Mannitol,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set17IT016,RCH2_defined_noCarbon,carbon source,D-Mannitol,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set17IT017,RCH2_defined_noCarbon,carbon source,D-Mannitol,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set17IT018,RCH2_defined_noCarbon,carbon source,L-Ornithine,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set17IT019,RCH2_defined_noCarbon,carbon source,L-Ornithine,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set17IT020,RCH2_defined_noCarbon,carbon source,L-Citrulline,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set17IT021,RCH2_defined_noCarbon,carbon source,L-Citrulline,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set17IT022,RCH2_defined_noCarbon,carbon source,D-Mannitol,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set17IT023,RCH2_defined_noCarbon,carbon source,D-Mannitol,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set17IT024,RCH2_defined_noCarbon,carbon source,D-Mannitol,2.5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set17IT025,RCH2_defined_noCarbon,carbon source,L-Ornithine,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set17IT026,RCH2_defined_noCarbon,carbon source,L-Ornithine,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set17IT027,RCH2_defined_noCarbon,carbon source,L-Citrulline,10,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set17IT028,RCH2_defined_noCarbon,carbon source,L-Citrulline,5,mM,,,,,,,,,,30,7,Aerobic,700 rpm,,True
+WCS417,set18IT035,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set18IT036,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set18IT037,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set18IT038,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set18IT040,R2A,supernatant control:fungal media,"Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set18IT044,R2A,r2a control,,,,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set20IT050,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI tmk3mutant grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set20IT051,R2A,supernatant,"Supernatant; Trichoderma atroviride IMI tmk3mutant grown in Vogels_fungal_media, filtered",0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set22IT073,R2A,r2a control with 0.2x vogels,Vogels_fungal_media,0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set22IT074,R2A,r2a control with 0.2x vogels,Vogels_fungal_media,0.2,X,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set22IT082,R2A,stress,Polymyxin B sulfate,0.002,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set22IT083,R2A,stress,Polymyxin B sulfate,0.002,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set22IT084,R2A,stress,Polymyxin B sulfate,0.002,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set22IT085,R2A,stress,Polymyxin B sulfate,0.002,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set22IT086,R2A,stress,Polymyxin B sulfate,0.002,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set22IT087,R2A,stress,Polymyxin B sulfate,0.002,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set22IT088,R2A,stress,Polymyxin B sulfate,0.003,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set22IT089,R2A,stress,Polymyxin B sulfate,0.003,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set22IT090,R2A,stress,Polymyxin B sulfate,0.003,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set22IT091,R2A,stress,Polymyxin B sulfate,0.003,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set22IT092,R2A,stress,Polymyxin B sulfate,0.003,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set22IT093,R2A,stress,Polymyxin B sulfate,0.003,mg/ml,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set23IT007,R2A,stress,Fusaric acid,120,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set23IT008,R2A,stress,Fusaric acid,120,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set23IT009,R2A,stress,Fusaric acid,120,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set23IT010,R2A,stress,Fusaric acid,120,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set23IT011,R2A,stress,Fusaric acid,120,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set23IT012,R2A,stress,Fusaric acid,120,ug/mL,,,,,,,,,,30,,Aerobic,700 rpm,,True
+WCS417,set23IT019,R2A,r2a control with 0.2% methanol,Methanol,0.2,vol%,,,,,,,,,,30,,Aerobic,700 rpm,,True

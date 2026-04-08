@@ -1,0 +1,21 @@
+# Install the project in editable mode to make all packages importable:
+#   pip install -e .
+# This file lists the same deps as pyproject.toml for direct pip install workflows.
+
+# Data processing & analysis
+pandas>=2.0
+pyarrow>=14.0
+numpy>=1.24
+scipy>=1.10
+openpyxl>=3.1
+matplotlib>=3.7
+seaborn>=0.13
+networkx>=3.0
+statsmodels>=0.14
+
+# Modeling
+torch>=2.0
+
+# Notebooks
+jupyter>=1.0
+ipykernel>=6.0

@@ -1,0 +1,87 @@
+media,n_missing_experiments,n_orgs,media_missing_in_components,candidate_component_media_match,suggested_action
+Varel_Bryant_medium_Glucose,239,1,True,,Add media composition row(s) or map alias
+MoYLS4,224,1,False,MoYLS4,"Investigate missing (orgId, expName) row in Excel Experiments sheet"
+RCH2_defined_noCarbon,184,15,False,RCH2_defined_noCarbon,"Investigate missing (orgId, expName) row in Excel Experiments sheet"
+MoLS4,176,2,False,MoLS4,"Investigate missing (orgId, expName) row in Excel Experiments sheet"
+BHIS,129,1,True,,Add media composition row(s) or map alias
+R2A,114,4,False,R2A,"Investigate missing (orgId, expName) row in Excel Experiments sheet"
+Varel_Bryant_medium,112,1,True,,Add media composition row(s) or map alias
+Dv_base_medium,111,1,True,,Add media composition row(s) or map alias
+MoLS4_no_ammonium,110,1,True,,Add media composition row(s) or map alias
+MOPS minimal media_noCarbon,108,1,False,MOPS minimal media_noCarbon,"Investigate missing (orgId, expName) row in Excel Experiments sheet"
+MOPS minimal media_Glucose_noNitrogen,104,1,True,,Add media composition row(s) or map alias
+Mc_defined_H2,86,2,True,,Add media composition row(s) or map alias
+Mc_defined_formate,76,2,True,,Add media composition row(s) or map alias
+Mc_H2_N_Free,68,2,True,,Add media composition row(s) or map alias
+,61,6,True,,Add media composition row(s) or map alias
+Potato tuber,53,3,True,,Add media composition row(s) or map alias
+KB,46,2,True,,Add media composition row(s) or map alias
+McCas_H2_complete,39,2,True,,Add media composition row(s) or map alias
+RCH2_defined_glucose,36,5,False,RCH2_defined_glucose,"Investigate missing (orgId, expName) row in Excel Experiments sheet"
+Dv_base_Y_medium,36,1,True,,Add media composition row(s) or map alias
+Mc_formate,36,1,True,,Add media composition row(s) or map alias
+McCas,34,2,True,,Add media composition row(s) or map alias
+MG minimal media_noIron,34,1,True,,Add media composition row(s) or map alias
+DinoMM_noCarbon_HighNutrient,26,3,False,DinoMM_noCarbon_HighNutrient,"Investigate missing (orgId, expName) row in Excel Experiments sheet"
+M9_1percentGlucose,22,1,True,,Add media composition row(s) or map alias
+Potato stem,22,1,True,,Add media composition row(s) or map alias
+LB,21,3,False,LB,"Investigate missing (orgId, expName) row in Excel Experiments sheet"
+RCH2_Lactate_Nitrate_YE,21,1,True,,Add media composition row(s) or map alias
+Varel_Bryant_medium_noNitrogen,19,1,True,,Add media composition row(s) or map alias
+M9 minimal media_noCarbon,18,3,False,M9 minimal media_noCarbon,"Investigate missing (orgId, expName) row in Excel Experiments sheet"
+Potato Dextrose Broth,18,3,True,,Add media composition row(s) or map alias
+McCas_H2_Fe_Free,18,2,True,,Add media composition row(s) or map alias
+McCas_formate_Fe_Free,18,2,True,,Add media composition row(s) or map alias
+McCas_H2_No_Na2S,17,1,True,,Add media composition row(s) or map alias
+McCas_formate_complete,15,2,True,,Add media composition row(s) or map alias
+MoLS4_no_vitamins,15,1,True,,Add media composition row(s) or map alias
+McCas_MOPS,12,2,True,,Add media composition row(s) or map alias
+Mc_formate_N_Free,12,2,True,,Add media composition row(s) or map alias
+RCH2_Lactate_1_M_Fe-Cu,12,1,True,,Add media composition row(s) or map alias
+RCH2_defined_noCarbon_noVitamins,12,1,True,,Add media composition row(s) or map alias
+M63_quarter_strength,11,4,True,,Add media composition row(s) or map alias
+DinoMM_L_lactateCarbon_HighNutrient,11,2,True,,Add media composition row(s) or map alias
+CPG,10,4,True,,Add media composition row(s) or map alias
+MoYLS4_no_iron,9,1,True,,Add media composition row(s) or map alias
+RCH2_defined_glucose_noVitamin,8,4,True,,Add media composition row(s) or map alias
+Dv_base_medium_no_Mo_no_W,7,1,True,,Add media composition row(s) or map alias
+M9+polygalacturonate,6,2,True,,Add media composition row(s) or map alias
+M9+starch,6,2,True,,Add media composition row(s) or map alias
+M9+sucrose,6,2,True,,Add media composition row(s) or map alias
+McAA_formate,6,2,True,,Add media composition row(s) or map alias
+McAA_formate_No_B12,6,2,True,,Add media composition row(s) or map alias
+McAA_formate_No_CaPantothenate,6,2,True,,Add media composition row(s) or map alias
+McAA_formate_No_FolicAcid,6,2,True,,Add media composition row(s) or map alias
+McAA_formate_No_NicotinicAcid,6,2,True,,Add media composition row(s) or map alias
+McAA_formate_No_Pyroxidine,6,2,True,,Add media composition row(s) or map alias
+McAA_formate_No_Riboflavin,6,2,True,,Add media composition row(s) or map alias
+McAA_formate_No_Thiamine,6,2,True,,Add media composition row(s) or map alias
+McAA_formate_No_biotin,6,2,True,,Add media composition row(s) or map alias
+McAA_formate_No_lipolicAcid,6,2,True,,Add media composition row(s) or map alias
+McAA_formate_No_pABA,6,2,True,,Add media composition row(s) or map alias
+MoLS4_no_B12,6,1,True,,Add media composition row(s) or map alias
+MoLS4_no_Choline_chloride,6,1,True,,Add media composition row(s) or map alias
+MoLS4_no_ammonium_no_Mo_no_W,6,1,True,,Add media composition row(s) or map alias
+MoLS4_no_ammonium_no_W,6,1,True,,Add media composition row(s) or map alias
+PYE,6,1,False,PYE,"Investigate missing (orgId, expName) row in Excel Experiments sheet"
+RCH2_Lactate_YE_1_M_Fe-Cu,6,1,True,,Add media composition row(s) or map alias
+Dv_base_medium_no_W,5,1,True,,Add media composition row(s) or map alias
+MoLS4_no_Folic_acid,5,1,True,,Add media composition row(s) or map alias
+MoLS4_no_Pantothenic_acid,5,1,True,,Add media composition row(s) or map alias
+MoLS4_no_Pyridoxine,5,1,True,,Add media composition row(s) or map alias
+M63_no_sulfur,4,1,True,,Add media composition row(s) or map alias
+DinoMM_L_lactateCarbon_HighNutrient_noVitamin,3,2,True,,Add media composition row(s) or map alias
+Dv_base_medium_no_Mo,3,1,True,,Add media composition row(s) or map alias
+LS4D,3,1,True,,Add media composition row(s) or map alias
+McCas_Formate_complete,3,1,True,,Add media composition row(s) or map alias
+MoLS4_no_Biotin,3,1,True,,Add media composition row(s) or map alias
+MoLS4_no_Mo,3,1,True,,Add media composition row(s) or map alias
+MoLS4_no_Mo_no_W,3,1,True,,Add media composition row(s) or map alias
+MoLS4_no_W,3,1,True,,Add media composition row(s) or map alias
+MoLS4_no_ammonium_no_Mo,3,1,True,,Add media composition row(s) or map alias
+MoLS4_no_lipoic_acid,3,1,True,,Add media composition row(s) or map alias
+MoLS4_no_nicotinic_acid,3,1,True,,Add media composition row(s) or map alias
+MoLS4_no_sulfide,3,1,True,,Add media composition row(s) or map alias
+MoLS4_no_thiamine,3,1,True,,Add media composition row(s) or map alias
+MG minimal media,1,1,True,,Add media composition row(s) or map alias
+MG minimal media_noCarbon,1,1,True,,Add media composition row(s) or map alias
