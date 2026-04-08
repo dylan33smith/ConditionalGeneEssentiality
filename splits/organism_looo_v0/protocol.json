@@ -1,0 +1,302 @@
+{
+  "protocol_id": "organism_looo_v0",
+  "description": "Leave-one-organism-out: each fold holds out one orgId for val; all others train. No test split.",
+  "split_axis": "orgId",
+  "canonical_fitness_parquet": "data/derived/canonical/v0/fitness_experiment_long.parquet",
+  "canonical_fitness_sha256_expected": "9b981201deee41a0f34c6ae366dc3f6c955f82589a6dafa56301d9c9ab1bd3b6",
+  "n_folds": 48,
+  "n_organisms": 48,
+  "folds": [
+    {
+      "fold_index": 0,
+      "val_org_id": "ANA3",
+      "file": "splits/organism_looo_v0/folds/fold_000_val_ANA3.json"
+    },
+    {
+      "fold_index": 1,
+      "val_org_id": "BFirm",
+      "file": "splits/organism_looo_v0/folds/fold_001_val_BFirm.json"
+    },
+    {
+      "fold_index": 2,
+      "val_org_id": "Btheta",
+      "file": "splits/organism_looo_v0/folds/fold_002_val_Btheta.json"
+    },
+    {
+      "fold_index": 3,
+      "val_org_id": "Burk376",
+      "file": "splits/organism_looo_v0/folds/fold_003_val_Burk376.json"
+    },
+    {
+      "fold_index": 4,
+      "val_org_id": "Caulo",
+      "file": "splits/organism_looo_v0/folds/fold_004_val_Caulo.json"
+    },
+    {
+      "fold_index": 5,
+      "val_org_id": "Cola",
+      "file": "splits/organism_looo_v0/folds/fold_005_val_Cola.json"
+    },
+    {
+      "fold_index": 6,
+      "val_org_id": "Cup4G11",
+      "file": "splits/organism_looo_v0/folds/fold_006_val_Cup4G11.json"
+    },
+    {
+      "fold_index": 7,
+      "val_org_id": "Dda3937",
+      "file": "splits/organism_looo_v0/folds/fold_007_val_Dda3937.json"
+    },
+    {
+      "fold_index": 8,
+      "val_org_id": "Ddia6719",
+      "file": "splits/organism_looo_v0/folds/fold_008_val_Ddia6719.json"
+    },
+    {
+      "fold_index": 9,
+      "val_org_id": "DdiaME23",
+      "file": "splits/organism_looo_v0/folds/fold_009_val_DdiaME23.json"
+    },
+    {
+      "fold_index": 10,
+      "val_org_id": "Dino",
+      "file": "splits/organism_looo_v0/folds/fold_010_val_Dino.json"
+    },
+    {
+      "fold_index": 11,
+      "val_org_id": "DvH",
+      "file": "splits/organism_looo_v0/folds/fold_011_val_DvH.json"
+    },
+    {
+      "fold_index": 12,
+      "val_org_id": "Dyella79",
+      "file": "splits/organism_looo_v0/folds/fold_012_val_Dyella79.json"
+    },
+    {
+      "fold_index": 13,
+      "val_org_id": "HerbieS",
+      "file": "splits/organism_looo_v0/folds/fold_013_val_HerbieS.json"
+    },
+    {
+      "fold_index": 14,
+      "val_org_id": "Kang",
+      "file": "splits/organism_looo_v0/folds/fold_014_val_Kang.json"
+    },
+    {
+      "fold_index": 15,
+      "val_org_id": "Keio",
+      "file": "splits/organism_looo_v0/folds/fold_015_val_Keio.json"
+    },
+    {
+      "fold_index": 16,
+      "val_org_id": "Korea",
+      "file": "splits/organism_looo_v0/folds/fold_016_val_Korea.json"
+    },
+    {
+      "fold_index": 17,
+      "val_org_id": "Koxy",
+      "file": "splits/organism_looo_v0/folds/fold_017_val_Koxy.json"
+    },
+    {
+      "fold_index": 18,
+      "val_org_id": "MR1",
+      "file": "splits/organism_looo_v0/folds/fold_018_val_MR1.json"
+    },
+    {
+      "fold_index": 19,
+      "val_org_id": "Magneto",
+      "file": "splits/organism_looo_v0/folds/fold_019_val_Magneto.json"
+    },
+    {
+      "fold_index": 20,
+      "val_org_id": "Marino",
+      "file": "splits/organism_looo_v0/folds/fold_020_val_Marino.json"
+    },
+    {
+      "fold_index": 21,
+      "val_org_id": "Methanococcus_JJ",
+      "file": "splits/organism_looo_v0/folds/fold_021_val_Methanococcus_JJ.json"
+    },
+    {
+      "fold_index": 22,
+      "val_org_id": "Methanococcus_S2",
+      "file": "splits/organism_looo_v0/folds/fold_022_val_Methanococcus_S2.json"
+    },
+    {
+      "fold_index": 23,
+      "val_org_id": "Miya",
+      "file": "splits/organism_looo_v0/folds/fold_023_val_Miya.json"
+    },
+    {
+      "fold_index": 24,
+      "val_org_id": "PS",
+      "file": "splits/organism_looo_v0/folds/fold_024_val_PS.json"
+    },
+    {
+      "fold_index": 25,
+      "val_org_id": "PV4",
+      "file": "splits/organism_looo_v0/folds/fold_025_val_PV4.json"
+    },
+    {
+      "fold_index": 26,
+      "val_org_id": "Pedo557",
+      "file": "splits/organism_looo_v0/folds/fold_026_val_Pedo557.json"
+    },
+    {
+      "fold_index": 27,
+      "val_org_id": "Phaeo",
+      "file": "splits/organism_looo_v0/folds/fold_027_val_Phaeo.json"
+    },
+    {
+      "fold_index": 28,
+      "val_org_id": "Ponti",
+      "file": "splits/organism_looo_v0/folds/fold_028_val_Ponti.json"
+    },
+    {
+      "fold_index": 29,
+      "val_org_id": "Putida",
+      "file": "splits/organism_looo_v0/folds/fold_029_val_Putida.json"
+    },
+    {
+      "fold_index": 30,
+      "val_org_id": "RalstoniaBSBF1503",
+      "file": "splits/organism_looo_v0/folds/fold_030_val_RalstoniaBSBF1503.json"
+    },
+    {
+      "fold_index": 31,
+      "val_org_id": "RalstoniaGMI1000",
+      "file": "splits/organism_looo_v0/folds/fold_031_val_RalstoniaGMI1000.json"
+    },
+    {
+      "fold_index": 32,
+      "val_org_id": "RalstoniaPSI07",
+      "file": "splits/organism_looo_v0/folds/fold_032_val_RalstoniaPSI07.json"
+    },
+    {
+      "fold_index": 33,
+      "val_org_id": "RalstoniaUW163",
+      "file": "splits/organism_looo_v0/folds/fold_033_val_RalstoniaUW163.json"
+    },
+    {
+      "fold_index": 34,
+      "val_org_id": "SB2B",
+      "file": "splits/organism_looo_v0/folds/fold_034_val_SB2B.json"
+    },
+    {
+      "fold_index": 35,
+      "val_org_id": "Smeli",
+      "file": "splits/organism_looo_v0/folds/fold_035_val_Smeli.json"
+    },
+    {
+      "fold_index": 36,
+      "val_org_id": "SynE",
+      "file": "splits/organism_looo_v0/folds/fold_036_val_SynE.json"
+    },
+    {
+      "fold_index": 37,
+      "val_org_id": "SyringaeB728a",
+      "file": "splits/organism_looo_v0/folds/fold_037_val_SyringaeB728a.json"
+    },
+    {
+      "fold_index": 38,
+      "val_org_id": "SyringaeB728a_mexBdelta",
+      "file": "splits/organism_looo_v0/folds/fold_038_val_SyringaeB728a_mexBdelta.json"
+    },
+    {
+      "fold_index": 39,
+      "val_org_id": "WCS417",
+      "file": "splits/organism_looo_v0/folds/fold_039_val_WCS417.json"
+    },
+    {
+      "fold_index": 40,
+      "val_org_id": "acidovorax_3H11",
+      "file": "splits/organism_looo_v0/folds/fold_040_val_acidovorax_3H11.json"
+    },
+    {
+      "fold_index": 41,
+      "val_org_id": "azobra",
+      "file": "splits/organism_looo_v0/folds/fold_041_val_azobra.json"
+    },
+    {
+      "fold_index": 42,
+      "val_org_id": "psRCH2",
+      "file": "splits/organism_looo_v0/folds/fold_042_val_psRCH2.json"
+    },
+    {
+      "fold_index": 43,
+      "val_org_id": "pseudo13_GW456_L13",
+      "file": "splits/organism_looo_v0/folds/fold_043_val_pseudo13_GW456_L13.json"
+    },
+    {
+      "fold_index": 44,
+      "val_org_id": "pseudo1_N1B4",
+      "file": "splits/organism_looo_v0/folds/fold_044_val_pseudo1_N1B4.json"
+    },
+    {
+      "fold_index": 45,
+      "val_org_id": "pseudo3_N2E3",
+      "file": "splits/organism_looo_v0/folds/fold_045_val_pseudo3_N2E3.json"
+    },
+    {
+      "fold_index": 46,
+      "val_org_id": "pseudo5_N2C3_1",
+      "file": "splits/organism_looo_v0/folds/fold_046_val_pseudo5_N2C3_1.json"
+    },
+    {
+      "fold_index": 47,
+      "val_org_id": "pseudo6_N2E2",
+      "file": "splits/organism_looo_v0/folds/fold_047_val_pseudo6_N2E2.json"
+    }
+  ],
+  "row_counts_in_canonical_by_org": {
+    "Btheta": 2104545,
+    "DvH": 2074937,
+    "Putida": 1433400,
+    "psRCH2": 1172150,
+    "pseudo3_N2E3": 1060908,
+    "pseudo6_N2E2": 965004,
+    "Koxy": 958464,
+    "pseudo5_N2C3_1": 955512,
+    "Marino": 930750,
+    "WCS417": 888219,
+    "Phaeo": 849126,
+    "Cola": 798708,
+    "Pedo557": 782871,
+    "Cup4G11": 676704,
+    "MR1": 665632,
+    "Caulo": 655776,
+    "pseudo1_N1B4": 637392,
+    "Keio": 636552,
+    "BFirm": 613364,
+    "SB2B": 592990,
+    "Dino": 592782,
+    "acidovorax_3H11": 550900,
+    "Korea": 549666,
+    "PV4": 481440,
+    "Smeli": 461970,
+    "Methanococcus_S2": 461524,
+    "pseudo13_GW456_L13": 461100,
+    "Miya": 450518,
+    "azobra": 439803,
+    "ANA3": 392476,
+    "Ponti": 383240,
+    "HerbieS": 372384,
+    "DdiaME23": 259509,
+    "Dyella79": 246500,
+    "SynE": 244971,
+    "Kang": 216324,
+    "Dda3937": 214890,
+    "PS": 202319,
+    "SyringaeB728a": 198444,
+    "Methanococcus_JJ": 178407,
+    "Burk376": 154590,
+    "Ddia6719": 116424,
+    "Magneto": 115956,
+    "SyringaeB728a_mexBdelta": 98486,
+    "RalstoniaPSI07": 32232,
+    "RalstoniaBSBF1503": 30232,
+    "RalstoniaGMI1000": 27860,
+    "RalstoniaUW163": 22770
+  },
+  "assignment_rule": "For fold i, row is val iff orgId == val_org_id; else train."
+}

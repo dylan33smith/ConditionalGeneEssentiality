@@ -1,0 +1,39 @@
+{
+  "generated_utc": "2026-04-05T19:25:20Z",
+  "n_experiments": 7552,
+  "n_fitness_sample_rows": 87574,
+  "sample_mod": 313,
+  "benchmark_experiments": 1740,
+  "benchmark_fitness_rows_estimate": null,
+  "variance_decomposition": {
+    "n_rows_sample": 87574,
+    "ss_total": 35382.51855693859,
+    "ss_orgId_vs_grand_mean": 380.52927536996015,
+    "frac_ss_orgId": 0.010754725522367812,
+    "ss_top400_exp_on_org_residuals": 1004.3079859454571,
+    "frac_ss_top400_exp_on_residuals_of_ss_tot": 0.028384298995824595,
+    "note": "Sequential exploratory decomposition on systematic sample; exp buckets top-400 + other."
+  },
+  "embedding_spotcheck": {
+    "file": "ANA3_proteomelm.pt",
+    "embeddings_shape": [
+      4360,
+      1152
+    ],
+    "n_labels": 4360,
+    "l2_mean": 33.95231628417969
+  },
+  "excel_experiment_sheet_coverage": {
+    "n_experiments_db": 7552,
+    "n_rows_excel_experiments": 4870,
+    "matched_on_orgId_expName": 4797,
+    "unmatched_db_experiments": 2755,
+    "media_string_mismatches_on_matches": 0
+  },
+  "outputs": {
+    "figures_dir": "figures/phase0",
+    "media_audit_md": "data_analysis/outputs/media_composition_audit.md",
+    "connected_media_csv": "data_analysis/outputs/connected_media_degree_benchmark.csv",
+    "phase0_summary_json": "data_analysis/outputs/phase0_summary.json"
+  }
+}

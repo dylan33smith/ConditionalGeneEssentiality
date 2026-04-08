@@ -1,0 +1,993 @@
+{
+  "manifest_version": 1,
+  "milestone": "M4",
+  "generated_utc": "2026-04-05T23:13:43Z",
+  "bundle_id": "processed_ProtLM_layer8",
+  "relative_directory": "data/processed/ProtLM_embeddings_layer8",
+  "model_note": "Bitbol-Lab/ProteomeLM-L layer 8, D=1152 (plan \u00a72.4)",
+  "canonical_fitness_parquet": "data/derived/canonical/v0/fitness_experiment_long.parquet",
+  "canonical_fitness_sha256_expected": "9b981201deee41a0f34c6ae366dc3f6c955f82589a6dafa56301d9c9ab1bd3b6",
+  "files": [
+    {
+      "filename": "ANA3_proteomelm.pt",
+      "orgId_inferred": "ANA3",
+      "bytes": 10142369,
+      "sha256": "2c69b70d6e3bdf820470cde2349852ba5d9d92965203ba6c8759ae3da73610e0",
+      "n_gene_keys_in_canonical": 3668,
+      "embeddings_shape": [
+        4360,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4360,
+      "n_missing_in_embedding_vs_canonical": 25,
+      "n_extra_in_embedding_vs_canonical": 717
+    },
+    {
+      "filename": "BFirm_proteomelm.pt",
+      "orgId_inferred": "BFirm",
+      "bytes": 16756584,
+      "sha256": "d1739b684a9421d7bf5dfae4a208f3ebae92e2b52e69b447acd7758bc39b478e",
+      "n_gene_keys_in_canonical": 5428,
+      "embeddings_shape": [
+        7182,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 7182,
+      "n_missing_in_embedding_vs_canonical": 6,
+      "n_extra_in_embedding_vs_canonical": 1760,
+      "missing_gene_keys_sample": [
+        "BFirm:BPHYT_RS01395",
+        "BFirm:BPHYT_RS01965",
+        "BFirm:BPHYT_RS13605",
+        "BFirm:BPHYT_RS14550",
+        "BFirm:BPHYT_RS15290",
+        "BFirm:BPHYT_RS15465"
+      ]
+    },
+    {
+      "filename": "Btheta_proteomelm.pt",
+      "orgId_inferred": "Btheta",
+      "bytes": 11207855,
+      "sha256": "27a495363dcad47403c1136f6294468c4f0310c2fe1c31a32091ccce39f0ddb4",
+      "n_gene_keys_in_canonical": 4055,
+      "embeddings_shape": [
+        4816,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4816,
+      "n_missing_in_embedding_vs_canonical": 1,
+      "n_extra_in_embedding_vs_canonical": 762,
+      "missing_gene_keys_sample": [
+        "Btheta:402097"
+      ]
+    },
+    {
+      "filename": "Burk376_proteomelm.pt",
+      "orgId_inferred": "Burk376",
+      "bytes": 15320054,
+      "sha256": "d7980a14ddb009760d5664d08ff8b21d48f44826a3c6f3dc29763abe7391e376",
+      "n_gene_keys_in_canonical": 5153,
+      "embeddings_shape": [
+        6555,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 6555,
+      "n_missing_in_embedding_vs_canonical": 6,
+      "n_extra_in_embedding_vs_canonical": 1408,
+      "missing_gene_keys_sample": [
+        "Burk376:H281DRAFT_00710",
+        "Burk376:H281DRAFT_00747",
+        "Burk376:H281DRAFT_02147",
+        "Burk376:H281DRAFT_04002",
+        "Burk376:H281DRAFT_04034",
+        "Burk376:H281DRAFT_05861"
+      ]
+    },
+    {
+      "filename": "Caulo_proteomelm.pt",
+      "orgId_inferred": "Caulo",
+      "bytes": 9055400,
+      "sha256": "0cfd157e34a7407806cb13e3cf2e15a78c748b74d7498884adfe0be0273455cf",
+      "n_gene_keys_in_canonical": 3312,
+      "embeddings_shape": [
+        3886,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 3886,
+      "n_missing_in_embedding_vs_canonical": 7,
+      "n_extra_in_embedding_vs_canonical": 581,
+      "missing_gene_keys_sample": [
+        "Caulo:CCNA_R0010",
+        "Caulo:CCNA_R0026",
+        "Caulo:CCNA_R0037",
+        "Caulo:CCNA_R0047",
+        "Caulo:CCNA_R0048",
+        "Caulo:CCNA_R0054",
+        "Caulo:CCNA_R0075"
+      ]
+    },
+    {
+      "filename": "Cola_proteomelm.pt",
+      "orgId_inferred": "Cola",
+      "bytes": 10772641,
+      "sha256": "6490fd912b680fa87db90d860e8402843964767f4e93ca4e3919b650f2278662",
+      "n_gene_keys_in_canonical": 3954,
+      "embeddings_shape": [
+        4625,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4625,
+      "n_missing_in_embedding_vs_canonical": 4,
+      "n_extra_in_embedding_vs_canonical": 675,
+      "missing_gene_keys_sample": [
+        "Cola:Echvi_1344",
+        "Cola:Echvi_1854",
+        "Cola:Echvi_2654",
+        "Cola:Echvi_3444"
+      ]
+    },
+    {
+      "filename": "Cup4G11_proteomelm.pt",
+      "orgId_inferred": "Cup4G11",
+      "bytes": 17174582,
+      "sha256": "964dd36ba32981a7fb60f430ee2f795da17563f37b533840572576112579d83f",
+      "n_gene_keys_in_canonical": 6384,
+      "embeddings_shape": [
+        7358,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 7358,
+      "n_missing_in_embedding_vs_canonical": 11,
+      "n_extra_in_embedding_vs_canonical": 985,
+      "missing_gene_keys_sample": [
+        "Cup4G11:RR42_RS01505",
+        "Cup4G11:RR42_RS15620",
+        "Cup4G11:RR42_RS16685",
+        "Cup4G11:RR42_RS19655",
+        "Cup4G11:RR42_RS22990",
+        "Cup4G11:RR42_RS23760",
+        "Cup4G11:RR42_RS23765",
+        "Cup4G11:RR42_RS24535",
+        "Cup4G11:RR42_RS26555",
+        "Cup4G11:RR42_RS30735",
+        "Cup4G11:RR42_RS30765"
+      ]
+    },
+    {
+      "filename": "Dda3937_proteomelm.pt",
+      "orgId_inferred": "Dda3937",
+      "bytes": 9846774,
+      "sha256": "e2aff6328f7ad6e83c27b30b7b920d7262ddf4cb67b9211c0f42f2b8254776af",
+      "n_gene_keys_in_canonical": 3705,
+      "embeddings_shape": [
+        4213,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4213,
+      "n_missing_in_embedding_vs_canonical": 91,
+      "n_extra_in_embedding_vs_canonical": 599
+    },
+    {
+      "filename": "Ddia6719_proteomelm.pt",
+      "orgId_inferred": "Ddia6719",
+      "bytes": 9601981,
+      "sha256": "38747e2f6195976f8d6b3ae248d1a5dae3ad5035b247d9df2e105f2adb1a7d37",
+      "n_gene_keys_in_canonical": 3528,
+      "embeddings_shape": [
+        4110,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4110,
+      "n_missing_in_embedding_vs_canonical": 95,
+      "n_extra_in_embedding_vs_canonical": 677
+    },
+    {
+      "filename": "DdiaME23_proteomelm.pt",
+      "orgId_inferred": "DdiaME23",
+      "bytes": 9770173,
+      "sha256": "d4ff6156481a434c9b0cad788c2563585837581d169dacb5143bf6d1406e205b",
+      "n_gene_keys_in_canonical": 3761,
+      "embeddings_shape": [
+        4182,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4182,
+      "n_missing_in_embedding_vs_canonical": 150,
+      "n_extra_in_embedding_vs_canonical": 571
+    },
+    {
+      "filename": "Dino_proteomelm.pt",
+      "orgId_inferred": "Dino",
+      "bytes": 9751585,
+      "sha256": "500b3639f697dc153b8420007f81b876806af59551d463c8178239e0a32c9426",
+      "n_gene_keys_in_canonical": 3187,
+      "embeddings_shape": [
+        4192,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4192,
+      "n_missing_in_embedding_vs_canonical": 2,
+      "n_extra_in_embedding_vs_canonical": 1007,
+      "missing_gene_keys_sample": [
+        "Dino:3610323",
+        "Dino:3610611"
+      ]
+    },
+    {
+      "filename": "DvH_proteomelm.pt",
+      "orgId_inferred": "DvH",
+      "bytes": 7909786,
+      "sha256": "a852ef54d9adb434768957bda884c7dbfa351d7a9b8a3fd9e16c020d6db466a9",
+      "n_gene_keys_in_canonical": 2741,
+      "embeddings_shape": [
+        3403,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 3403,
+      "n_missing_in_embedding_vs_canonical": 16,
+      "n_extra_in_embedding_vs_canonical": 678,
+      "missing_gene_keys_sample": [
+        "DvH:206124",
+        "DvH:206576",
+        "DvH:206584",
+        "DvH:207474",
+        "DvH:207523",
+        "DvH:207930",
+        "DvH:208460",
+        "DvH:208645",
+        "DvH:208805",
+        "DvH:209498",
+        "DvH:408291",
+        "DvH:408336",
+        "DvH:410431",
+        "DvH:410457",
+        "DvH:410463",
+        "DvH:410473"
+      ]
+    },
+    {
+      "filename": "Dyella79_proteomelm.pt",
+      "orgId_inferred": "Dyella79",
+      "bytes": 10120253,
+      "sha256": "846724feb7ac8ed392872ef719c7198c501b1b36a4babac7918ffd6763908f97",
+      "n_gene_keys_in_canonical": 3625,
+      "embeddings_shape": [
+        4330,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4330,
+      "n_missing_in_embedding_vs_canonical": 7,
+      "n_extra_in_embedding_vs_canonical": 712,
+      "missing_gene_keys_sample": [
+        "Dyella79:N515DRAFT_0438",
+        "Dyella79:N515DRAFT_0439",
+        "Dyella79:N515DRAFT_0445",
+        "Dyella79:N515DRAFT_1150",
+        "Dyella79:N515DRAFT_1437",
+        "Dyella79:N515DRAFT_1662",
+        "Dyella79:N515DRAFT_2025"
+      ]
+    },
+    {
+      "filename": "HerbieS_proteomelm.pt",
+      "orgId_inferred": "HerbieS",
+      "bytes": 11010550,
+      "sha256": "81f810405e61c6e87f4e1d97dbb70f1b579f4fc325090d7c1f0c09aa2acb0506",
+      "n_gene_keys_in_canonical": 3879,
+      "embeddings_shape": [
+        4715,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4715,
+      "n_missing_in_embedding_vs_canonical": 1,
+      "n_extra_in_embedding_vs_canonical": 837,
+      "missing_gene_keys_sample": [
+        "HerbieS:HSERO_RS02475"
+      ]
+    },
+    {
+      "filename": "Kang_proteomelm.pt",
+      "orgId_inferred": "Kang",
+      "bytes": 5756513,
+      "sha256": "4610ac4c7bd497a7a1fad35a003f57da89933b6b4ff0aeaf7395d4d404db170f",
+      "n_gene_keys_in_canonical": 2003,
+      "embeddings_shape": [
+        2467,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 2467,
+      "n_missing_in_embedding_vs_canonical": 11,
+      "n_extra_in_embedding_vs_canonical": 475,
+      "missing_gene_keys_sample": [
+        "Kang:B158DRAFT_1040",
+        "Kang:B158DRAFT_1041",
+        "Kang:B158DRAFT_1264",
+        "Kang:B158DRAFT_1408",
+        "Kang:B158DRAFT_1409",
+        "Kang:B158DRAFT_1466",
+        "Kang:B158DRAFT_1467",
+        "Kang:B158DRAFT_1493",
+        "Kang:B158DRAFT_1577",
+        "Kang:B158DRAFT_1816",
+        "Kang:B158DRAFT_2470"
+      ]
+    },
+    {
+      "filename": "Keio_proteomelm.pt",
+      "orgId_inferred": "Keio",
+      "bytes": 9636769,
+      "sha256": "f70e6a79aa1a43a26e5823138229007b178d93b0f1e6a6e83756a0e68c2208b0",
+      "n_gene_keys_in_canonical": 3789,
+      "embeddings_shape": [
+        4146,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4146,
+      "n_missing_in_embedding_vs_canonical": 204,
+      "n_extra_in_embedding_vs_canonical": 561
+    },
+    {
+      "filename": "Korea_proteomelm.pt",
+      "orgId_inferred": "Korea",
+      "bytes": 9684776,
+      "sha256": "3b5ac5f981fd1fa99046e384fc53030a0324e0612c4871eca526c2399958eac9",
+      "n_gene_keys_in_canonical": 3393,
+      "embeddings_shape": [
+        4149,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4149,
+      "n_missing_in_embedding_vs_canonical": 33,
+      "n_extra_in_embedding_vs_canonical": 789
+    },
+    {
+      "filename": "Koxy_proteomelm.pt",
+      "orgId_inferred": "Koxy",
+      "bytes": 12381601,
+      "sha256": "af97377f936434429f815858ec60fdb4ec742d50e0c4b9afd13a10b162223222",
+      "n_gene_keys_in_canonical": 4608,
+      "embeddings_shape": [
+        5309,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 5309,
+      "n_missing_in_embedding_vs_canonical": 123,
+      "n_extra_in_embedding_vs_canonical": 824
+    },
+    {
+      "filename": "MR1_proteomelm.pt",
+      "orgId_inferred": "MR1",
+      "bytes": 10382298,
+      "sha256": "fd13ef0c3bb9904fc4c041720b707675a8e4fa672fdda895358be23f2bfc595b",
+      "n_gene_keys_in_canonical": 3782,
+      "embeddings_shape": [
+        4467,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4467,
+      "n_missing_in_embedding_vs_canonical": 120,
+      "n_extra_in_embedding_vs_canonical": 805
+    },
+    {
+      "filename": "Magneto_proteomelm.pt",
+      "orgId_inferred": "Magneto",
+      "bytes": 10473846,
+      "sha256": "750e0777034acc6360ce9fbe06cfa0f0d7074ab711a488d167fe5811b10ed964",
+      "n_gene_keys_in_canonical": 3221,
+      "embeddings_shape": [
+        4489,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4489,
+      "n_missing_in_embedding_vs_canonical": 66,
+      "n_extra_in_embedding_vs_canonical": 1334
+    },
+    {
+      "filename": "Marino_proteomelm.pt",
+      "orgId_inferred": "Marino",
+      "bytes": 10266415,
+      "sha256": "06ba9406f5b7a41ba4459d1fa0909c029bc84173d7d5a4fe49638aedfea72531",
+      "n_gene_keys_in_canonical": 3650,
+      "embeddings_shape": [
+        4410,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4410,
+      "n_missing_in_embedding_vs_canonical": 2,
+      "n_extra_in_embedding_vs_canonical": 762,
+      "missing_gene_keys_sample": [
+        "Marino:GFF2286",
+        "Marino:GFF3796"
+      ]
+    },
+    {
+      "filename": "Methanococcus_JJ_proteomelm.pt",
+      "orgId_inferred": "Methanococcus_JJ",
+      "bytes": 4209141,
+      "sha256": "484b076aeb64ab16301e75f0b9f38018cae503bcb4c6fc71254d7ef7e65566f3",
+      "n_gene_keys_in_canonical": 1383,
+      "embeddings_shape": [
+        1796,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 1796,
+      "n_missing_in_embedding_vs_canonical": 16,
+      "n_extra_in_embedding_vs_canonical": 429,
+      "missing_gene_keys_sample": [
+        "Methanococcus_JJ:MMJJ_RS00955",
+        "Methanococcus_JJ:MMJJ_RS00975",
+        "Methanococcus_JJ:MMJJ_RS00985",
+        "Methanococcus_JJ:MMJJ_RS00990",
+        "Methanococcus_JJ:MMJJ_RS01745",
+        "Methanococcus_JJ:MMJJ_RS02315",
+        "Methanococcus_JJ:MMJJ_RS02865",
+        "Methanococcus_JJ:MMJJ_RS04070",
+        "Methanococcus_JJ:MMJJ_RS04220",
+        "Methanococcus_JJ:MMJJ_RS04330",
+        "Methanococcus_JJ:MMJJ_RS04350",
+        "Methanococcus_JJ:MMJJ_RS04870",
+        "Methanococcus_JJ:MMJJ_RS04875",
+        "Methanococcus_JJ:MMJJ_RS08415",
+        "Methanococcus_JJ:MMJJ_RS08745",
+        "Methanococcus_JJ:MMJJ_RS09385"
+      ]
+    },
+    {
+      "filename": "Methanococcus_S2_proteomelm.pt",
+      "orgId_inferred": "Methanococcus_S2",
+      "bytes": 4078581,
+      "sha256": "4d77793f8f2bed33811df5e9c170e5a9de5a3a5db0913426d3b956883aa62629",
+      "n_gene_keys_in_canonical": 1244,
+      "embeddings_shape": [
+        1741,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 1741,
+      "n_missing_in_embedding_vs_canonical": 6,
+      "n_extra_in_embedding_vs_canonical": 503,
+      "missing_gene_keys_sample": [
+        "Methanococcus_S2:MMP_RS01830",
+        "Methanococcus_S2:MMP_RS01965",
+        "Methanococcus_S2:MMP_RS02045",
+        "Methanococcus_S2:MMP_RS06065",
+        "Methanococcus_S2:MMP_RS07600",
+        "Methanococcus_S2:MMP_RS09050"
+      ]
+    },
+    {
+      "filename": "Miya_proteomelm.pt",
+      "orgId_inferred": "Miya",
+      "bytes": 7397665,
+      "sha256": "ce2b81933dd24b002191eedcba48cff78086bb5d8628ed6d2d1bec7910ae35c0",
+      "n_gene_keys_in_canonical": 2531,
+      "embeddings_shape": [
+        3180,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 3180,
+      "n_missing_in_embedding_vs_canonical": 20,
+      "n_extra_in_embedding_vs_canonical": 669,
+      "missing_gene_keys_sample": [
+        "Miya:8499222",
+        "Miya:8499224",
+        "Miya:8499225",
+        "Miya:8499253",
+        "Miya:8499386",
+        "Miya:8499461",
+        "Miya:8500028",
+        "Miya:8500121",
+        "Miya:8500305",
+        "Miya:8500449",
+        "Miya:8500927",
+        "Miya:8501049",
+        "Miya:8501141",
+        "Miya:8501559",
+        "Miya:8501580",
+        "Miya:8501750",
+        "Miya:8501788",
+        "Miya:8501847",
+        "Miya:8502057",
+        "Miya:8502136"
+      ]
+    },
+    {
+      "filename": "PS_proteomelm.pt",
+      "orgId_inferred": "PS",
+      "bytes": 8009363,
+      "sha256": "62f78355336586266aa998ae62138e075de46dc9ff4142783becd301d7d51d7c",
+      "n_gene_keys_in_canonical": 2561,
+      "embeddings_shape": [
+        3443,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 3443,
+      "n_missing_in_embedding_vs_canonical": 5,
+      "n_extra_in_embedding_vs_canonical": 887,
+      "missing_gene_keys_sample": [
+        "PS:Dsui_0088",
+        "PS:Dsui_1005",
+        "PS:Dsui_2131",
+        "PS:Dsui_2430",
+        "PS:Dsui_3130"
+      ]
+    },
+    {
+      "filename": "PV4_proteomelm.pt",
+      "orgId_inferred": "PV4",
+      "bytes": 8973146,
+      "sha256": "4008e86ea41296d19879c16d359cefedf23082fee83cb63c3bf15bf7176cb81e",
+      "n_gene_keys_in_canonical": 3009,
+      "embeddings_shape": [
+        3859,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 3859,
+      "n_missing_in_embedding_vs_canonical": 11,
+      "n_extra_in_embedding_vs_canonical": 861,
+      "missing_gene_keys_sample": [
+        "PV4:5207540",
+        "PV4:5208376",
+        "PV4:5208807",
+        "PV4:5208835",
+        "PV4:5208914",
+        "PV4:5208918",
+        "PV4:5208984",
+        "PV4:5209272",
+        "PV4:5209606",
+        "PV4:5211422",
+        "PV4:5211424"
+      ]
+    },
+    {
+      "filename": "Pedo557_proteomelm.pt",
+      "orgId_inferred": "Pedo557",
+      "bytes": 11591926,
+      "sha256": "6278aa7f91a55f73458f1c7f31af696e7dd837d4b1a789fbff817a18f192d9a3",
+      "n_gene_keys_in_canonical": 4423,
+      "embeddings_shape": [
+        4964,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4964,
+      "n_missing_in_embedding_vs_canonical": 64,
+      "n_extra_in_embedding_vs_canonical": 605
+    },
+    {
+      "filename": "Phaeo_proteomelm.pt",
+      "orgId_inferred": "Phaeo",
+      "bytes": 9017064,
+      "sha256": "666696f0c0ab9b3bcafa01d5857e073a1b18459d3d58a0979915df58db1ff529",
+      "n_gene_keys_in_canonical": 3099,
+      "embeddings_shape": [
+        3875,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 3875,
+      "n_missing_in_embedding_vs_canonical": 5,
+      "n_extra_in_embedding_vs_canonical": 781,
+      "missing_gene_keys_sample": [
+        "Phaeo:GFF2003",
+        "Phaeo:GFF2014",
+        "Phaeo:GFF2815",
+        "Phaeo:GFF2938",
+        "Phaeo:GFF3333"
+      ]
+    },
+    {
+      "filename": "Ponti_proteomelm.pt",
+      "orgId_inferred": "Ponti",
+      "bytes": 9837800,
+      "sha256": "b8928cecd661980ca1f5316ed210a14f44c91bae7de032e247896b8005850bed",
+      "n_gene_keys_in_canonical": 3685,
+      "embeddings_shape": [
+        4220,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4220,
+      "n_missing_in_embedding_vs_canonical": 42,
+      "n_extra_in_embedding_vs_canonical": 577
+    },
+    {
+      "filename": "Putida_proteomelm.pt",
+      "orgId_inferred": "Putida",
+      "bytes": 12951663,
+      "sha256": "dfcd5cb86a993de33c26f30e1a654ee72e674082e97024797a9d963f598a7d1d",
+      "n_gene_keys_in_canonical": 4778,
+      "embeddings_shape": [
+        5563,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 5563,
+      "n_missing_in_embedding_vs_canonical": 9,
+      "n_extra_in_embedding_vs_canonical": 794,
+      "missing_gene_keys_sample": [
+        "Putida:PP_5SB",
+        "Putida:PP_t10",
+        "Putida:PP_t11",
+        "Putida:PP_t12",
+        "Putida:PP_t13",
+        "Putida:PP_t29",
+        "Putida:PP_t49",
+        "Putida:PP_t57",
+        "Putida:PP_t64"
+      ]
+    },
+    {
+      "filename": "RalstoniaBSBF1503_proteomelm.pt",
+      "orgId_inferred": "RalstoniaBSBF1503",
+      "bytes": 10935804,
+      "sha256": "231e39c9fb2d19a120bd4925db6252375869fa83542b7e1ec7d59dd99d3c786e",
+      "n_gene_keys_in_canonical": 3779,
+      "embeddings_shape": [
+        4659,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4659,
+      "n_missing_in_embedding_vs_canonical": 127,
+      "n_extra_in_embedding_vs_canonical": 1007
+    },
+    {
+      "filename": "RalstoniaGMI1000_proteomelm.pt",
+      "orgId_inferred": "RalstoniaGMI1000",
+      "bytes": 11603125,
+      "sha256": "733c7b8627d8e6d17c329d9bdc865dc0463c5335ff02471e95db1054160be703",
+      "n_gene_keys_in_canonical": 3980,
+      "embeddings_shape": [
+        4956,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4956,
+      "n_missing_in_embedding_vs_canonical": 127,
+      "n_extra_in_embedding_vs_canonical": 1103
+    },
+    {
+      "filename": "RalstoniaPSI07_proteomelm.pt",
+      "orgId_inferred": "RalstoniaPSI07",
+      "bytes": 11095207,
+      "sha256": "ba29f5b322aebdffbc1e23a8da30eca58d3419d193bbd1164a243af08e31f52e",
+      "n_gene_keys_in_canonical": 4029,
+      "embeddings_shape": [
+        4735,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4735,
+      "n_missing_in_embedding_vs_canonical": 131,
+      "n_extra_in_embedding_vs_canonical": 837
+    },
+    {
+      "filename": "RalstoniaUW163_proteomelm.pt",
+      "orgId_inferred": "RalstoniaUW163",
+      "bytes": 11144359,
+      "sha256": "153357293d65da973180e32f72d21125771850ad4e809085b13603149982faca",
+      "n_gene_keys_in_canonical": 3795,
+      "embeddings_shape": [
+        4758,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4758,
+      "n_missing_in_embedding_vs_canonical": 128,
+      "n_extra_in_embedding_vs_canonical": 1091
+    },
+    {
+      "filename": "SB2B_proteomelm.pt",
+      "orgId_inferred": "SB2B",
+      "bytes": 8479265,
+      "sha256": "17285b6e9fa14649a6d13b2f15f0ade0212e5663f501f98e17dbd4bc5267f537",
+      "n_gene_keys_in_canonical": 3121,
+      "embeddings_shape": [
+        3645,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 3645,
+      "n_missing_in_embedding_vs_canonical": 22,
+      "n_extra_in_embedding_vs_canonical": 546
+    },
+    {
+      "filename": "Smeli_proteomelm.pt",
+      "orgId_inferred": "Smeli",
+      "bytes": 14476776,
+      "sha256": "2bc6eeab06b74d14826ac46f8687186fe4bc178eee5bd39dd3f02c5111a7eafd",
+      "n_gene_keys_in_canonical": 5133,
+      "embeddings_shape": [
+        6218,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 6218,
+      "n_missing_in_embedding_vs_canonical": 2,
+      "n_extra_in_embedding_vs_canonical": 1087,
+      "missing_gene_keys_sample": [
+        "Smeli:SMa2168",
+        "Smeli:SMc01244"
+      ]
+    },
+    {
+      "filename": "SynE_proteomelm.pt",
+      "orgId_inferred": "SynE",
+      "bytes": 6230433,
+      "sha256": "bebec54b1b806432cc332b818b490ab877a40ecc51ed3149d6f6be8792e836e7",
+      "n_gene_keys_in_canonical": 1899,
+      "embeddings_shape": [
+        2669,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 2669,
+      "n_missing_in_embedding_vs_canonical": 1,
+      "n_extra_in_embedding_vs_canonical": 771,
+      "missing_gene_keys_sample": [
+        "SynE:Synpcc7942_R0031"
+      ]
+    },
+    {
+      "filename": "SyringaeB728a_mexBdelta_proteomelm.pt",
+      "orgId_inferred": "SyringaeB728a_mexBdelta",
+      "bytes": 11945062,
+      "sha256": "47c1ab97df8ca23c4ad7416d5c758d5026a3fdb66c5b3cb7adcccd7d232ed865",
+      "n_gene_keys_in_canonical": 4282,
+      "embeddings_shape": [
+        5089,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 5089,
+      "n_missing_in_embedding_vs_canonical": 45,
+      "n_extra_in_embedding_vs_canonical": 852
+    },
+    {
+      "filename": "SyringaeB728a_proteomelm.pt",
+      "orgId_inferred": "SyringaeB728a",
+      "bytes": 11894112,
+      "sha256": "b70a120332fb688e188ba0abb8565f858413870daa5e85707f375c474efe624c",
+      "n_gene_keys_in_canonical": 4314,
+      "embeddings_shape": [
+        5089,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 5089,
+      "n_missing_in_embedding_vs_canonical": 43,
+      "n_extra_in_embedding_vs_canonical": 818
+    },
+    {
+      "filename": "WCS417_proteomelm.pt",
+      "orgId_inferred": "WCS417",
+      "bytes": 12817903,
+      "sha256": "86c458badc9771086e00b52b80db96457354f2b86a70541c558e026df7cbafc4",
+      "n_gene_keys_in_canonical": 4419,
+      "embeddings_shape": [
+        5506,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 5506,
+      "n_missing_in_embedding_vs_canonical": 5,
+      "n_extra_in_embedding_vs_canonical": 1092,
+      "missing_gene_keys_sample": [
+        "WCS417:GFF117",
+        "WCS417:GFF1376",
+        "WCS417:GFF4462",
+        "WCS417:GFF642",
+        "WCS417:GFF770"
+      ]
+    },
+    {
+      "filename": "acidovorax_3H11_proteomelm.pt",
+      "orgId_inferred": "acidovorax_3H11",
+      "bytes": 11620782,
+      "sha256": "6079dc875c22669356179338203c4c35e39cb0b7f3e6536ddcbb4b8dd8554d4a",
+      "n_gene_keys_in_canonical": 3935,
+      "embeddings_shape": [
+        4964,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4964,
+      "n_missing_in_embedding_vs_canonical": 11,
+      "n_extra_in_embedding_vs_canonical": 1040,
+      "missing_gene_keys_sample": [
+        "acidovorax_3H11:Ac3H11_1044",
+        "acidovorax_3H11:Ac3H11_2979",
+        "acidovorax_3H11:Ac3H11_2983",
+        "acidovorax_3H11:Ac3H11_3094",
+        "acidovorax_3H11:Ac3H11_3095",
+        "acidovorax_3H11:Ac3H11_3097",
+        "acidovorax_3H11:Ac3H11_4224",
+        "acidovorax_3H11:Ac3H11_4226",
+        "acidovorax_3H11:Ac3H11_4228",
+        "acidovorax_3H11:Ac3H11_4830",
+        "acidovorax_3H11:Ac3H11_568"
+      ]
+    },
+    {
+      "filename": "azobra_proteomelm.pt",
+      "orgId_inferred": "azobra",
+      "bytes": 12809967,
+      "sha256": "0ee881478347b5f115509dff1f6672ea7b2f5ba9e0f537b65764f1c5cc681c73",
+      "n_gene_keys_in_canonical": 4833,
+      "embeddings_shape": [
+        5488,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 5488,
+      "n_missing_in_embedding_vs_canonical": 655,
+      "n_extra_in_embedding_vs_canonical": 1310
+    },
+    {
+      "filename": "psRCH2_proteomelm.pt",
+      "orgId_inferred": "psRCH2",
+      "bytes": 9928815,
+      "sha256": "6589c8bbe2e6d4741d7fecc9e0c068f92b6548cf090c966c989fb2c5fc34503b",
+      "n_gene_keys_in_canonical": 3349,
+      "embeddings_shape": [
+        4265,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 4265,
+      "n_missing_in_embedding_vs_canonical": 4,
+      "n_extra_in_embedding_vs_canonical": 920,
+      "missing_gene_keys_sample": [
+        "psRCH2:GFF1481",
+        "psRCH2:GFF2850",
+        "psRCH2:GFF2919",
+        "psRCH2:GFF2993"
+      ]
+    },
+    {
+      "filename": "pseudo13_GW456_L13_proteomelm.pt",
+      "orgId_inferred": "pseudo13_GW456_L13",
+      "bytes": 12096963,
+      "sha256": "3d71e54fabe1527b19febd5c1c81b3d7e6b741e35db3cce467a2bfc617c26fff",
+      "n_gene_keys_in_canonical": 4350,
+      "embeddings_shape": [
+        5152,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 5152,
+      "n_missing_in_embedding_vs_canonical": 4,
+      "n_extra_in_embedding_vs_canonical": 806,
+      "missing_gene_keys_sample": [
+        "pseudo13_GW456_L13:PfGW456L13_5163",
+        "pseudo13_GW456_L13:PfGW456L13_5218",
+        "pseudo13_GW456_L13:PfGW456L13_5237",
+        "pseudo13_GW456_L13:PfGW456L13_5241"
+      ]
+    },
+    {
+      "filename": "pseudo1_N1B4_proteomelm.pt",
+      "orgId_inferred": "pseudo1_N1B4",
+      "bytes": 13968537,
+      "sha256": "379f33cd1ce0686f32c378cff262d748afc6c1a90624e98353d2693c2359926c",
+      "n_gene_keys_in_canonical": 4336,
+      "embeddings_shape": [
+        5972,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 5972,
+      "n_missing_in_embedding_vs_canonical": 3,
+      "n_extra_in_embedding_vs_canonical": 1639,
+      "missing_gene_keys_sample": [
+        "pseudo1_N1B4:Pf1N1B4_5187",
+        "pseudo1_N1B4:Pf1N1B4_5219",
+        "pseudo1_N1B4:Pf1N1B4_5224"
+      ]
+    },
+    {
+      "filename": "pseudo3_N2E3_proteomelm.pt",
+      "orgId_inferred": "pseudo3_N2E3",
+      "bytes": 13482009,
+      "sha256": "a7ad9bbf7913db8964319cad1ceef02ae1a1e6482ec55e72aebe29306ce8665e",
+      "n_gene_keys_in_canonical": 5028,
+      "embeddings_shape": [
+        5766,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 5766,
+      "n_missing_in_embedding_vs_canonical": 4,
+      "n_extra_in_embedding_vs_canonical": 742,
+      "missing_gene_keys_sample": [
+        "pseudo3_N2E3:AO353_05535",
+        "pseudo3_N2E3:AO353_11125",
+        "pseudo3_N2E3:AO353_17525",
+        "pseudo3_N2E3:AO353_20565"
+      ]
+    },
+    {
+      "filename": "pseudo5_N2C3_1_proteomelm.pt",
+      "orgId_inferred": "pseudo5_N2C3_1",
+      "bytes": 14041127,
+      "sha256": "186937ec7c8453e36c6af4534eea3b0e8a8f6ced95920343ef44951fadcbe8a6",
+      "n_gene_keys_in_canonical": 5193,
+      "embeddings_shape": [
+        6000,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 6000,
+      "n_missing_in_embedding_vs_canonical": 6,
+      "n_extra_in_embedding_vs_canonical": 813,
+      "missing_gene_keys_sample": [
+        "pseudo5_N2C3_1:AO356_00870",
+        "pseudo5_N2C3_1:AO356_04700",
+        "pseudo5_N2C3_1:AO356_07385",
+        "pseudo5_N2C3_1:AO356_10815",
+        "pseudo5_N2C3_1:AO356_19285",
+        "pseudo5_N2C3_1:AO356_21320"
+      ]
+    },
+    {
+      "filename": "pseudo6_N2E2_proteomelm.pt",
+      "orgId_inferred": "pseudo6_N2E2",
+      "bytes": 14253849,
+      "sha256": "c6d32507664da5640bd50a3ea6fda118f407ffdbdf6d613250b270f3a3ad4f9a",
+      "n_gene_keys_in_canonical": 5133,
+      "embeddings_shape": [
+        6094,
+        1152
+      ],
+      "embedding_dim": 1152,
+      "n_group_labels": 6094,
+      "n_missing_in_embedding_vs_canonical": 7,
+      "n_extra_in_embedding_vs_canonical": 968,
+      "missing_gene_keys_sample": [
+        "pseudo6_N2E2:Pf6N2E2_6095",
+        "pseudo6_N2E2:Pf6N2E2_6099",
+        "pseudo6_N2E2:Pf6N2E2_6100",
+        "pseudo6_N2E2:Pf6N2E2_6113",
+        "pseudo6_N2E2:Pf6N2E2_6130",
+        "pseudo6_N2E2:Pf6N2E2_6140",
+        "pseudo6_N2E2:Pf6N2E2_6164"
+      ]
+    }
+  ],
+  "coverage_summary": {
+    "n_organisms_in_canonical": 48,
+    "n_embedding_files_matched_pattern": 48,
+    "canonical_orgs_without_embedding_file": [],
+    "embedding_orgs_without_canonical_rows": [],
+    "total_gene_keys_canonical": 182447,
+    "total_missing_gene_keys_in_embeddings": 2484,
+    "total_extra_gene_keys_in_embeddings": 41067
+  },
+  "status": "ok"
+}
