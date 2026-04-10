@@ -21,6 +21,7 @@ PARQUET_COLUMNS = (
     "orgId",
     "gene_key",
     "expName",
+    "media",
     "fit",
     "cor12",
     "abs_t",
@@ -80,6 +81,13 @@ def _row_used_by_model(
     return True
 
 
+def _nonempty_text(x: Any) -> str | None:
+    if x is None:
+        return None
+    s = str(x).strip()
+    return s if s else None
+
+
 def count_split_row_stats(
     parquet_path,
     train_orgs: set[str],
@@ -127,6 +135,9 @@ def count_split_row_stats(
                 n_tr_emb += 1
             else:
                 n_va_emb += 1
+            media = _nonempty_text(cols["media"][i])
+            if media is None:
+                continue
             ex = cols["expName"][i]
             if ex is None:
                 continue
@@ -192,6 +203,9 @@ def iter_filtered_row_dicts(
             if fit is None:
                 continue
             if not embed_store.has_embedding(org, gene_key):
+                continue
+            media = _nonempty_text(cols["media"][i])
+            if media is None:
                 continue
             ex = cols["expName"][i]
             if ex is None:
