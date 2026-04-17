@@ -229,6 +229,7 @@ def iter_filtered_row_dicts(
                 "orgId": org,
                 "gene_key": gene_key,
                 "expName": exp_name,
+                "media": media,
                 "fit": fit,
                 "weight": w,
                 "ce_cat": cats,

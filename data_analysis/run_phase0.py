@@ -5,7 +5,7 @@ Run from repo root:
   python data_analysis/run_phase0.py
 
 Outputs:
-  figures/phase0/*.png
+  figures/phase0/*.png  (01–06 from DB sample; 07+ from canonical Parquet + media_composition_v2.xlsx)
   data_analysis/outputs/media_composition_audit.md
   data_analysis/outputs/phase0_summary.json
 """
@@ -35,12 +35,22 @@ from paths import (
     EMBEDDINGS_DIR,
     FEBA_DB,
     FIGURES_PHASE0,
-    MEDIA_XLSX,
     OUTPUT_DIR,
     REPO_ROOT,
 )
 
 SAMPLE_MOD = 313  # ~88k rows from ~27.4M
+
+CANON_EXPERIMENTS_PARQUET = REPO_ROOT / "data" / "derived" / "canonical" / "v0" / "experiments.parquet"
+CANON_FITNESS_LONG_PARQUET = REPO_ROOT / "data" / "derived" / "canonical" / "v0" / "fitness_experiment_long.parquet"
+MEDIA_XLSX_V2 = REPO_ROOT / "data" / "media_composition_v2.xlsx"
+COND_ENCODING_PARQUET = REPO_ROOT / "data" / "derived" / "condition_encoding" / "v0" / "experiments_condition.parquet"
+
+
+def _norm_text(x) -> str:
+    if pd.isna(x):
+        return ""
+    return str(x).strip()
 
 
 def ensure_dirs() -> None:
@@ -220,11 +230,374 @@ def variance_decomposition_table(sample: pd.DataFrame) -> dict:
     }
 
 
+def _load_media_components_v2() -> pd.DataFrame | None:
+    if not MEDIA_XLSX_V2.is_file():
+        print(f"Skipping Parquet/v2 figures: missing {MEDIA_XLSX_V2}", file=sys.stderr)
+        return None
+    mc = pd.read_excel(MEDIA_XLSX_V2, sheet_name="Media_Components")
+    mc["Media_n"] = mc["Media"].map(_norm_text)
+    mc["Component_n"] = mc["Component"].map(_norm_text)
+    return mc[(mc["Media_n"] != "") & (mc["Component_n"] != "")][["Media_n", "Component_n"]].drop_duplicates()
 
 
-def excel_experiment_coverage(experiments: pd.DataFrame) -> dict:
-    """How many DB experiments appear in the Excel `Experiments` sheet (orgId + name)."""
-    ex = pd.read_excel(MEDIA_XLSX, sheet_name="Experiments", header=0)
+def _experiment_component_table() -> tuple[pd.DataFrame, pd.DataFrame] | None:
+    """Canonical experiments expanded to (experiment × component) rows."""
+    if not CANON_EXPERIMENTS_PARQUET.is_file():
+        print(f"Skipping Parquet/v2 figures: missing {CANON_EXPERIMENTS_PARQUET}", file=sys.stderr)
+        return None
+    mc = _load_media_components_v2()
+    if mc is None:
+        return None
+    canon = pd.read_parquet(CANON_EXPERIMENTS_PARQUET, columns=["orgId", "expName", "media"])
+    canon["orgId_n"] = canon["orgId"].map(_norm_text)
+    canon["expName_n"] = canon["expName"].map(_norm_text)
+    canon["media_n"] = canon["media"].map(_norm_text)
+    exp_comp = canon[["orgId_n", "expName_n", "media_n"]].copy()
+    exp_comp = exp_comp[exp_comp["media_n"] != ""]
+    media_with_components = set(mc["Media_n"].unique())
+    exp_comp = exp_comp[exp_comp["media_n"].isin(media_with_components)]
+    exp_comp = exp_comp.merge(mc, left_on="media_n", right_on="Media_n", how="inner")
+    exp_comp = exp_comp[exp_comp["Component_n"].notna()].copy()
+    component_coverage = (
+        exp_comp.groupby("Component_n", as_index=False)
+        .agg(
+            n_organisms=("orgId_n", "nunique"),
+            n_experiments=("expName_n", "count"),
+            n_media=("media_n", "nunique"),
+        )
+        .sort_values(["n_organisms", "n_experiments"], ascending=False)
+    )
+    return exp_comp, component_coverage
+
+
+def plot_chemical_overlap_figures() -> list[str]:
+    """07–09: all chemical components on x-axis; tick labels omitted for density."""
+    out: list[str] = []
+    tbl = _experiment_component_table()
+    if tbl is None:
+        return out
+    exp_comp, component_coverage = tbl
+    component_coverage.to_csv(OUTPUT_DIR / "chemical_component_cross_species_coverage.csv", index=False)
+    out.append(str(OUTPUT_DIR / "chemical_component_cross_species_coverage.csv"))
+
+    plot_df = component_coverage.sort_values(["n_organisms", "n_experiments"], ascending=False).reset_index(drop=True)
+    n_comp = len(plot_df)
+    fig_w = max(14.0, 0.06 * n_comp)
+    fig, ax = plt.subplots(figsize=(fig_w, 6.0))
+    ax.bar(range(n_comp), plot_df["n_organisms"], color="tab:cyan", alpha=0.85, width=1.0)
+    ax.set_ylabel("Number of organisms")
+    ax.set_xlabel("Chemical component (all; sorted by organism count; labels omitted)")
+    ax.set_title("Cross-species overlap per chemical (by organisms)")
+    ax.set_xticks(range(n_comp))
+    ax.set_xticklabels([])
+    ax.grid(True, axis="y", alpha=0.3)
+    fig.tight_layout()
+    p07 = FIGURES_PHASE0 / "07_component_organism_overlap_all.png"
+    fig.savefig(p07, dpi=150)
+    plt.close(fig)
+    out.append(str(p07))
+
+    fig, ax = plt.subplots(figsize=(7.0, 5.0))
+    ax.scatter(
+        component_coverage["n_organisms"],
+        component_coverage["n_experiments"],
+        alpha=0.7,
+        s=25,
+        color="tab:blue",
+    )
+    ax.set_xlabel("# organisms containing component")
+    ax.set_ylabel("# experiments containing component")
+    ax.set_title("Chemical component support across organisms/experiments")
+    ax.grid(True, alpha=0.3)
+    fig.tight_layout()
+    p09 = FIGURES_PHASE0 / "09_component_support_scatter.png"
+    fig.savefig(p09, dpi=150)
+    plt.close(fig)
+    out.append(str(p09))
+
+    co = (
+        exp_comp.groupby(["Component_n", "orgId_n"], as_index=False)
+        .agg(n_experiments=("expName_n", "count"))
+    )
+    totals = co.groupby("Component_n", as_index=False)["n_experiments"].sum().sort_values(
+        "n_experiments", ascending=False
+    )
+    component_order = totals["Component_n"].tolist()
+    pivot = co.pivot_table(
+        index="Component_n", columns="orgId_n", values="n_experiments", aggfunc="sum", fill_value=0
+    )
+    pivot = pivot.reindex(component_order).fillna(0)
+    org_order = pivot.sum(axis=0).sort_values(ascending=False).index.tolist()
+    pivot = pivot[org_order]
+    top_orgs = 12
+    if pivot.shape[1] > top_orgs:
+        keep = org_order[:top_orgs]
+        other = [c for c in org_order if c not in keep]
+        pivot_plot = pivot[keep].copy()
+        pivot_plot["__Other_organisms__"] = pivot[other].sum(axis=1)
+    else:
+        pivot_plot = pivot.copy()
+    pivot_plot.to_csv(OUTPUT_DIR / "component_by_organism_experiment_counts_all.csv")
+    out.append(str(OUTPUT_DIR / "component_by_organism_experiment_counts_all.csv"))
+
+    n_stack = pivot_plot.shape[0]
+    fig_w2 = max(16.0, 0.06 * n_stack)
+    fig2, ax2 = plt.subplots(figsize=(fig_w2, 6.5))
+    pivot_plot.plot(kind="bar", stacked=True, ax=ax2, width=1.0, linewidth=0)
+    ax2.set_xlabel("Chemical component (all; sorted by experiment count; labels omitted)")
+    ax2.set_ylabel("# experiments containing component")
+    ax2.set_title("Cross-species overlap: experiment support per chemical (stacked by organism)")
+    ax2.grid(True, axis="y", alpha=0.3)
+    ax2.legend(title="orgId", bbox_to_anchor=(1.02, 1), loc="upper left", frameon=False, fontsize=8)
+    ax2.set_xticklabels([])
+    fig2.tight_layout()
+    p08 = FIGURES_PHASE0 / "08_component_overlap_stacked_by_organism_all.png"
+    fig2.savefig(p08, dpi=150)
+    plt.close(fig2)
+    out.append(str(p08))
+    return out
+
+
+def plot_media_and_condition_diversity_figures() -> list[str]:
+    """10–12: media richness, encoding coverage by org, condition diversity."""
+    out: list[str] = []
+    mc = _load_media_components_v2()
+    if mc is None or not CANON_EXPERIMENTS_PARQUET.is_file():
+        return out
+
+    richness = (
+        mc.groupby("Media_n", as_index=False)
+        .agg(n_components=("Component_n", "nunique"))
+        .sort_values("n_components", ascending=False)
+    )
+    richness.to_csv(OUTPUT_DIR / "media_component_richness.csv", index=False)
+    out.append(str(OUTPUT_DIR / "media_component_richness.csv"))
+
+    fig, ax = plt.subplots(figsize=(7.5, 4.5))
+    ax.hist(
+        richness["n_components"],
+        bins=min(40, max(10, int(np.sqrt(len(richness))))),
+        color="tab:blue",
+        alpha=0.85,
+    )
+    ax.set_xlabel("Number of components in media")
+    ax.set_ylabel("Count of media")
+    ax.set_title("Component richness distribution across media")
+    ax.grid(True, axis="y", alpha=0.3)
+    fig.tight_layout()
+    p10 = FIGURES_PHASE0 / "10_media_component_richness_hist.png"
+    fig.savefig(p10, dpi=150)
+    plt.close(fig)
+    out.append(str(p10))
+
+    canon = pd.read_parquet(CANON_EXPERIMENTS_PARQUET, columns=["orgId", "expName", "media"])
+    canon["orgId_n"] = canon["orgId"].map(_norm_text)
+    canon["expName_n"] = canon["expName"].map(_norm_text)
+    canon["media_n"] = canon["media"].map(_norm_text)
+    media_with_components = set(mc["Media_n"].unique())
+    canon["has_media_label"] = canon["media_n"] != ""
+    canon["has_component_mapping"] = canon["media_n"].isin(media_with_components)
+    canon["covered_for_chem_encoding"] = canon["has_media_label"] & canon["has_component_mapping"]
+    coverage_by_org = (
+        canon.groupby("orgId_n", as_index=False)
+        .agg(
+            n_experiments=("expName_n", "count"),
+            n_has_media_label=("has_media_label", "sum"),
+            n_covered_for_chem_encoding=("covered_for_chem_encoding", "sum"),
+        )
+    )
+    coverage_by_org["pct_covered_for_chem_encoding"] = (
+        100.0 * coverage_by_org["n_covered_for_chem_encoding"] / coverage_by_org["n_experiments"].clip(lower=1)
+    )
+    coverage_by_org = coverage_by_org.sort_values("pct_covered_for_chem_encoding", ascending=True)
+    coverage_by_org.to_csv(OUTPUT_DIR / "chemical_encoding_coverage_by_org.csv", index=False)
+    out.append(str(OUTPUT_DIR / "chemical_encoding_coverage_by_org.csv"))
+
+    fig, ax = plt.subplots(figsize=(12, 5))
+    ax.bar(
+        coverage_by_org["orgId_n"],
+        coverage_by_org["pct_covered_for_chem_encoding"],
+        color="tab:green",
+        alpha=0.85,
+    )
+    ax.set_ylabel("% experiments mappable to components")
+    ax.set_xlabel("orgId")
+    ax.set_title("Chemical encoding coverage by organism (canonical experiments)")
+    ax.set_xticks(range(len(coverage_by_org)))
+    ax.set_xticklabels(coverage_by_org["orgId_n"], rotation=80, ha="right")
+    ax.grid(True, axis="y", alpha=0.3)
+    fig.tight_layout()
+    p11 = FIGURES_PHASE0 / "11_chemical_encoding_coverage_by_org.png"
+    fig.savefig(p11, dpi=150)
+    plt.close(fig)
+    out.append(str(p11))
+
+    if not COND_ENCODING_PARQUET.is_file():
+        return out
+    ce = pd.read_parquet(COND_ENCODING_PARQUET)
+    cat_cols = [c for c in ce.columns if c.startswith("ce_cat_")]
+    cont_cols = [c for c in ce.columns if c.startswith("ce_cont_")]
+    cond_cols = cat_cols + cont_cols
+    ce["orgId_n"] = ce["orgId"].map(_norm_text)
+    for c in cont_cols:
+        ce[c] = pd.to_numeric(ce[c], errors="coerce").fillna(0.0).round(6)
+    ce["condition_signature"] = ce[cond_cols].astype(str).agg("|".join, axis=1)
+    cond_div = (
+        ce.groupby("orgId_n", as_index=False)
+        .agg(
+            n_experiments=("expName", "count"),
+            n_unique_condition_signatures=("condition_signature", "nunique"),
+            n_unique_media_codes=("ce_cat_media", "nunique"),
+            n_unique_condition1_codes=("ce_cat_condition_1", "nunique"),
+        )
+    )
+    cond_div["avg_experiments_per_condition_signature"] = (
+        cond_div["n_experiments"] / cond_div["n_unique_condition_signatures"].clip(lower=1)
+    )
+    cond_div = cond_div.sort_values("n_unique_condition_signatures", ascending=False)
+    cond_div.to_csv(OUTPUT_DIR / "condition_diversity_by_org.csv", index=False)
+    out.append(str(OUTPUT_DIR / "condition_diversity_by_org.csv"))
+
+    fig, ax = plt.subplots(figsize=(12, 5))
+    ax.bar(cond_div["orgId_n"], cond_div["n_unique_condition_signatures"], color="tab:orange", alpha=0.85)
+    ax.set_ylabel("Unique condition signatures")
+    ax.set_xlabel("orgId")
+    ax.set_title("Condition diversity by organism (encoded table)")
+    ax.set_xticks(range(len(cond_div)))
+    ax.set_xticklabels(cond_div["orgId_n"], rotation=80, ha="right")
+    ax.grid(True, axis="y", alpha=0.3)
+    fig.tight_layout()
+    p12 = FIGURES_PHASE0 / "12_condition_diversity_by_org.png"
+    fig.savefig(p12, dpi=150)
+    plt.close(fig)
+    out.append(str(p12))
+    return out
+
+
+def plot_embedding_coverage_figures() -> list[str]:
+    """13–14: ProteomeLM embedding coverage vs canonical fitness long."""
+    out: list[str] = []
+    try:
+        import torch
+    except ImportError:
+        print("Skipping embedding coverage figures: torch not installed", file=sys.stderr)
+        return out
+    if not CANON_FITNESS_LONG_PARQUET.is_file() or not EMBEDDINGS_DIR.is_dir():
+        print("Skipping embedding coverage figures: missing Parquet or embeddings dir", file=sys.stderr)
+        return out
+
+    fit = pd.read_parquet(CANON_FITNESS_LONG_PARQUET, columns=["orgId", "gene_key", "fit"])
+    fit = fit[fit["fit"].notna()].copy()
+    fit["orgId"] = fit["orgId"].astype(str)
+    fit["gene_key"] = fit["gene_key"].astype(str)
+
+    emb_by_org: dict[str, set[str]] = {}
+    for pt in sorted(EMBEDDINGS_DIR.glob("*_proteomelm.pt")):
+        org = pt.name.replace("_proteomelm.pt", "")
+        try:
+            blob = torch.load(pt, map_location="cpu", weights_only=False)
+        except TypeError:
+            blob = torch.load(pt, map_location="cpu")
+        labels = blob.get("group_labels")
+        if labels is None:
+            continue
+        emb_by_org[org] = {str(x) for x in labels}
+
+    fit["has_embedding"] = [
+        gk in emb_by_org.get(org, set()) for org, gk in zip(fit["orgId"], fit["gene_key"], strict=False)
+    ]
+    row_summary = {
+        "n_rows_with_fit": int(len(fit)),
+        "n_rows_with_embedding": int(fit["has_embedding"].sum()),
+        "n_rows_missing_embedding": int((~fit["has_embedding"]).sum()),
+    }
+    row_summary["pct_rows_missing_embedding"] = (
+        100.0 * row_summary["n_rows_missing_embedding"] / max(1, row_summary["n_rows_with_fit"])
+    )
+
+    genes = fit[["orgId", "gene_key"]].drop_duplicates().copy()
+    genes["has_embedding"] = [
+        gk in emb_by_org.get(org, set()) for org, gk in zip(genes["orgId"], genes["gene_key"], strict=False)
+    ]
+    gene_summary = {
+        "n_unique_org_gene_keys": int(len(genes)),
+        "n_unique_with_embedding": int(genes["has_embedding"].sum()),
+        "n_unique_missing_embedding": int((~genes["has_embedding"]).sum()),
+    }
+    gene_summary["pct_unique_missing_embedding"] = (
+        100.0 * gene_summary["n_unique_missing_embedding"] / max(1, gene_summary["n_unique_org_gene_keys"])
+    )
+
+    per_org = (
+        genes.groupby("orgId", as_index=False)
+        .agg(
+            n_unique_gene_keys=("gene_key", "count"),
+            n_unique_with_embedding=("has_embedding", "sum"),
+        )
+    )
+    per_org["n_unique_missing_embedding"] = per_org["n_unique_gene_keys"] - per_org["n_unique_with_embedding"]
+    per_org["pct_unique_missing_embedding"] = (
+        100.0 * per_org["n_unique_missing_embedding"] / per_org["n_unique_gene_keys"].clip(lower=1)
+    )
+    per_org = per_org.sort_values("pct_unique_missing_embedding", ascending=False)
+
+    summary = {"row_level": row_summary, "gene_level": gene_summary}
+    (OUTPUT_DIR / "embedding_coverage_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    out.append(str(OUTPUT_DIR / "embedding_coverage_summary.json"))
+    per_org.to_csv(OUTPUT_DIR / "embedding_coverage_by_org.csv", index=False)
+    out.append(str(OUTPUT_DIR / "embedding_coverage_by_org.csv"))
+    genes.loc[~genes["has_embedding"]].sort_values(["orgId", "gene_key"]).to_csv(
+        OUTPUT_DIR / "missing_embedding_gene_keys.csv", index=False
+    )
+    out.append(str(OUTPUT_DIR / "missing_embedding_gene_keys.csv"))
+
+    plot_pct = per_org.head(20).copy()
+    fig, ax = plt.subplots(figsize=(11, 5))
+    ax.bar(plot_pct["orgId"], plot_pct["pct_unique_missing_embedding"], color="tab:purple", alpha=0.85)
+    ax.set_ylabel("% unique gene keys missing embedding")
+    ax.set_xlabel("orgId (top 20 by missing %)")
+    ax.set_title("Embedding coverage gap by organism")
+    ax.grid(True, axis="y", alpha=0.3)
+    ax.set_xticks(range(len(plot_pct)))
+    ax.set_xticklabels(plot_pct["orgId"], rotation=70, ha="right")
+    fig.tight_layout()
+    p13 = FIGURES_PHASE0 / "13_embedding_coverage_gap_top20.png"
+    fig.savefig(p13, dpi=150)
+    plt.close(fig)
+    out.append(str(p13))
+
+    top_abs = per_org.sort_values("n_unique_missing_embedding", ascending=False).head(20)
+    fig2, ax2 = plt.subplots(figsize=(11, 5))
+    ax2.bar(top_abs["orgId"], top_abs["n_unique_missing_embedding"], color="tab:red", alpha=0.85)
+    ax2.set_ylabel("Missing unique (orgId, gene_key) embeddings")
+    ax2.set_xlabel("orgId (top 20 by absolute missing count)")
+    ax2.set_title("Absolute missing embedding counts by organism")
+    ax2.grid(True, axis="y", alpha=0.3)
+    ax2.set_xticks(range(len(top_abs)))
+    ax2.set_xticklabels(top_abs["orgId"], rotation=70, ha="right")
+    fig2.tight_layout()
+    p14 = FIGURES_PHASE0 / "14_embedding_missing_counts_top20.png"
+    fig2.savefig(p14, dpi=150)
+    plt.close(fig2)
+    out.append(str(p14))
+    return out
+
+
+def excel_experiment_coverage(
+    experiments: pd.DataFrame, workbook: Path = MEDIA_XLSX_V2
+) -> dict:
+    """How many DB experiments appear in the workbook `Experiments` sheet (orgId + name)."""
+    if not workbook.is_file():
+        return {
+            "workbook": str(workbook),
+            "error": "workbook_missing",
+            "n_experiments_db": int(len(experiments[["orgId", "expName"]].drop_duplicates())),
+            "n_rows_excel_experiments": 0,
+            "matched_on_orgId_expName": 0,
+            "unmatched_db_experiments": 0,
+            "media_string_mismatches_on_matches": 0,
+        }
+    ex = pd.read_excel(workbook, sheet_name="Experiments", header=0)
     ex = ex.rename(columns={"name": "expName"})
     key = ["orgId", "expName"]
     db = experiments[key + ["media"]].drop_duplicates()
@@ -232,7 +605,12 @@ def excel_experiment_coverage(experiments: pd.DataFrame) -> dict:
     matched = int(merged["Media"].notna().sum())
     mismatch = merged.dropna(subset=["Media"])
     mismatch = mismatch[mismatch["media"].astype(str) != mismatch["Media"].astype(str)]
+    try:
+        wb_rel = str(workbook.relative_to(REPO_ROOT))
+    except ValueError:
+        wb_rel = str(workbook)
     return {
+        "workbook": wb_rel,
         "n_experiments_db": int(len(db)),
         "n_rows_excel_experiments": int(len(ex)),
         "matched_on_orgId_expName": matched,
@@ -242,12 +620,22 @@ def excel_experiment_coverage(experiments: pd.DataFrame) -> dict:
 
 
 def write_media_audit_md() -> str:
-    xl = pd.ExcelFile(MEDIA_XLSX)
+    audit_wb = MEDIA_XLSX_V2
+    if not audit_wb.is_file():
+        out = OUTPUT_DIR / "media_composition_audit.md"
+        out.write_text(
+            f"# Media composition workbook audit (Phase 0)\n\n"
+            f"**Missing file:** `{audit_wb.relative_to(REPO_ROOT)}` — audit not generated.\n",
+            encoding="utf-8",
+        )
+        return str(out)
+    wb_rel = str(audit_wb.relative_to(REPO_ROOT))
+    xl = pd.ExcelFile(audit_wb)
     lines = [
         "# Media composition workbook audit (Phase 0)",
         "",
         f"Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')} UTC",
-        "File: `data/media_composition.xlsx` (repo root-relative)",
+        f"File: `{wb_rel}` (authoritative for this audit; v2 expanded workbook).",
         "",
         "## Sheet inventory",
         "",
@@ -255,14 +643,14 @@ def write_media_audit_md() -> str:
         "| ----- | ---------- | ---- | ---- |",
     ]
     for i, name in enumerate(xl.sheet_names):
-        df = pd.read_excel(MEDIA_XLSX, sheet_name=name, header=None)
+        df = pd.read_excel(audit_wb, sheet_name=name, header=None)
         lines.append(f"| {i} | {name} | {df.shape[0]} | {df.shape[1]} |")
     conn_x = connect()
     try:
         exp_db = pd.read_sql_query("SELECT orgId, expName, media FROM Experiment", conn_x)
     finally:
         conn_x.close()
-    cov = excel_experiment_coverage(exp_db)
+    cov = excel_experiment_coverage(exp_db, audit_wb)
     lines.extend(
         [
             "",
@@ -277,17 +665,17 @@ def write_media_audit_md() -> str:
     lines.extend(
         [
             "",
-            "## Authoritative mapping (restart)",
+            "## Authoritative mapping",
             "",
-            "- **Medium → components:** sheet **`Media_Components`** (index 1): columns *Media*, *Component*, *Concentration*, *Units*, …",
-            "- **Experiment ↔ medium / metadata:** sheet **`Experiments`** (index 2): join to `Experiment` table on **`(orgId, name)`** ↔ **`(orgId, expName)`**; medium string in column *Media*.",
-            "- v1 loader note referenced sheet index 2 for *composition*; this workbook places **composition** on **`Media_Components`**, not index 2. Index 2 is experiment-level metadata.",
+            "- **Medium → components:** sheet **`Media_Components`**: columns *Media*, *Component*, *Concentration*, *Units*, …",
+            "- **Experiment ↔ medium / metadata:** sheet **`Experiments`**: join to `Experiment` table on **`(orgId, name)`** ↔ **`(orgId, expName)`**; medium string in column *Media*.",
+            "- **Composition** is on **`Media_Components`**, not derived from the `Experiments` row alone (that sheet names the medium; components are looked up by medium name).",
             "",
             "## `Media_Components` header row (row 0)",
             "",
         ]
     )
-    mc = pd.read_excel(MEDIA_XLSX, sheet_name="Media_Components", header=0)
+    mc = pd.read_excel(audit_wb, sheet_name="Media_Components", header=0)
     lines.append("| " + " | ".join(str(c) for c in mc.columns) + " |")
     lines.append("| " + " | ".join(["---"] * len(mc.columns)) + " |")
     for _, row in mc.head(15).iterrows():
@@ -297,7 +685,7 @@ def write_media_audit_md() -> str:
     lines.append("")
     lines.append("## `Experiments` sheet columns (header row)")
     lines.append("")
-    ex = pd.read_excel(MEDIA_XLSX, sheet_name="Experiments", header=0)
+    ex = pd.read_excel(audit_wb, sheet_name="Experiments", header=0)
     lines.append("- " + "\n- ".join(f"`{c}`" for c in ex.columns))
     lines.append("")
     text = "\n".join(lines)
@@ -352,10 +740,15 @@ def main() -> int:
     deg.to_csv(OUTPUT_DIR / "connected_media_degree_benchmark.csv", index=False)
     plot_media_org_bipartite(experiments, mask)
 
+    parquet_derived_outputs: list[str] = []
+    parquet_derived_outputs.extend(plot_chemical_overlap_figures())
+    parquet_derived_outputs.extend(plot_media_and_condition_diversity_figures())
+    parquet_derived_outputs.extend(plot_embedding_coverage_figures())
+
     vd = variance_decomposition_table(sample)
     audit_path = write_media_audit_md()
     emb = embedding_spotcheck()
-    xl_cov = excel_experiment_coverage(experiments)
+    xl_cov = excel_experiment_coverage(experiments, MEDIA_XLSX_V2)
 
     def _rel(path: Path) -> str:
         try:
@@ -378,6 +771,7 @@ def main() -> int:
             "media_audit_md": _rel(Path(audit_path)),
             "connected_media_csv": _rel(OUTPUT_DIR / "connected_media_degree_benchmark.csv"),
             "phase0_summary_json": _rel(OUTPUT_DIR / "phase0_summary.json"),
+            "parquet_workbook_derived": [_rel(Path(p)) for p in parquet_derived_outputs],
         },
     }
     (OUTPUT_DIR / "phase0_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
