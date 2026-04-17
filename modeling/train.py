@@ -8,6 +8,9 @@ Smoke:
   python modeling/train.py --protocol splits/organism_single_holdout_largest_v0/protocol.json \\
     --epochs 1 --max-train-rows 8000 --max-val-rows 4000 --shuffle-buffer 4000 \\
     --skip-full-row-counts
+
+Chemistry OOD (val rows vs train-organism media components) uses ``--media-workbook`` (default
+``data/media_composition_v2.xlsx``) and ``--experiments-parquet``; disable with ``--skip-chemistry-audit``.
 """
 
 from __future__ import annotations
@@ -33,6 +36,7 @@ from embedding_store import EmbeddingStore
 from metrics import mean_within_gene_spearman_with_diagnostics, rmse_numpy
 from model import GeneConditionMLP
 from paths import EMBEDDING_LAYER8_DIR, REPO_ROOT, RUNS_ROOT, resolve_parquet_path
+from split_diagnostics import compute_split_chemistry_report
 from split_protocol import load_split_protocol
 
 DEFAULT_CONDITION_MANIFEST = REPO_ROOT / "docs" / "condition_encoding_manifest_v0.json"
@@ -83,7 +87,30 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--min-val-conditions-per-gene", type=int, default=2)
     p.add_argument("--embed-dir", type=str, default=str(EMBEDDING_LAYER8_DIR))
     p.add_argument("--parquet", type=str, default="", help="Override canonical long Parquet path.")
+    p.add_argument(
+        "--experiments-parquet",
+        type=str,
+        default="data/derived/canonical/v0/experiments.parquet",
+        help="Canonical experiments.parquet (train media → component vocabulary for chemistry audit).",
+    )
+    p.add_argument(
+        "--media-workbook",
+        type=str,
+        default="data/media_composition_v2.xlsx",
+        help="Excel workbook with Media_Components sheet (chemistry OOD audit vs train organisms).",
+    )
+    p.add_argument(
+        "--skip-chemistry-audit",
+        action="store_true",
+        help="Do not compute val chemistry-overlap stats (no extra Parquet / Excel read).",
+    )
     p.add_argument("--output-dir", type=str, default=str(RUNS_ROOT))
+    p.add_argument(
+        "--log-every-n-batches",
+        type=int,
+        default=0,
+        help="Print train heartbeat every N batches (0 = only end-of-epoch logs).",
+    )
     return p.parse_args()
 
 
@@ -135,6 +162,35 @@ def main() -> int:
 
     train_orgs = set(protocol.train_org_ids)
     val_orgs = set(protocol.val_org_ids)
+    test_orgs = set(protocol.test_org_ids)
+
+    experiments_pq = Path(args.experiments_parquet)
+    if not experiments_pq.is_absolute():
+        experiments_pq = REPO_ROOT / experiments_pq
+    media_workbook = Path(args.media_workbook)
+    if not media_workbook.is_absolute():
+        media_workbook = REPO_ROOT / media_workbook
+
+    max_train = args.max_train_rows or None
+    max_val = args.max_val_rows or None
+
+    chem_audit: dict[str, object] | None = None
+    if not args.skip_chemistry_audit:
+        chem_audit = compute_split_chemistry_report(
+            experiments_parquet=experiments_pq,
+            media_workbook=media_workbook,
+            fitness_parquet=parquet_path,
+            train_orgs=train_orgs,
+            val_orgs=val_orgs,
+            arm=arm,
+            embed_store=embed_store,
+            condition_store=condition_store,
+            strict_min_cor12=args.strict_min_cor12,
+            strict_min_abs_t=args.strict_min_abs_t,
+            cor12_floor=args.cor12_floor,
+            weight_t_scale=args.weight_t_scale,
+            max_val_rows=max_val,
+        )
     cat_field_order = condition_store.cat_field_order
     n_cont = condition_store.n_cont_fields
     gene_dim = embed_store.gene_embedding_dim
@@ -150,9 +206,6 @@ def main() -> int:
     ).to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr)
     huber = nn.HuberLoss(delta=args.huber_delta, reduction="none")
-
-    max_train = args.max_train_rows or None
-    max_val = args.max_val_rows or None
 
     row_stats: dict[str, int | float] = {}
     if not args.skip_full_row_counts:
@@ -170,6 +223,8 @@ def main() -> int:
         )
         print(f"  row stats done ({time.perf_counter() - t1:.1f}s)", flush=True)
 
+    log_every = max(0, int(args.log_every_n_batches))
+
     config = {
         "run_id": run_id,
         "generated_utc": generated_utc,
@@ -183,6 +238,7 @@ def main() -> int:
         "condition_encoding_parquet": str(Path(summ["parquet_path"]).relative_to(REPO_ROOT)),
         "canonical_experiments_sha256_expected_in_manifest": summ.get("canonical_experiments_sha256_expected"),
         "epochs": args.epochs,
+        "log_every_n_batches": log_every,
         "batch_size": args.batch_size,
         "lr": args.lr,
         "hidden_dim": args.hidden_dim,
@@ -201,12 +257,38 @@ def main() -> int:
         "min_val_conditions_per_gene": args.min_val_conditions_per_gene,
         "cat_field_max_index": condition_store.cat_field_max_ids,
         "gene_dim": gene_dim,
+        "train_org_ids": sorted(train_orgs),
+        "val_org_ids": sorted(val_orgs),
+        "test_org_ids": sorted(test_orgs),
+        "split_axis_orgId": True,
+        "experiments_parquet_chemistry_audit": str(experiments_pq.relative_to(REPO_ROOT))
+        if experiments_pq.is_relative_to(REPO_ROOT)
+        else str(experiments_pq),
+        "media_workbook_chemistry_audit": str(media_workbook.relative_to(REPO_ROOT))
+        if media_workbook.is_relative_to(REPO_ROOT)
+        else str(media_workbook),
+        "chemistry_audit_skipped": bool(args.skip_chemistry_audit),
         "row_weighting_note": "Arm weighted_full: Huber weighted by cor12 (floored) × min(1, abs_t/weight_t_scale).",
         "modular_inputs_note": "Gene: ProteomeLM .pt; Condition: table keyed by (orgId, expName).",
     }
     (run_dir / "config.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
 
-    history: list[dict[str, float | int]] = []
+    history: list[dict[str, object]] = []
+
+    def _chem_epoch_fields() -> dict[str, object]:
+        if not chem_audit:
+            return {}
+        out: dict[str, object] = {}
+        for key in ("val_frac_rows_any_unseen_component", "val_frac_weight_on_unseen_component_rows"):
+            v = chem_audit.get(key)
+            if isinstance(v, float) and not math.isnan(v):
+                out[key] = v
+            else:
+                out[key] = None
+        n = chem_audit.get("n_val_rows_chemistry_audit")
+        if isinstance(n, int):
+            out["n_val_rows_chemistry_audit"] = n
+        return out
 
     null_path = REPO_ROOT / "evaluation" / "outputs" / "null_baselines_m35.json"
     null_ref: float | None = None
@@ -288,6 +370,18 @@ def main() -> int:
         n_batches = 0
         losses = []
         t_ep = time.perf_counter()
+        if log_every:
+            print(
+                f"epoch {epoch + 1}/{args.epochs}  train started "
+                f"(heartbeat every {log_every} batches)",
+                flush=True,
+            )
+        else:
+            print(
+                f"epoch {epoch + 1}/{args.epochs}  train started "
+                f"(no per-batch logs; use --log-every-n-batches N for progress)",
+                flush=True,
+            )
         for x_g, cat_ids, x_cont, y, w in shuffled_training_batches(
             parquet_path,
             train_orgs,
@@ -315,19 +409,26 @@ def main() -> int:
             opt.step()
             n_batches += 1
             losses.append(float(loss.detach().cpu()))
+            if log_every and n_batches % log_every == 0:
+                tail = float(np.mean(losses[-log_every:])) if len(losses) >= log_every else float(losses[-1])
+                print(
+                    f"epoch {epoch + 1}/{args.epochs}  batch={n_batches}  "
+                    f"recent_mean_loss={tail:.6f}  wall_s={time.perf_counter() - t_ep:.1f}",
+                    flush=True,
+                )
         train_loss = float(np.mean(losses)) if losses else float("nan")
         eval_stats = _eval_pass()
-        history.append(
-            {
-                "epoch": epoch + 1,
-                "train_loss_huber_weighted": train_loss,
-                "val_loss_huber_weighted": float(eval_stats["val_loss_huber_weighted"]),
-                "val_rmse": float(eval_stats["val_rmse"]),
-                "mean_within_gene_spearman": float(eval_stats["mean_within_gene_spearman"]),
-                "n_genes_used_for_spearman": int(eval_stats["n_genes_used_for_spearman"]),
-                "n_val_rows_scored": int(eval_stats["n_val_rows_scored"]),
-            }
-        )
+        row_hist: dict[str, object] = {
+            "epoch": epoch + 1,
+            "train_loss_huber_weighted": train_loss,
+            "val_loss_huber_weighted": float(eval_stats["val_loss_huber_weighted"]),
+            "val_rmse": float(eval_stats["val_rmse"]),
+            "mean_within_gene_spearman": float(eval_stats["mean_within_gene_spearman"]),
+            "n_genes_used_for_spearman": int(eval_stats["n_genes_used_for_spearman"]),
+            "n_val_rows_scored": int(eval_stats["n_val_rows_scored"]),
+        }
+        row_hist.update(_chem_epoch_fields())
+        history.append(row_hist)
         print(
             f"epoch {epoch + 1}/{args.epochs}  batches={n_batches}  "
             f"train_loss={train_loss:.6f}  val_loss={float(eval_stats['val_loss_huber_weighted']):.6f}  "
@@ -339,17 +440,17 @@ def main() -> int:
 
     if not history:
         eval_stats = _eval_pass()
-        history.append(
-            {
-                "epoch": 0,
-                "train_loss_huber_weighted": float("nan"),
-                "val_loss_huber_weighted": float(eval_stats["val_loss_huber_weighted"]),
-                "val_rmse": float(eval_stats["val_rmse"]),
-                "mean_within_gene_spearman": float(eval_stats["mean_within_gene_spearman"]),
-                "n_genes_used_for_spearman": int(eval_stats["n_genes_used_for_spearman"]),
-                "n_val_rows_scored": int(eval_stats["n_val_rows_scored"]),
-            }
-        )
+        row_hist0: dict[str, object] = {
+            "epoch": 0,
+            "train_loss_huber_weighted": float("nan"),
+            "val_loss_huber_weighted": float(eval_stats["val_loss_huber_weighted"]),
+            "val_rmse": float(eval_stats["val_rmse"]),
+            "mean_within_gene_spearman": float(eval_stats["mean_within_gene_spearman"]),
+            "n_genes_used_for_spearman": int(eval_stats["n_genes_used_for_spearman"]),
+            "n_val_rows_scored": int(eval_stats["n_val_rows_scored"]),
+        }
+        row_hist0.update(_chem_epoch_fields())
+        history.append(row_hist0)
 
     final_eval = _eval_pass(detailed=True)
     val_rmse = float(final_eval["val_rmse"])
@@ -420,6 +521,25 @@ def main() -> int:
     else:
         metrics["note_row_counts"] = "Skipped full-file row counts (--skip-full-row-counts)."
 
+    if chem_audit:
+        for k, v in chem_audit.items():
+            if k == "chemistry_audit_note":
+                metrics["split_chemistry_audit_note"] = v
+            elif isinstance(v, float):
+                metrics[k] = _json_float(v)
+            else:
+                metrics[k] = v
+    else:
+        metrics["split_chemistry_audit"] = None
+        if args.skip_chemistry_audit:
+            metrics["split_chemistry_audit_skip_reason"] = "--skip-chemistry-audit"
+        elif not media_workbook.is_file():
+            metrics["split_chemistry_audit_skip_reason"] = f"missing_workbook:{media_workbook}"
+        elif not experiments_pq.is_file():
+            metrics["split_chemistry_audit_skip_reason"] = f"missing_experiments_parquet:{experiments_pq}"
+        else:
+            metrics["split_chemistry_audit_skip_reason"] = "unknown"
+
     (run_dir / "history.json").write_text(json.dumps(history, indent=2), encoding="utf-8")
     (run_dir / "per_org_metrics.json").write_text(json.dumps(per_org_rows, indent=2), encoding="utf-8")
 
@@ -429,8 +549,13 @@ def main() -> int:
     val_rmse_curve = [float(h["val_rmse"]) for h in history]
     val_spearman_curve = [float(h["mean_within_gene_spearman"]) for h in history]
 
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4.5))
-    ax0, ax1, ax2 = axes
+    split_title = (
+        f"{protocol.protocol_id} | train orgs={len(train_orgs)} | "
+        f"val={','.join(sorted(val_orgs))} | test={','.join(sorted(test_orgs))}"
+    )
+
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+    (ax0, ax1), (ax2, ax3) = axes
     ax0.plot(epochs, train_loss_curve, marker="o", label="train_loss_huber_weighted")
     ax0.plot(epochs, val_loss_curve, marker="o", label="val_loss_huber_weighted")
     ax0.set_title("Training vs evaluation loss")
@@ -450,14 +575,64 @@ def main() -> int:
 
     ax2.plot(epochs, val_spearman_curve, marker="o", color="tab:green", label="val_spearman")
     ax2.axhline(0.0, color="gray", linestyle=":", linewidth=1.0)
-    ax2.set_title("Within-gene Spearman")
+    ax2.set_title("Within-gene Spearman (val)")
     ax2.set_xlabel("Epoch")
     ax2.set_ylabel("Spearman")
     ax2.grid(True, alpha=0.3)
     ax2.legend()
 
+    ax3.set_title("Val rows: unseen chemistry vs train media")
+    ax3.set_ylabel("Fraction")
+    ax3.set_ylim(0.0, 1.05)
+    n_chem = int(chem_audit["n_val_rows_chemistry_audit"]) if chem_audit else 0
+    if chem_audit and n_chem > 0:
+        fr = chem_audit["val_frac_rows_any_unseen_component"]
+        fw = chem_audit["val_frac_weight_on_unseen_component_rows"]
+        fr_f = float(fr) if isinstance(fr, (int, float)) and not (isinstance(fr, float) and math.isnan(fr)) else 0.0
+        fw_f = float(fw) if isinstance(fw, (int, float)) and not (isinstance(fw, float) and math.isnan(fw)) else 0.0
+        xpos = [0, 1]
+        ax3.bar(
+            xpos,
+            [fr_f, fw_f],
+            color=["tab:blue", "tab:purple"],
+            alpha=0.85,
+            tick_label=[
+                "Row fraction\n(any unseen component)",
+                "Huber weight fraction\n(on those rows)",
+            ],
+        )
+        ax3.axhline(0.0, color="gray", linewidth=0.8)
+        n_train_comp = chem_audit.get("n_distinct_components_in_train_media", "?")
+        ax3.text(
+            0.5,
+            1.02,
+            f"n_val_rows(audit)={n_chem} | train component types={n_train_comp}",
+            transform=ax3.transAxes,
+            ha="center",
+            fontsize=9,
+        )
+    else:
+        reason = metrics.get("split_chemistry_audit_skip_reason")
+        if reason is None and chem_audit is not None:
+            reason = f"n_val_rows_chemistry_audit={chem_audit.get('n_val_rows_chemistry_audit', 0)}"
+        if reason is None:
+            reason = "no val rows or audit off"
+        ax3.text(
+            0.5,
+            0.55,
+            "Chemistry OOD audit unavailable\n(same filters as training val iterator).",
+            ha="center",
+            va="center",
+            transform=ax3.transAxes,
+            fontsize=10,
+        )
+        ax3.text(0.5, 0.35, str(reason), ha="center", va="center", transform=ax3.transAxes, fontsize=8)
+        ax3.set_xticks([])
+        ax3.set_yticks([0, 0.5, 1.0])
+
+    fig.suptitle(split_title, fontsize=10, y=1.02)
     fig.tight_layout()
-    fig.savefig(run_dir / "learning_curves.png", dpi=150)
+    fig.savefig(run_dir / "learning_curves.png", dpi=150, bbox_inches="tight")
     plt.close(fig)
 
     if per_org_rows:
@@ -497,6 +672,7 @@ def main() -> int:
         f"# Experiment summary: {run_id}",
         "",
         f"- protocol: `{config['protocol_id']}`",
+        f"- organism split: train={len(train_orgs)} orgs | val={sorted(val_orgs)} | test={sorted(test_orgs)}",
         f"- arm: `{arm}`",
         f"- run_tag: `{args.run_tag.strip() or 'None'}`",
         f"- epochs: `{args.epochs}`",
@@ -514,6 +690,16 @@ def main() -> int:
         f"- per_org_plot: `per_org_metrics.png`",
         f"- learning_curves: `learning_curves.png`",
     ]
+    if chem_audit and int(chem_audit.get("n_val_rows_chemistry_audit", 0) or 0) > 0:
+        summary_lines.extend(
+            [
+                f"- val_frac_rows_any_unseen_component: `{chem_audit.get('val_frac_rows_any_unseen_component')}`",
+                f"- val_frac_weight_on_unseen_component_rows: `{chem_audit.get('val_frac_weight_on_unseen_component_rows')}`",
+                f"- (unseen = medium has no Media_Components row, or any component not in train-organism media union)",
+            ]
+        )
+    elif not args.skip_chemistry_audit:
+        summary_lines.append("- chemistry OOD audit: skipped or unavailable (see `metrics.json` split_chemistry_audit_*)")
     (run_dir / "README.md").write_text("\n".join(summary_lines), encoding="utf-8")
 
     (run_dir / "metrics.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")

@@ -1,6 +1,6 @@
 # Media composition workbook audit (Phase 0)
 
-Generated: 2026-04-05T19:25:15Z UTC
+Generated: 2026-04-10T16:26:58Z UTC
 File: `data/media_composition.xlsx` (repo root-relative)
 
 ## Sheet inventory

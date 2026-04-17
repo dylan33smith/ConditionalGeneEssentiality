@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-04-05T19:25:20Z",
+  "generated_utc": "2026-04-10T16:27:02Z",
   "n_experiments": 7552,
   "n_fitness_sample_rows": 87574,
   "sample_mod": 313,
@@ -34,6 +34,24 @@
     "figures_dir": "figures/phase0",
     "media_audit_md": "data_analysis/outputs/media_composition_audit.md",
     "connected_media_csv": "data_analysis/outputs/connected_media_degree_benchmark.csv",
-    "phase0_summary_json": "data_analysis/outputs/phase0_summary.json"
+    "phase0_summary_json": "data_analysis/outputs/phase0_summary.json",
+    "parquet_workbook_derived": [
+      "data_analysis/outputs/chemical_component_cross_species_coverage.csv",
+      "figures/phase0/07_component_organism_overlap_all.png",
+      "figures/phase0/09_component_support_scatter.png",
+      "data_analysis/outputs/component_by_organism_experiment_counts_all.csv",
+      "figures/phase0/08_component_overlap_stacked_by_organism_all.png",
+      "data_analysis/outputs/media_component_richness.csv",
+      "figures/phase0/10_media_component_richness_hist.png",
+      "data_analysis/outputs/chemical_encoding_coverage_by_org.csv",
+      "figures/phase0/11_chemical_encoding_coverage_by_org.png",
+      "data_analysis/outputs/condition_diversity_by_org.csv",
+      "figures/phase0/12_condition_diversity_by_org.png",
+      "data_analysis/outputs/embedding_coverage_summary.json",
+      "data_analysis/outputs/embedding_coverage_by_org.csv",
+      "data_analysis/outputs/missing_embedding_gene_keys.csv",
+      "figures/phase0/13_embedding_coverage_gap_top20.png",
+      "figures/phase0/14_embedding_missing_counts_top20.png"
+    ]
   }
 }

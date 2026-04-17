@@ -1,0 +1,14 @@
+{
+  "row_level": {
+    "n_rows_with_fit": 27410721,
+    "n_rows_with_embedding": 27172421,
+    "n_rows_missing_embedding": 238300,
+    "pct_rows_missing_embedding": 0.869367865223246
+  },
+  "gene_level": {
+    "n_unique_org_gene_keys": 182447,
+    "n_unique_with_embedding": 179963,
+    "n_unique_missing_embedding": 2484,
+    "pct_unique_missing_embedding": 1.3614912823998202
+  }
+}

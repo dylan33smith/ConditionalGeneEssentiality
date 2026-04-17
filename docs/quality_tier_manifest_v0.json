@@ -1,0 +1,35 @@
+{
+  "manifest_version": 1,
+  "generated_utc": "2026-04-10T18:34:54Z",
+  "phase0_condition_diversity_csv": "data_analysis/outputs/condition_diversity_by_org.csv",
+  "phase0_embedding_coverage_csv": "data_analysis/outputs/embedding_coverage_by_org.csv",
+  "baseline_protocol": "splits/organism_single_holdout_largest_v0/protocol.json",
+  "curated": {
+    "protocol_path": "splits/organism_single_holdout_largest_curated_v0/protocol.json",
+    "n_excluded": 6,
+    "excluded": {
+      "Magneto": "n_unique_condition_signatures=5 <= 5",
+      "RalstoniaBSBF1503": "n_unique_condition_signatures=3 <= 5",
+      "RalstoniaGMI1000": "n_unique_condition_signatures=3 <= 5",
+      "RalstoniaPSI07": "n_unique_condition_signatures=3 <= 5",
+      "RalstoniaUW163": "n_unique_condition_signatures=2 <= 5",
+      "azobra": "pct_unique_missing_embedding=13.6% > 10%"
+    }
+  },
+  "curated_strict": {
+    "protocol_path": "splits/organism_single_holdout_largest_curated_strict_v0/protocol.json",
+    "n_excluded": 10,
+    "excluded": {
+      "Magneto": "n_unique_condition_signatures=5 <= 5",
+      "RalstoniaBSBF1503": "n_unique_condition_signatures=3 <= 5",
+      "RalstoniaGMI1000": "n_unique_condition_signatures=3 <= 5",
+      "RalstoniaPSI07": "n_unique_condition_signatures=3 <= 5",
+      "RalstoniaUW163": "n_unique_condition_signatures=2 <= 5",
+      "azobra": "pct_unique_missing_embedding=13.6% > 10%",
+      "Burk376": "n_unique_condition_signatures=13 < 15",
+      "Dda3937": "n_unique_condition_signatures=11 < 15",
+      "Ddia6719": "n_unique_condition_signatures=6 < 15",
+      "DdiaME23": "n_unique_condition_signatures=13 < 15"
+    }
+  }
+}

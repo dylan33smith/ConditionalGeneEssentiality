@@ -1,0 +1,121 @@
+Media_n,n_components
+MOPS Rich Defined media_noCarbon,45
+McAA_formate,27
+McAA_formate_No_NicotinicAcid,26
+McAA_formate_No_lipolicAcid,26
+McAA_formate_No_Riboflavin,26
+McAA_formate_No_Pyroxidine,26
+McAA_formate_No_pABA,26
+McAA_formate_No_FolicAcid,26
+McAA_formate_No_biotin,26
+McAA_formate_No_B12,26
+McAA_formate_No_CaPantothenate,26
+McAA_formate_No_Thiamine,26
+Dv_base_Y_medium,21
+MoYLS4,21
+MoLS4,20
+Dv_base_medium,20
+MoYLS4_no_iron,20
+MoLS4_no_Pantothenic_acid,19
+MoLS4_no_Biotin,19
+MoLS4_no_B12,19
+MoLS4_no_Choline_chloride,19
+MoLS4_no_Mo,19
+Dv_base_medium_no_Mo,19
+Dv_base_medium_no_W,19
+MoLS4_no_thiamine,19
+MoLS4_no_Folic_acid,19
+MoLS4_no_Pyridoxine,19
+MoLS4_no_W,19
+MoLS4_no_lactate,19
+MoLS4_no_lipoic_acid,19
+MoLS4_no_ammonia,19
+MoLS4_no_ammonium,19
+MoLS4_no_sulfide,19
+MoLS4_no_nicotinic_acid,19
+MoLS4_no_vitamins,19
+Dv_base_medium_no_Mo_no_W,18
+MoLS4_no_Mo_no_W,18
+MoLS4_no_ammonium_no_Mo,18
+MoLS4_no_ammonium_no_W,18
+McCas_MOPS,17
+McCas_formate_complete,17
+McCas_Formate_complete,17
+MoLS4_no_ammonium_no_Mo_no_W,17
+McCas,16
+Mc_formate,16
+McCas_formate_Fe_Free,16
+Mc_defined_formate,16
+McCas_H2_complete,16
+marine_broth_2216,15
+Wolfe's mineral mix,15
+Mc_formate_N_Free,15
+Mc_defined_H2,15
+MOPS minimal media_Glucose_noNitrogen,15
+McCas_H2_No_Na2S,15
+MOPS minimal media_noCarbon,15
+McCas_H2_Fe_Free,15
+Mc_H2_N_Free,14
+Thauer's vitamin mix,12
+Varel_Bryant_medium_Glucose,12
+Wolfe's vitamin mix,11
+Varel_Bryant_medium,11
+MG minimal media,11
+Varel_Bryant_medium_noNitrogen,10
+RCH2_Lactate_YE_1_M_Fe-Cu,10
+LS4D,10
+ALP_rich,10
+MG minimal media_noIron,10
+ALP_richB,9
+RCH2_Lactate_Nitrate_YE,9
+RCH2_Lactate_1_M_Fe-Cu,9
+ShewMM,9
+ShewMM_MES_buffer,9
+BG11,9
+BG11_noNitrogen,8
+R2A,8
+ShewMM_noNitrogen,8
+ShewMM_noCarbon,8
+RCH2_defined_glucose_MES,7
+M9+sucrose,7
+M9_1percentGlucose,7
+M2_noNitrogen,7
+RCH2_defined_glucose,7
+M9+polygalacturonate,7
+M2_noCarbon,7
+M9+starch,7
+MG minimal media_noCarbon,7
+RCH2_defined_TAPS,7
+RCH2_defined,7
+RCH2_defined_glucose_TAPS,7
+Trace metal mix A5,7
+RCH2_defined_glucose_CAPS,7
+ALP_defined_noC,6
+DinoMM_L_lactateCarbon_HighNutrient,6
+RCH2_defined_noNitrogen,6
+RCH2_defined_Glucose_noNitrogen,6
+RCH2_defined_glucose_noVitamin,6
+RCH2_defined_noCarbon,6
+RCH2_defined_no_vitamin,6
+M9 minimal media_noCarbon,6
+M9 minimal media_noNitrogen,6
+DinoMM_noCarbon,5
+BHIS,5
+DinoMM_L_lactateCarbon_HighNutrient_noVitamin,5
+DinoMM_alphaKetoGlutAcid_NoNitrogen,5
+DinoMM_noCarbon_HighNutrient,5
+DinoMM_noNitrogen_HighNutrient_GlucoseC,5
+SGWD_noNitrogen,5
+RCH2_defined_noCarbon_noVitamins,5
+DinoMM_noNitrogen_HighNutrient,5
+DinoMM_noNitrogen_HighNutrient_SucroseC,5
+DinoMM_noNitrogen,5
+KB,4
+PYE,4
+M63_quarter_strength,4
+M63_no_sulfur,4
+LB,3
+CPG,3
+Potato Dextrose Broth,2
+Potato tuber,1
+Potato stem,1
