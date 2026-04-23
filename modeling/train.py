@@ -294,7 +294,7 @@ def main() -> int:
     null_ref: float | None = None
     if null_path.is_file():
         nb = json.loads(null_path.read_text(encoding="utf-8"))
-        block = nb.get("organism_single_holdout_largest_v0", {}).get("val", {})
+        block = nb.get(protocol.protocol_id, {}).get("val", {})
         null_ref = block.get("rmse_global_train_mean")
 
     def _json_float(x: float) -> float | None:
