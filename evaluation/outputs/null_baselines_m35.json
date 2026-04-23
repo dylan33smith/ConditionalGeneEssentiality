@@ -382,5 +382,21 @@
         "rmse_global_train_mean": 0.576345603091631
       }
     ]
+  },
+  "organism_multi_holdout_overlap_v0": {
+    "protocol_id": "organism_multi_holdout_overlap_v0",
+    "val_org_ids": [
+      "Koxy",
+      "SB2B",
+      "WCS417",
+      "pseudo3_N2E3"
+    ],
+    "val": {
+      "rmse_global_train_mean": 0.6175807724737316,
+      "n_val_rows": 3500581,
+      "global_train_mean": -0.09748474735368672,
+      "note": "Global train mean baseline applied to all val rows with finite fit."
+    },
+    "computed_utc": "2026-04-23T16:10:05Z"
   }
 }
