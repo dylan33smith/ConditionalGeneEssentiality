@@ -11,7 +11,9 @@ REPO_ROOT = Path(__file__).resolve().parent
 
 DATA_RAW = REPO_ROOT / "data" / "raw"
 FEBA_DB = DATA_RAW / "feba.db"
-MEDIA_XLSX = REPO_ROOT / "data" / "media_composition.xlsx"
+MEDIA_XLSX = REPO_ROOT / "data" / "media_composition.xlsx"       # v1 (original, 45 media)
+MEDIA_XLSX_V2 = REPO_ROOT / "data" / "media_composition_v2.xlsx"  # v2 (120 media, physical components)
+MEDIA_XLSX_V3 = REPO_ROOT / "data" / "media_composition_v3.xlsx"  # v3 (121 media, adds LB (Miller) in-silico; current default)
 
 DERIVED_CANONICAL_V0 = REPO_ROOT / "data" / "derived" / "canonical" / "v0"
 CANONICAL_FITNESS_LONG = DERIVED_CANONICAL_V0 / "fitness_experiment_long.parquet"

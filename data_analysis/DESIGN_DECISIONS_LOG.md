@@ -2,6 +2,16 @@
 
 Short record of Phase 0 choices. Expand as modeling stages land.
 
+## 2026-04-23 — Media workbook v3
+
+1. **`data/media_composition_v3.xlsx`** (120 media, 1,627 component rows). The `"LB"` entry has been completely replaced with a richer in-silico representation: the old 3-ingredient physical recipe (Tryptone, Yeast Extract, NaCl) was removed and replaced with **74 in-silico metabolite components** (all 20 amino acids, nucleosides, B-vitamins, minerals, cofactors — `Units = "In Silico"`, indicating metabolic availability rather than measured concentration). LB is the largest single medium in the fitness data (5,287,640 rows = 19.5% of all rows).
+
+2. **Component names aligned to workbook conventions.** The original in-silico data used BIGG metabolite ID suffixes (e.g. `'L-Alanine (ala-L)'`). All 74 component names were remapped to match the naming conventions used by other media entries: amino acids → plain free-acid names (`'L-Alanine'`), vitamins → closest existing name (`'Biotin'`, `'Riboflavin'`, `'Folic acid'`, `'Thiamine HCl'`, `'Pyridoxine HCl'`, `'Cyanocobalamin'`, `'Calcium pantothenate'`, `'Lipoic acid'`, `'4-Aminobenzoic acid'`, `'Nicotinic acid'`), simple organics → stripped names (`'Glycerol'`, `'D-Glucose'`, etc.). Result: **32 of 74 LB components now exactly match component names used by at least one other medium**, enabling recognized chemistry overlap in the audit and condition feature vector.
+
+3. **In-silico vs physical representation.** The 42 remaining LB components (ions like `'Sodium'`, `'Magnesium'`; nucleosides like `'Adenosine'`; cofactors like `'Heme'`) have no matching names in other media, which use compound-level reagent names (e.g. `'Sodium Chloride'`, `'MgSO4·7H2O'`). These represent genuine new vocabulary for LB. The mixed representation (in-silico metabolites for LB, physical reagents for all other media) is a known inconsistency to resolve if the in-silico approach is extended to additional media.
+
+4. **Default updated.** `repo_paths.py`, `modeling/train.py`, and `data_analysis/run_phase0.py` now default to v3. v1 (`MEDIA_XLSX`) and v2 (`MEDIA_XLSX_V2`) remain as named constants in `repo_paths.py` for reference; all active code uses `MEDIA_XLSX_V3`.
+
 ## 2026-04-05 — Phase 0 (M1) scaffolding
 
 1. **Media workbook “composition” sheet.** The v1 note pointed at sheet index 2; in the current `data/media_composition.xlsx`, **component-level rows** live on **`Media_Components` (index 1)**. Sheet **`Experiments` (index 2)** holds experiment metadata and a **join key** to the DB: `(orgId, name)` ↔ `(orgId, expName)` with `Media` matching `Experiment.media` where both exist. Documented in [`outputs/media_composition_audit.md`](outputs/media_composition_audit.md).
