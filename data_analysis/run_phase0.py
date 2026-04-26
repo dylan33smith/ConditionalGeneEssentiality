@@ -5,7 +5,7 @@ Run from repo root:
   python data_analysis/run_phase0.py
 
 Outputs:
-  figures/phase0/*.png  (01–06 from DB sample; 07+ from canonical Parquet + media_composition_v2.xlsx)
+  figures/phase0/*.png  (01–06 from DB sample; 07+ from canonical Parquet + media_composition_v3.xlsx)
   data_analysis/outputs/media_composition_audit.md
   data_analysis/outputs/phase0_summary.json
 """
@@ -43,7 +43,8 @@ SAMPLE_MOD = 313  # ~88k rows from ~27.4M
 
 CANON_EXPERIMENTS_PARQUET = REPO_ROOT / "data" / "derived" / "canonical" / "v0" / "experiments.parquet"
 CANON_FITNESS_LONG_PARQUET = REPO_ROOT / "data" / "derived" / "canonical" / "v0" / "fitness_experiment_long.parquet"
-MEDIA_XLSX_V2 = REPO_ROOT / "data" / "media_composition_v2.xlsx"
+MEDIA_XLSX_V2 = REPO_ROOT / "data" / "media_composition_v2.xlsx"  # kept for reference
+MEDIA_XLSX_V3 = REPO_ROOT / "data" / "media_composition_v3.xlsx"  # current default
 COND_ENCODING_PARQUET = REPO_ROOT / "data" / "derived" / "condition_encoding" / "v0" / "experiments_condition.parquet"
 
 
@@ -231,10 +232,11 @@ def variance_decomposition_table(sample: pd.DataFrame) -> dict:
 
 
 def _load_media_components_v2() -> pd.DataFrame | None:
-    if not MEDIA_XLSX_V2.is_file():
-        print(f"Skipping Parquet/v2 figures: missing {MEDIA_XLSX_V2}", file=sys.stderr)
+    wb = MEDIA_XLSX_V3 if MEDIA_XLSX_V3.is_file() else MEDIA_XLSX_V2
+    if not wb.is_file():
+        print(f"Skipping Parquet/v2 figures: missing {wb}", file=sys.stderr)
         return None
-    mc = pd.read_excel(MEDIA_XLSX_V2, sheet_name="Media_Components")
+    mc = pd.read_excel(wb, sheet_name="Media_Components")
     mc["Media_n"] = mc["Media"].map(_norm_text)
     mc["Component_n"] = mc["Component"].map(_norm_text)
     return mc[(mc["Media_n"] != "") & (mc["Component_n"] != "")][["Media_n", "Component_n"]].drop_duplicates()
@@ -584,7 +586,7 @@ def plot_embedding_coverage_figures() -> list[str]:
 
 
 def excel_experiment_coverage(
-    experiments: pd.DataFrame, workbook: Path = MEDIA_XLSX_V2
+    experiments: pd.DataFrame, workbook: Path = MEDIA_XLSX_V3
 ) -> dict:
     """How many DB experiments appear in the workbook `Experiments` sheet (orgId + name)."""
     if not workbook.is_file():
@@ -620,7 +622,7 @@ def excel_experiment_coverage(
 
 
 def write_media_audit_md() -> str:
-    audit_wb = MEDIA_XLSX_V2
+    audit_wb = MEDIA_XLSX_V3 if MEDIA_XLSX_V3.is_file() else MEDIA_XLSX_V2
     if not audit_wb.is_file():
         out = OUTPUT_DIR / "media_composition_audit.md"
         out.write_text(
@@ -748,7 +750,7 @@ def main() -> int:
     vd = variance_decomposition_table(sample)
     audit_path = write_media_audit_md()
     emb = embedding_spotcheck()
-    xl_cov = excel_experiment_coverage(experiments, MEDIA_XLSX_V2)
+    xl_cov = excel_experiment_coverage(experiments, MEDIA_XLSX_V3 if MEDIA_XLSX_V3.is_file() else MEDIA_XLSX_V2)
 
     def _rel(path: Path) -> str:
         try:

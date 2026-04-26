@@ -10,7 +10,7 @@ Smoke:
     --skip-full-row-counts
 
 Chemistry OOD (val rows vs train-organism media components) uses ``--media-workbook`` (default
-``data/media_composition_v2.xlsx``) and ``--experiments-parquet``; disable with ``--skip-chemistry-audit``.
+``data/media_composition_v3.xlsx``) and ``--experiments-parquet``; disable with ``--skip-chemistry-audit``.
 """
 
 from __future__ import annotations
@@ -33,6 +33,7 @@ import torch.nn as nn
 from condition_store import ExperimentConditionEncoding
 from data import ArmName, count_split_row_stats, iter_val_batches, shuffled_training_batches
 from embedding_store import EmbeddingStore
+from fast_data import MaterializedSplit
 from metrics import mean_within_gene_spearman_with_diagnostics, rmse_numpy
 from model import GeneConditionMLP
 from paths import EMBEDDING_LAYER8_DIR, REPO_ROOT, RUNS_ROOT, resolve_parquet_path
@@ -96,7 +97,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--media-workbook",
         type=str,
-        default="data/media_composition_v2.xlsx",
+        default="data/media_composition_v3.xlsx",
         help="Excel workbook with Media_Components sheet (chemistry OOD audit vs train organisms).",
     )
     p.add_argument(
@@ -105,6 +106,16 @@ def parse_args() -> argparse.Namespace:
         help="Do not compute val chemistry-overlap stats (no extra Parquet / Excel read).",
     )
     p.add_argument("--output-dir", type=str, default=str(RUNS_ROOT))
+    p.add_argument(
+        "--materialized-dir",
+        type=str,
+        default="",
+        help=(
+            "Path to directory produced by materialize_training_data.py "
+            "(contains train/ and val/ subdirs with meta.json + .npy arrays). "
+            "When set, skips all Parquet streaming and Python row filtering each epoch."
+        ),
+    )
     p.add_argument(
         "--log-every-n-batches",
         type=int,
@@ -153,16 +164,43 @@ def main() -> int:
     run_dir = out_dir / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    orgs_needed = protocol.train_org_ids | protocol.val_org_ids
-    embed_dir = Path(args.embed_dir)
-    if not embed_dir.is_absolute():
-        embed_dir = REPO_ROOT / embed_dir
-    print(f"Loading embeddings from {embed_dir} ({len(orgs_needed)} organisms)…", flush=True)
-    embed_store = EmbeddingStore(embed_dir, set(orgs_needed), device=device)
-
     train_orgs = set(protocol.train_org_ids)
     val_orgs = set(protocol.val_org_ids)
     test_orgs = set(protocol.test_org_ids)
+
+    # --- Decide: fast materialized path vs streaming Parquet path ---
+    mat_dir_str = getattr(args, "materialized_dir", "").strip()
+    mat_dir: Path | None = None
+    if mat_dir_str:
+        mat_dir = Path(mat_dir_str) if Path(mat_dir_str).is_absolute() else REPO_ROOT / mat_dir_str
+    using_materialized = (
+        mat_dir is not None
+        and (mat_dir / "train" / "meta.json").is_file()
+        and (mat_dir / "val" / "meta.json").is_file()
+    )
+
+    mat_train: MaterializedSplit | None = None
+    mat_val: MaterializedSplit | None = None
+    embed_store: EmbeddingStore | None = None
+
+    if using_materialized:
+        assert mat_dir is not None
+        print(f"Loading pre-materialized data from {mat_dir}…", flush=True)
+        mat_train = MaterializedSplit(mat_dir / "train", device)
+        mat_val = MaterializedSplit(mat_dir / "val", device)
+        gene_dim = mat_train.gene_dim
+        print(
+            f"  train: {mat_train.n_rows:,} rows | val: {mat_val.n_rows:,} rows",
+            flush=True,
+        )
+    else:
+        orgs_needed = protocol.train_org_ids | protocol.val_org_ids
+        embed_dir = Path(args.embed_dir)
+        if not embed_dir.is_absolute():
+            embed_dir = REPO_ROOT / embed_dir
+        print(f"Loading embeddings from {embed_dir} ({len(orgs_needed)} organisms)…", flush=True)
+        embed_store = EmbeddingStore(embed_dir, set(orgs_needed), device=device)
+        gene_dim = embed_store.gene_embedding_dim
 
     experiments_pq = Path(args.experiments_parquet)
     if not experiments_pq.is_absolute():
@@ -175,7 +213,7 @@ def main() -> int:
     max_val = args.max_val_rows or None
 
     chem_audit: dict[str, object] | None = None
-    if not args.skip_chemistry_audit:
+    if not args.skip_chemistry_audit and not using_materialized:
         chem_audit = compute_split_chemistry_report(
             experiments_parquet=experiments_pq,
             media_workbook=media_workbook,
@@ -183,7 +221,7 @@ def main() -> int:
             train_orgs=train_orgs,
             val_orgs=val_orgs,
             arm=arm,
-            embed_store=embed_store,
+            embed_store=embed_store,  # type: ignore[arg-type]
             condition_store=condition_store,
             strict_min_cor12=args.strict_min_cor12,
             strict_min_abs_t=args.strict_min_abs_t,
@@ -191,9 +229,9 @@ def main() -> int:
             weight_t_scale=args.weight_t_scale,
             max_val_rows=max_val,
         )
+
     cat_field_order = condition_store.cat_field_order
     n_cont = condition_store.n_cont_fields
-    gene_dim = embed_store.gene_embedding_dim
     model = GeneConditionMLP(
         gene_dim=gene_dim,
         cat_field_max_ids=condition_store.cat_field_max_ids,
@@ -208,14 +246,20 @@ def main() -> int:
     huber = nn.HuberLoss(delta=args.huber_delta, reduction="none")
 
     row_stats: dict[str, int | float] = {}
-    if not args.skip_full_row_counts:
+    if using_materialized:
+        assert mat_train is not None and mat_val is not None
+        row_stats = {
+            "n_train_rows_used_by_model_under_arm": mat_train.n_rows,
+            "n_val_rows_used_by_model_under_arm": mat_val.n_rows,
+        }
+    elif not args.skip_full_row_counts:
         print("Counting train/val rows (full Parquet pass)…", flush=True)
         t1 = time.perf_counter()
         row_stats = count_split_row_stats(
             parquet_path,
             train_orgs,
             val_orgs,
-            embed_store,
+            embed_store,  # type: ignore[arg-type]
             arm,
             condition_store.key_set(),
             strict_min_cor12=args.strict_min_cor12,
@@ -311,22 +355,27 @@ def main() -> int:
         val_loss_num = 0.0
         val_loss_den = 0.0
         with torch.no_grad():
-            for x_g, cat_ids, x_cont, y, w, gks in iter_val_batches(
-                parquet_path,
-                val_orgs,
-                arm,
-                embed_store,
-                condition_store,
-                device,
-                batch_size=args.batch_size,
-                cat_field_order=cat_field_order,
-                n_cont=n_cont,
-                strict_min_cor12=args.strict_min_cor12,
-                strict_min_abs_t=args.strict_min_abs_t,
-                cor12_floor=args.cor12_floor,
-                weight_t_scale=args.weight_t_scale,
-                max_rows=max_val,
-            ):
+            if using_materialized:
+                assert mat_val is not None
+                _val_iter = mat_val.iter_val_batches(batch_size=args.batch_size)
+            else:
+                _val_iter = iter_val_batches(
+                    parquet_path,
+                    val_orgs,
+                    arm,
+                    embed_store,  # type: ignore[arg-type]
+                    condition_store,
+                    device,
+                    batch_size=args.batch_size,
+                    cat_field_order=cat_field_order,
+                    n_cont=n_cont,
+                    strict_min_cor12=args.strict_min_cor12,
+                    strict_min_abs_t=args.strict_min_abs_t,
+                    cor12_floor=args.cor12_floor,
+                    weight_t_scale=args.weight_t_scale,
+                    max_rows=max_val,
+                )
+            for x_g, cat_ids, x_cont, y, w, gks in _val_iter:
                 pred = model(x_g, cat_ids, x_cont)
                 loss_vec = huber(pred, y) * w
                 val_loss_num += float(loss_vec.sum().detach().cpu())
@@ -382,24 +431,33 @@ def main() -> int:
                 f"(no per-batch logs; use --log-every-n-batches N for progress)",
                 flush=True,
             )
-        for x_g, cat_ids, x_cont, y, w in shuffled_training_batches(
-            parquet_path,
-            train_orgs,
-            arm,
-            embed_store,
-            condition_store,
-            device,
-            batch_size=args.batch_size,
-            shuffle_buffer=args.shuffle_buffer,
-            seed=args.seed + epoch * 10_000,
-            cat_field_order=cat_field_order,
-            n_cont=n_cont,
-            strict_min_cor12=args.strict_min_cor12,
-            strict_min_abs_t=args.strict_min_abs_t,
-            cor12_floor=args.cor12_floor,
-            weight_t_scale=args.weight_t_scale,
-            max_rows=max_train,
-        ):
+        if using_materialized:
+            assert mat_train is not None
+            _train_iter = mat_train.iter_train_batches(
+                batch_size=args.batch_size,
+                seed=args.seed,
+                epoch=epoch,
+            )
+        else:
+            _train_iter = shuffled_training_batches(
+                parquet_path,
+                train_orgs,
+                arm,
+                embed_store,  # type: ignore[arg-type]
+                condition_store,
+                device,
+                batch_size=args.batch_size,
+                shuffle_buffer=args.shuffle_buffer,
+                seed=args.seed + epoch * 10_000,
+                cat_field_order=cat_field_order,
+                n_cont=n_cont,
+                strict_min_cor12=args.strict_min_cor12,
+                strict_min_abs_t=args.strict_min_abs_t,
+                cor12_floor=args.cor12_floor,
+                weight_t_scale=args.weight_t_scale,
+                max_rows=max_train,
+            )
+        for x_g, cat_ids, x_cont, y, w in _train_iter:
             opt.zero_grad(set_to_none=True)
             pred = model(x_g, cat_ids, x_cont)
             loss_vec = huber(pred, y) * w
@@ -417,7 +475,8 @@ def main() -> int:
                     flush=True,
                 )
         train_loss = float(np.mean(losses)) if losses else float("nan")
-        eval_stats = _eval_pass()
+        is_last_epoch = (epoch == args.epochs - 1)
+        eval_stats = _eval_pass(detailed=is_last_epoch)
         row_hist: dict[str, object] = {
             "epoch": epoch + 1,
             "train_loss_huber_weighted": train_loss,
@@ -439,7 +498,8 @@ def main() -> int:
         )
 
     if not history:
-        eval_stats = _eval_pass()
+        # epochs=0 path: run one eval without training
+        eval_stats = _eval_pass(detailed=True)
         row_hist0: dict[str, object] = {
             "epoch": 0,
             "train_loss_huber_weighted": float("nan"),
@@ -452,16 +512,16 @@ def main() -> int:
         row_hist0.update(_chem_epoch_fields())
         history.append(row_hist0)
 
-    final_eval = _eval_pass(detailed=True)
-    val_rmse = float(final_eval["val_rmse"])
-    rho = float(final_eval["mean_within_gene_spearman"])
-    n_genes = int(final_eval["n_genes_used_for_spearman"])
-    n_val_rows_scored = int(final_eval["n_val_rows_scored"])
-    n_val_batches = int(final_eval["n_val_batches"])
-    spearman_diag = final_eval["spearman_diagnostics"]
-    y_true = final_eval["y_true"]
-    y_pred = final_eval["y_pred"]
-    gene_keys = final_eval["gene_keys"]
+    # Reuse the last epoch's detailed eval — no extra val pass needed.
+    val_rmse = float(eval_stats["val_rmse"])
+    rho = float(eval_stats["mean_within_gene_spearman"])
+    n_genes = int(eval_stats["n_genes_used_for_spearman"])
+    n_val_rows_scored = int(eval_stats["n_val_rows_scored"])
+    n_val_batches = int(eval_stats["n_val_batches"])
+    spearman_diag = eval_stats["spearman_diagnostics"]
+    y_true = eval_stats["y_true"]
+    y_pred = eval_stats["y_pred"]
+    gene_keys = eval_stats["gene_keys"]
 
     null_ref_intersection: float | None = None
     if null_ref is not None and not (isinstance(null_ref, float) and math.isnan(null_ref)):

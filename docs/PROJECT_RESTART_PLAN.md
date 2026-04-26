@@ -173,11 +173,21 @@ SQLite export of the Fitness Browser. Key tables:
 
 Raw amino acid sequences (FASTA-like). Gets copied to `proteins.fasta` during processing.
 
-### 1.3 Media composition workbooks (`data/media_composition.xlsx`, `data/media_composition_v2.xlsx`)
+### 1.3 Media composition workbooks
 
-Excel workbooks with media composition information. The v1 pipeline loader used **sheet index 2** (third sheet) for composition-style data — **this must be re-verified** in Phase 0 (sheet names, column headers, units). A **v2** curated file may be used for joins and audits (`run_phase0.py` defaults documented in that script); authoritative sheet for medium → components remains `**Media_Components`**.
+Three versioned workbooks; **v3 is the current default** in all code:
 
-**Coverage is an open question:** Not all experiments may be mappable to this table.
+| File | Media | Component rows | Notes |
+|------|-------|----------------|-------|
+| `data/media_composition.xlsx` (v1) | 45 | 422 | Original; narrow coverage |
+| `data/media_composition_v2.xlsx` (v2) | 120 | 1,556 | Expanded physical components (g/L, mM, etc.) |
+| `data/media_composition_v3.xlsx` (v3) | 121 | 1,630 | **Current default.** Adds "LB (Miller)" with 74 in-silico metabolite components |
+
+All versions share identical sheet structure: `Media`, `Media_Components`, `Experiments`, `Organisms_Refs`, `Coverage_Summary`. Authoritative sheet for medium → components is `Media_Components`.
+
+**v3 change — LB replaced with in-silico representation.** The old `"LB"` entry (3 physical ingredients: Tryptone, Yeast Extract, NaCl) was removed and replaced with 74 in-silico metabolite components (all 20 amino acids, nucleosides, B-vitamins, minerals, cofactors), `Units = "In Silico"`. This is the only in-silico entry; all other 119 media retain physical-unit components. LB is the largest single medium (19.5% of fitness rows, 5.29M rows). Component names were aligned to workbook conventions so that **32 of 74 LB components exactly match names used in other media**, enabling recognized chemistry overlap in the audit and condition feature vector.
+
+**Coverage:** Not all experiments are mappable to this table (~2,755 of 7,552 DB experiments have no Excel row). See `data_analysis/DESIGN_DECISIONS_LOG.md` and `data_analysis/outputs/media_composition_audit.md`.
 
 #### 1.3.1 Verification checklist (Phase 0, required)
 
@@ -595,7 +605,11 @@ Four **separate** one-hot blocks: `media`, `condition_1`, `condition_2`, `condit
 
 ### 8.2 Planned upgrades
 
-- **Chemistry:** Nutrient multi-hot or concentration vector from verified `media_composition.xlsx` (§1.3.1).
+- **Chemistry:** Nutrient multi-hot or concentration vector from `media_composition_v3.xlsx` (§1.3). Two representation options now available:
+  - *Physical ingredients* (g/L / mM / etc.): available for all 121 media in v3. Binary presence/absence over ~141 known components, or concentration after unit normalisation.
+  - *In-silico metabolite availability* (binary "Present In Silico"): currently only available for "LB (Miller)" (74 metabolites). Biologically more meaningful — encodes which biosynthesis pathways can be disabled — but requires resolving the "LB" / "LB (Miller)" naming mismatch before it covers the 19.5% of fitness rows on LB medium. If extended to all media, this ~74-dim binary vector would be the preferred chemistry feature.
+  - **Immediate path:** build binary presence/absence over physical components for all 121 media (already covers 100% of fitness rows), using the `Media_Components` sheet with any `Units` value treated as "present". Resolve the LB alias separately.
+- **Extend in-silico representation.** The LB in-silico approach (74 metabolite availability features) is more biologically meaningful than physical-reagent names. Extending it to remaining media would require: deriving metabolite availability from each medium's physical recipe (e.g. via metabolic model lookup), then adding in-silico rows and aligning names to the existing component vocabulary. This would enable a ~74-dim binary availability vector as the condition chemistry feature across all media.
 - **Stressors:** Keep categorical one-hot per `condition_*` **or** add **bucketed concentrations** / **units** as extra features when Phase 0 shows they carry signal.
 
 ---
@@ -808,4 +822,4 @@ Success is **always defined relative to the null baseline on the same val set an
 
 ---
 
-*Last updated: 2026-04-10 (M5a: organism quality-tier ablation added as next experiment §3.6; M4.5: split + chemistry OOD diagnostics on learning curves; v2 workbook note in §1.3 / Finding 1). Living document — revise as we learn.*
+*Last updated: 2026-04-23 (v3 workbook: §1.3 table + naming mismatch note; §8.2 in-silico path + alias table plan; defaults updated to v3 in repo_paths.py, train.py, run_phase0.py; design log entry added). Living document — revise as we learn.*
