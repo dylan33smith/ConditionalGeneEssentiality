@@ -10,13 +10,35 @@ must record in its manifest. Authoritative for all stages and tiers per
 
 | Artifact | Path | Notes |
 |---|---|---|
-| Raw fitness DB | `data/raw/feba.db` | Never modified |
-| Condition workbook | `data/media_composition_v4.xlsx` | Sheet `Media_Components_ML` |
-| Gene embeddings | `data/processed/ProtLM_embeddings_layer8/*.pt` | Frozen |
-| Canonical fitness table | `data/derived/canonical/v0/fitness_experiment_long.parquet` | Inner join GeneFitness ⋈ Experiment |
-| Canonical experiments | `data/derived/canonical/v0/experiments.parquet` | |
-| Media master | `data/derived/canonical/v0/media_master.parquet` | |
-| Media components | `data/derived/canonical/v0/media_components_long.parquet` | |
+| Raw fitness DB | `data/raw/feba.db` | 27,410,721 GeneFitness rows, 7,552 Experiment rows |
+| Condition workbook | `data/media_composition_v4.xlsx` | Sheet `Media_Components_ML`, 4,332 rows |
+| Gene embeddings | `data/processed/ProtLM_embeddings_layer8/*_proteomelm.pt` | 48 organisms; see "Embedding bundle" below |
+| Canonical fitness | `data/derived/canonical/v0/fitness_experiment_long.parquet` | 27.4M rows × 56 cols (inner join GeneFitness ⋈ Experiment + derived `gene_key`, `abs_t`, `has_media_composition`) |
+| Canonical experiments | `data/derived/canonical/v0/experiments.parquet` | 7,552 rows × 50 cols (rich metadata) |
+
+### Deprecated / diagnostic-only
+
+| Artifact | Path | Why |
+|---|---|---|
+| Media master (legacy) | `data/derived/canonical/v0/media_master.parquet` | Reflects v1 (45 media); v4 supersedes |
+| Media components (legacy) | `data/derived/canonical/v0/media_components_long.parquet` | Reflects v1 (422 rows for 45 media); v4 sheet `Media_Components_ML` (4,332 rows for 120+ media) supersedes |
+
+S1 and S4 must read condition data directly from `media_composition_v4.xlsx`, not
+from the legacy media parquets. The legacy parquets are retained for diagnostic
+comparison only.
+
+### Embedding bundle structure
+
+Each `*_proteomelm.pt` file is a `dict` with two keys:
+
+| Key | Type | Shape / format |
+|---|---|---|
+| `embeddings` | `torch.Tensor` (bfloat16) | `(N_genes, 1152)`, ProteomeLM layer-8 output |
+| `group_labels` | `list[str]` | length `N_genes`, aligned by index with `embeddings`; entries are `gene_key` strings of the form `{orgId}:{locusId}` |
+
+**Cast to fp32 before any numerical comparison or training**; bf16 storage is fine
+but not all downstream ops support it. Lookup is `idx = group_labels.index(gene_key)`
+(O(N); cache as a dict for repeated lookups).
 
 ## Schemas
 

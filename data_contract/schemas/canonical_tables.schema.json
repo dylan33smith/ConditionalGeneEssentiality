@@ -2,39 +2,55 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "canonical_tables.schema.json",
   "title": "Canonical Modeling Tables (v0)",
-  "description": "Schema descriptors for the canonical Parquet tables under data/derived/canonical/v0/. These are descriptive (not validated row-by-row) but pin column names and dtypes.",
+  "description": "Schema descriptors for the canonical Parquet tables under data/derived/canonical/v0/. Verified against actual files on 2026-04-27.",
   "type": "object",
   "properties": {
     "fitness_experiment_long": {
       "type": "object",
       "description": "Inner join GeneFitness ⋈ Experiment, one row per (gene_key, expName).",
-      "required_columns": [
-        "orgId",
-        "locusId",
-        "gene_key",
-        "expName",
-        "fit",
-        "t",
-        "cor12",
-        "media",
-        "abs_t",
-        "has_media_composition"
+      "row_count_observed": 27410721,
+      "required_columns_minimum": [
+        "orgId", "locusId", "expName", "fit", "t",
+        "gene_key", "abs_t", "has_media_composition",
+        "media", "expGroup"
+      ],
+      "all_columns_observed": [
+        "orgId", "locusId", "expName", "fit", "t",
+        "expDesc", "timeZeroSet", "num", "nMapped", "nPastEnd",
+        "nGenic", "nUsed", "gMed", "gMedt0", "gMean",
+        "cor12", "mad12", "mad12c", "mad12c_t0",
+        "opcor", "adjcor", "gccor", "maxFit",
+        "expGroup", "expDescLong", "mutantLibrary", "person",
+        "dateStarted", "setName", "seqindex",
+        "media", "mediaStrength", "temperature", "pH", "vessel",
+        "aerobic", "liquid", "shaking",
+        "condition_1", "units_1", "concentration_1",
+        "condition_2", "units_2", "concentration_2",
+        "condition_3", "units_3", "concentration_3",
+        "condition_4", "units_4", "concentration_4",
+        "growthPlate", "growthWells", "nGenerations", "pubId",
+        "gene_key", "abs_t", "has_media_composition"
       ]
     },
     "experiments": {
       "type": "object",
       "description": "One row per experiment.",
-      "required_columns": ["orgId", "expName", "media", "expGroup"]
+      "row_count_observed": 7552,
+      "required_columns_minimum": ["orgId", "expName", "media", "expGroup"]
     },
     "media_master": {
       "type": "object",
-      "description": "One row per medium across all known media.",
-      "required_columns": ["Media"]
+      "description": "DEPRECATED for modeling: this file reflects the v1 45-media workbook. v4 (data/media_composition_v4.xlsx) is authoritative. Kept for diagnostic comparison only.",
+      "row_count_observed": 45,
+      "deprecated": true,
+      "authoritative_source": "data/media_composition_v4.xlsx, sheet 'Media'"
     },
     "media_components_long": {
       "type": "object",
-      "description": "Long-form components (legacy v3 sheet structure).",
-      "required_columns": ["Media", "Component"]
+      "description": "DEPRECATED for modeling: legacy v1 45-media components (422 rows). v4 sheet 'Media_Components_ML' is authoritative. Kept for diagnostic comparison only.",
+      "row_count_observed": 422,
+      "deprecated": true,
+      "authoritative_source": "data/media_composition_v4.xlsx, sheet 'Media_Components_ML'"
     }
   }
 }

@@ -61,6 +61,13 @@ def fit_additive_baseline(
         - Uses train rows only. Caller is responsible for not leaking val/test.
         - Predictions for unseen gene_keys or condition_keys default to 0 (no effect),
           which is the correct cold-start fallback for an additive baseline.
+
+    TODO(perf): the dict-of-list aggregation here is O(n_iters · n_rows) with
+        Python-level dict insertion overhead. Acceptable for unit tests and small
+        protocols (≲100k rows) but expected to be slow on the full ~27M-row
+        canonical fitness table — likely tens of minutes. Replace the inner loop
+        with a vectorized groupby (e.g., `numpy.bincount` or `pandas.DataFrame.groupby`)
+        before any S2 promotion-eligible run on full-scale data.
     """
     if not (len(fit) == len(gene_keys) == len(condition_keys)):
         raise ValueError("fit, gene_keys, condition_keys must have equal length")
