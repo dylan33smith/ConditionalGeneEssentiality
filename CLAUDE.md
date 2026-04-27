@@ -22,8 +22,8 @@ S0 → S1 → S2 → S3 → S4 → S5 → T1 → T2 → T3 → T4
 
 | Phase | Concern | Status |
 |---|---|---|
-| S0 | Reproducibility & Governance (smoke pipeline, run manifest, v4 verification) | not started |
-| S1 | Data Characterization → emits candidate protocols | not started |
+| S0 | Reproducibility & Governance (smoke pipeline, run manifest, v4 verification) | **approved** (S0-DEC-001) |
+| S1 | Data Characterization → emits candidate protocols | next |
 | S2 | Evaluation Trustworthiness (null baselines + power report per candidate) | not started |
 | S3 | Split Protocol Lock | not started |
 | S4 | Feature Contract (train-only vocab/scalers) | not started |

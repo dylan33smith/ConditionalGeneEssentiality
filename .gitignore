@@ -7,6 +7,7 @@ runs/
 ## Preprocessing / materialization caches — contents only, not the skeleton
 artifacts/runs/*/
 artifacts/indexes/*/
+artifacts/checksums_cache.json
 data/materialized/
 
 ## Python build artifacts
