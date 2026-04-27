@@ -16,16 +16,14 @@ must record in its manifest. Authoritative for all stages and tiers per
 | Canonical fitness | `data/derived/canonical/v0/fitness_experiment_long.parquet` | 27.4M rows × 56 cols (inner join GeneFitness ⋈ Experiment + derived `gene_key`, `abs_t`, `has_media_composition`) |
 | Canonical experiments | `data/derived/canonical/v0/experiments.parquet` | 7,552 rows × 50 cols (rich metadata) |
 
-### Deprecated / diagnostic-only
+### Deleted (2026-04-27)
 
-| Artifact | Path | Why |
-|---|---|---|
-| Media master (legacy) | `data/derived/canonical/v0/media_master.parquet` | Reflects v1 (45 media); v4 supersedes |
-| Media components (legacy) | `data/derived/canonical/v0/media_components_long.parquet` | Reflects v1 (422 rows for 45 media); v4 sheet `Media_Components_ML` (4,332 rows for 120+ media) supersedes |
+The legacy media parquets (`media_master.parquet`, `media_components_long.parquet`)
+were deleted on 2026-04-27 to eliminate any chance of accidental use. They reflected
+the v1 workbook (45 media); v4 (`Media_Components_ML`, 4,332 rows across 120 media)
+is authoritative per L2.
 
-S1 and S4 must read condition data directly from `media_composition_v4.xlsx`, not
-from the legacy media parquets. The legacy parquets are retained for diagnostic
-comparison only.
+S1 and S4 read condition data directly from `data/media_composition_v4.xlsx`.
 
 ### Embedding bundle structure
 
@@ -75,8 +73,23 @@ decision ledger.
 - Any feature trimming fit on train only and persisted as a named artifact in
   `preprocessing/<artifact_id>/`.
 - The `Decomposition_type` column drives the per-medium `representation_mode` tag
-  (`physical` | `mix` | `in_silico`); physical and in-silico features must not be
-  silently merged into one untagged feature space.
+  (`physical` | `mix` | `extract` | `in_silico`); the proposed mapping is in
+  [`representation_mode_mapping.yaml`](representation_mode_mapping.yaml). S1
+  ratifies it. Modes must not be silently merged into one untagged feature
+  space — `extract` in particular is the H-ENC-05 case and is tracked
+  separately from `mix`.
+
+## Condition definition
+
+A "condition" has two granularities used for different analyses; see
+[`condition_definition.yaml`](condition_definition.yaml) for the full
+field specification:
+
+- **Coarse:** tuple of (`media`, `condition_1..4`, `temperature`, `pH`,
+  `aerobic`). Used for sparsity / support analyses.
+- **Fine:** the chemistry vector from `Media_Components_ML` (joined on
+  `media`) plus the same metadata, plus stressor concentrations. This is
+  what the model sees as input.
 
 ## Per-run hard gate
 

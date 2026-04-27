@@ -1,6 +1,48 @@
-# S1 emits this. List of candidate val/test protocols for evaluation in S2.
-# Each entry must include val_org_ids, test_org_ids, chemistry_overlap_seen_rate,
-# support metrics, and a rationale.
+# S1 emits this. Each entry describes a candidate val/test split.
+# S2 consumes the entries to compute null baselines and a metric power report
+# per candidate. S3 selects one as the locked primary protocol.
+#
+# Status: pending — populated by src/experiments/stage1/run.py.
+
 status: pending
 emitted_by: stage1
-candidates: []   # filled by src/experiments/stage1/run_data_characterization.py
+
+# Schema for entries (each item in `candidates` must conform):
+#
+# - protocol_id: string                # short stable id (snake_case)
+#   description: string                # 1–2 sentence summary
+#   val_org_ids: list[string]          # held-out organisms for validation
+#   test_org_ids: list[string]         # held-out organisms for testing
+#   selection_strategy: string         # how this protocol was chosen
+#                                      # e.g. "largest-by-rows", "stratified-overlap",
+#                                      #      "low-overlap-stress", "homology-aware"
+#   support:
+#     train_rows: int                  # row count after split
+#     val_rows: int
+#     test_rows: int
+#     val_n_genes: int                 # unique gene_keys in val
+#     test_n_genes: int
+#     val_n_conditions: int            # unique expNames in val
+#     test_n_conditions: int
+#   chemistry_overlap:                 # see condition_definition.yaml for granularity
+#     val_seen_rate: float             # fraction of val media whose chemistry
+#                                      # appeared in train
+#     val_unseen_rate: float
+#     test_seen_rate: float
+#     test_unseen_rate: float
+#     val_canonical_id_seen_rate: float    # at the Canonical_ID level
+#     val_canonical_id_unseen_rate: float
+#     test_canonical_id_seen_rate: float
+#     test_canonical_id_unseen_rate: float
+#   representation_mode_proportions:   # fraction of rows by representation_mode
+#     train: {physical: float, mix: float, extract: float, in_silico: float}
+#     val:   {physical: float, mix: float, extract: float, in_silico: float}
+#     test:  {physical: float, mix: float, extract: float, in_silico: float}
+#   homology_summary:                  # required if H-HOMO-01 enabled in S1
+#     val_high_sim_fraction: float     # fraction of val genes with cosine sim
+#                                      # > threshold to nearest train gene
+#     test_high_sim_fraction: float
+#     similarity_threshold: float
+#   notes: string                      # free-text caveats
+
+candidates: []

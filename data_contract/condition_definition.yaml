@@ -1,0 +1,90 @@
+# Definition of "condition" in this project
+#
+# Pinned by user, 2026-04-27. Owned by S1 (analyses) and S4 (feature contract).
+#
+# A "condition" in (gene, condition) -> fitness regression has TWO levels of
+# granularity, used for different analyses:
+
+# ---------------------------------------------------------------------------
+# Coarse level — used as the unit-of-experiment for sparsity / support analyses
+# ---------------------------------------------------------------------------
+# Coarse condition := tuple of metadata fields from canonical experiments table:
+#   - media               (string; joins to v4 workbook on Media)
+#   - condition_1         (string; primary stressor / treatment)
+#   - condition_2         (string; secondary, often null)
+#   - condition_3         (string; tertiary, often null)
+#   - condition_4         (string; quaternary, very often null)
+#   - temperature         (string)
+#   - pH                  (string)
+#   - aerobic             (string; "True"/"False"/null)
+# Identity: two experiments with identical values across all coarse fields
+# define the same coarse condition. The natural primary key is `expName` for
+# row identity in the canonical fitness table; coarse condition is a
+# stable many-to-one grouping above expName.
+
+coarse_condition_fields:
+  - media
+  - condition_1
+  - condition_2
+  - condition_3
+  - condition_4
+  - temperature
+  - pH
+  - aerobic
+
+# ---------------------------------------------------------------------------
+# Fine level — used as the model input for chemistry-feature encoders
+# ---------------------------------------------------------------------------
+# Fine condition := chemical-component vector derived from joining
+#   media -> media_composition_v4.xlsx, sheet `Media_Components_ML`
+# plus the same stressor/temperature/pH/aerobic metadata as coarse, plus any
+# stressor concentrations. The model sees:
+#   - multihot vector over Canonical_ID present (Include_in_ml = True)
+#   - representation_mode tags per medium (physical | mix | extract | in_silico)
+#   - numeric concentration of each component (transformed per S4 policy)
+#   - categorical/stringly metadata: stressors, temperature, pH, aerobic
+#   - numeric stressor concentration if recorded (concentration_1..4)
+
+fine_condition_components:
+  chemistry:
+    source: data/media_composition_v4.xlsx
+    sheet: Media_Components_ML
+    join_key: media
+    include_filter: Include_in_ml == True
+  metadata:
+    fields:
+      - condition_1
+      - condition_2
+      - condition_3
+      - condition_4
+      - temperature
+      - pH
+      - aerobic
+      - liquid
+      - shaking
+      - mediaStrength
+  stressor_concentrations:
+    fields:
+      - concentration_1
+      - units_1
+      - concentration_2
+      - units_2
+      - concentration_3
+      - units_3
+      - concentration_4
+      - units_4
+
+# ---------------------------------------------------------------------------
+# Usage rules
+# ---------------------------------------------------------------------------
+# - Sparsity / support / row-count analyses (S1):
+#       use `expName` as the unit (each row in canonical fitness is keyed by it).
+# - Chemistry-overlap analyses (S1, S3):
+#       use `media` and `Canonical_ID` as the unit (the v4 workbook keys).
+# - Modeling (T1+):
+#       use the fine-condition feature vector as the model's condition input.
+# - Splits (S3):
+#       partitions are by organism; conditions are NOT split.
+#       Two organisms can share the same expName / media; the split keeps
+#       organism-level holdout meaningful only because organism + media + ...
+#       jointly identify a row.

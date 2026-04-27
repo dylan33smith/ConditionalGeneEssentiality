@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "canonical_tables.schema.json",
   "title": "Canonical Modeling Tables (v0)",
-  "description": "Schema descriptors for the canonical Parquet tables under data/derived/canonical/v0/. Verified against actual files on 2026-04-27.",
+  "description": "Schema descriptors for the canonical Parquet tables under data/derived/canonical/v0/. Verified against actual files on 2026-04-27. Legacy v1 media tables (media_master.parquet, media_components_long.parquet) were deleted on 2026-04-27 because v4 workbook is the authoritative condition source per data contract L2.",
   "type": "object",
   "properties": {
     "fitness_experiment_long": {
@@ -37,20 +37,6 @@
       "description": "One row per experiment.",
       "row_count_observed": 7552,
       "required_columns_minimum": ["orgId", "expName", "media", "expGroup"]
-    },
-    "media_master": {
-      "type": "object",
-      "description": "DEPRECATED for modeling: this file reflects the v1 45-media workbook. v4 (data/media_composition_v4.xlsx) is authoritative. Kept for diagnostic comparison only.",
-      "row_count_observed": 45,
-      "deprecated": true,
-      "authoritative_source": "data/media_composition_v4.xlsx, sheet 'Media'"
-    },
-    "media_components_long": {
-      "type": "object",
-      "description": "DEPRECATED for modeling: legacy v1 45-media components (422 rows). v4 sheet 'Media_Components_ML' is authoritative. Kept for diagnostic comparison only.",
-      "row_count_observed": 422,
-      "deprecated": true,
-      "authoritative_source": "data/media_composition_v4.xlsx, sheet 'Media_Components_ML'"
     }
   }
 }

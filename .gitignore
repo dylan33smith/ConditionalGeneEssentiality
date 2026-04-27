@@ -1,8 +1,9 @@
 ## Large / generated data (never commit raw DB or embeddings)
-data/
+/data/
 
 ## Run artifacts (model checkpoints, metrics, logs)
-runs/
+/runs/
+archive/runs/
 
 ## Preprocessing / materialization caches — contents only, not the skeleton
 artifacts/runs/*/

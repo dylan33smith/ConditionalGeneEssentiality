@@ -1,0 +1,65 @@
+# Representation-mode mapping for chemistry features
+#
+# Source:    `Decomposition_type` column of media_composition_v4.xlsx, sheet
+#            `Media_Components_ML`. Five distinct values observed in S0:
+#            direct, extract, mix, salt, unrecoverable.
+#
+# Status:    proposed (S0). Will be ratified or revised in S1-DEC-001 after the
+#            empirical audit verifies that the bucketing of actual compounds
+#            in each Decomposition_type is sensible.
+# Owner:     S1 (audits), S4 (consumes)
+# Consumers: S1 LB representation-mode audit; S4 feature contract
+#            (`representation_mode` tag per medium); T1-E (decomposition-mode
+#            indicator features, hypothesis H-ENC-05).
+#
+# Why 4 modes (not 3 as in plan v2 §3): the v2 plan listed `physical | mix |
+# in_silico`. After S0 surfaced the 5 actual `Decomposition_type` values, we
+# split off `extract` as its own mode rather than collapsing it into `mix`,
+# because `extract` is exactly the case H-ENC-05 was designed to test
+# (decomposition-induced over-coupling: yeast extract / tryptone are listed
+# as their inferred component vitamins/amino acids, which can drive spurious
+# overlap with defined media). Collapsing extract into mix would erase the
+# ability to flag this with a feature.
+
+modes: [physical, mix, extract, in_silico]
+
+mapping:
+  direct:
+    mode: physical
+    rationale: >
+      A single defined chemical added directly to the medium
+      (e.g. glucose, NaCl, pure amino acid).
+  salt:
+    mode: physical
+    rationale: >
+      A defined inorganic salt or ion (e.g. ferrous sulfate as Fe2+).
+      Treated as physical because the chemistry is fully specified.
+  mix:
+    mode: mix
+    rationale: >
+      A defined mixture of components (e.g. Wolfe's vitamin mix,
+      Wolfe's mineral mix). Components are known and listed but
+      are added as a pre-formulated mixture.
+  extract:
+    mode: extract
+    rationale: >
+      A complex biological extract (e.g. yeast extract, tryptone)
+      whose components are inferred rather than measured. This is the
+      H-ENC-05 case — the same nominal vitamin/amino-acid components
+      may appear under both "extract" and "direct" rows for different
+      media, creating spurious overlap. Tagged separately so models
+      can learn the distinction if it matters.
+  unrecoverable:
+    mode: in_silico
+    rationale: >
+      Decomposition not knowable from available data; entries are
+      placeholders for downstream in-silico metabolite features.
+      LB historically fell here under v3; v4 is expected to populate
+      this sparingly.
+
+# S1 ratification checklist
+# - For each Decomposition_type bucket, sample 5–10 distinct compounds
+#   and verify the assigned mode is sensible.
+# - Report row-count per mode globally and per organism in the S1 report.
+# - If any bucket contains compounds that span modes (e.g. an "extract"
+#   that's actually a defined mix), revise here and document in S1-DEC-001.
