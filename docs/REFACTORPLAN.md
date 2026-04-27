@@ -215,17 +215,63 @@ Pure description; no parameter fitting.
 - OOD diagnostics: candidate val/test chemistry unseen-rate vs train; embedding cosine
   similarity profile vs train genes (homology proxy for `H-HOMO-01`).
 - LB representation-mode audit: every Canonical_ID gets a `representation_mode` tag
-  (`physical` | `mix` | `in_silico`) derived from `Decomposition_type`. Fraction of
-  rows per mode, per organism, per candidate protocol.
+  (`physical` | `mix` | `extract` | `in_silico`) per
+  `data_contract/representation_mode_mapping.yaml`. Fraction of rows per mode,
+  per organism, per candidate protocol.
 
 **Hard-gate decisions**
 - Mapped/unmapped chemistry handling policy (`H-DATA-01`).
 - Minimum support threshold for candidate val/test organisms (`H-DATA-02`).
 - Whether `H-HOMO-01` evidence is strong enough (effect size > 0.5σ) to require a
   homology diagnostic in S3.
+- Ratification or revision of the proposed `representation_mode_mapping.yaml`
+  (S1-DEC-001).
 
-**Emits:** `data_contract/splits/candidate_protocols.yaml` listing 3–5 candidate
-protocols with documented (val_orgs, test_orgs, chemistry-overlap, support) tuples.
+**Required figures (per §11 Visualization Standard).** All saved to
+`research_log/figures/stage1/` as PNG + sibling CSV. Each figure informs at
+least one hard-gate decision listed above.
+
+| # | Figure | Decision it informs |
+|---|---|---|
+| 01 | `01_org_media_overlap_heatmap.png` (48×48 shared-media count) | candidate protocol selection |
+| 02 | `02_org_canonical_id_overlap_heatmap.png` (48×48 chemistry overlap) | H-SPLIT-01, candidate selection |
+| 03 | `03_org_pair_jaccard_distribution.png` (pairwise Jaccard histogram) | candidate selection |
+| 04 | `04_bipartite_org_media_top.png` (top-degree bipartite graph) | qualitative organism-clustering |
+| 05 | `05_rows_per_organism_bar.png` (sorted, log-scale) | min support threshold |
+| 06 | `06_conditions_per_gene_cdf.png` (empirical CDF, faceted) | Spearman eligibility `m` (H-EVAL-01, H-SPR-01) |
+| 07 | `07_conditions_per_gene_violin.png` (per-organism distribution) | min support threshold |
+| 08 | `08_org_media_row_count_heatmap.png` (org × media row counts) | candidate selection support analysis |
+| 09 | `09_genes_per_organism_bar.png` | min support threshold |
+| 10 | `10_fit_distribution_per_org_violin.png` | heteroscedastic-noise policy |
+| 11 | `11_t_stat_distribution_per_org.png` | quality filter policy |
+| 12 | `12_cor12_distribution_per_experiment.png` | quality filter policy |
+| 13 | `13_fit_qq_plot_global.png` (tail-behavior QQ plot) | T4 loss-family choice (H-LOSS-01) |
+| 14 | `14_chemistry_mapped_unmapped_by_org.png` | mapped/unmapped policy (H-DATA-01) |
+| 15 | `15_embedding_coverage_by_org.png` | candidate organism eligibility |
+| 16 | `16_canonical_id_prevalence_distribution.png` | feature trimming policy (S4) |
+| 17 | `17_chemistry_seen_unseen_rate_per_protocol.png` (faceted) | candidate selection (H-SPLIT-01) |
+| 18 | `18_embedding_cosine_to_nearest_train_per_protocol.png` | H-HOMO-01 trigger evaluation |
+| 19 | `19_homology_similarity_by_org.png` | H-HOMO-01 trigger evaluation |
+| 20 | `20_representation_mode_proportions_per_org.png` (stacked bar) | representation_mode mapping ratification |
+| 21 | `21_representation_mode_per_protocol.png` (train/val/test stacks per candidate) | LB risk policy diagnostics |
+| 22 | `22_chemical_ubiquity_histogram.png` (cross-organism reuse distribution) | mapped/unmapped policy, feature trimming |
+| 23 | `23_organism_topN_chemical_heatmap.png` (top-100 chemicals × 48 orgs, log experiment counts) | cross-organism chemistry coverage |
+| 24 | `24_chemical_coverage_curve.png` (chemicals sorted by descending #orgs; dual-axis with experiment count) | feature trimming policy (S4) |
+
+**Optional / exploratory figure**
+| # | Figure | Note |
+|---|---|---|
+| 25 | `25_media_chemistry_umap.png` (UMAP of media multihot vectors, colored by #organisms using each medium) | exploratory; flagged as "not used to gate any decision" in the report. |
+
+**Emits:**
+- `data_contract/splits/candidate_protocols.yaml` listing 3–5 candidate
+  protocols with documented (val_orgs, test_orgs, chemistry-overlap, support) tuples.
+- `research_log/tier_reports/s1_data_characterization.md` embedding all figures
+  with captions and the hard-gate decision rationale.
+- `research_log/figures/stage1/` containing 24 required + 1 optional figures
+  (PNG + sibling CSV each).
+- `research_log/decisions/stage1/S1-DEC-001.md` ratifying or revising
+  `representation_mode_mapping.yaml`.
 
 ### S2 — Evaluation Trustworthiness
 
@@ -543,3 +589,72 @@ Persist for every run (in the run's manifest, conforming to `run_manifest_v1.sch
 
 `pytest tests/` must stay green before any commit. Stage gates require this plus
 the stage-specific acceptance criteria.
+
+---
+
+## 11. Visualization Standard
+
+Every stage and tier that emits a tier report must include figures that directly
+inform its hard-gate decisions. Visualizations are not optional decoration —
+they are part of the deliverable.
+
+### Per-stage / per-tier figure deliverables
+
+Each stage's spec in §7 (and each tier's spec in §8) lists the **required figures**
+inline as a numbered table with one column for "decision it informs." Stages
+and tiers may also list **optional / exploratory figures** flagged separately.
+
+| Phase | Required figures | Optional |
+|---|---|---|
+| S0 | none (no analysis) | none |
+| S1 | 24 (see §7 S1) | 1 |
+| S2 | TBD (defined when S2 is reached) | — |
+| S3 | TBD | — |
+| S4 | TBD | — |
+| S5 | TBD | — |
+| T1+ | TBD per tier | — |
+
+### Layout
+
+```
+research_log/figures/<stage_or_tier>/
+  NN_<descriptive_snake_case_name>.png   # the figure
+  NN_<descriptive_snake_case_name>.csv   # underlying data, one row per plotted element
+```
+
+- **Numbering** is global within a stage (`01`, `02`, ..., `25`); stable across
+  reruns (do not renumber).
+- **Naming** uses snake_case and describes what is plotted, not the conclusion.
+  Bad: `21_overlap_is_high.png`. Good: `21_representation_mode_per_protocol.png`.
+- **Sibling CSV** contains the data behind the figure so the plot can be
+  reproduced without re-running the full analysis. Same basename as the PNG.
+- **Captions** live in the tier report (`research_log/tier_reports/<phase>_report.md`),
+  not in the PNG. One paragraph per figure: "what to look at, what decision it
+  informs, what we concluded."
+
+### Code
+
+Plotting helpers live in `src/evaluation/reporting.py`. Each stage's runner
+calls them; no stage reimplements matplotlib boilerplate. Required helpers:
+
+| Helper | Use |
+|---|---|
+| `save_heatmap(matrix, row_labels, col_labels, *, title, path)` | overlap matrices, org × chemical |
+| `save_distribution_per_group(df, value_col, group_col, *, kind, path)` | violin / box plots faceted by organism or condition |
+| `save_ecdf(df, value_col, *, group_col, path)` | empirical CDF (e.g. conditions per gene) |
+| `save_stacked_bar(df, group_col, stack_col, *, path)` | representation mode proportions |
+| `save_bipartite(edges, *, max_nodes_per_side, path)` | org × media bipartite graphs |
+| `save_qq(values, *, dist, path)` | tail diagnostic |
+| `save_similarity_bin_scatter(...)` | homology-stratified metric plots |
+| `save_coverage_curve(...)` | dual-axis chemical-coverage curves |
+| `save_umap_scatter(...)` | exploratory media-chemistry UMAP |
+
+Each helper writes both the PNG and its sibling CSV.
+
+### Promotion rule
+
+A stage gate cannot pass with figures missing. Tier reports without figures
+fail the promotion rubric §5. The decision-ledger entry for a stage gate must
+list each required figure path and confirm it exists.
+
+

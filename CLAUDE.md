@@ -98,6 +98,15 @@ python -m src.cli.run_experiment +experiment=T1-A_granularity train.seed=0,1,2 -
 Stub tests for unimplemented modules use `@pytest.mark.skip` with a
 `reason=` pointing at the stage/tier that will activate them.
 
+## Visualization policy (REFACTORPLAN §11)
+
+Every stage/tier with a tier report must include figures that inform its
+hard-gate decisions. Figures live at `research_log/figures/<stage_or_tier>/`
+as `NN_descriptive_name.png` + sibling `.csv`. Plotting helpers live in
+`src/evaluation/reporting.py` — stages call them rather than reinventing
+matplotlib code. Required figure lists are inline in each stage's spec
+(see e.g. §7 S1 → 24 required + 1 optional).
+
 ## Decision log
 
 Decisions go in `research_log/decisions/<stage_or_tier>/` using the template at
