@@ -1,0 +1,10 @@
+# Base training config — override per experiment
+train:
+  seed: 0
+  epochs: 10
+  batch_size: 2048
+  lr: 1.0e-3
+  weight_decay: 1.0e-5
+  loss_family: huber      # "mse" | "huber"
+  huber_delta: 1.0
+  row_quality_policy: weighted_full   # "weighted_full" | "strict_slice"

@@ -1,0 +1,9 @@
+# Stage 0 — reproducibility smoke test config
+defaults:
+  - base/data
+  - base/train
+  - base/eval
+
+stage: stage0
+experiment_id: stage0_repro_smoke
+split_protocol: organism_single_holdout_largest_v0   # placeholder; lock in Stage 2

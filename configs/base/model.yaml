@@ -1,0 +1,8 @@
+# Base model config — override per experiment
+model:
+  gene_dim: 1152          # ProteomeLM layer-8 embedding dim
+  cond_dim: 256           # condition encoder output dim
+  hidden_dim: 256
+  dropout: 0.1
+  fusion: concat_linear
+  condition_encoder: multihot

@@ -1,0 +1,7 @@
+# Pre-Tier — null baseline evaluation
+defaults:
+  - base/data
+  - base/eval
+
+stage: pretier
+experiment_id: pretier_null_baselines

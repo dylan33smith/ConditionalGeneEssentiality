@@ -1,0 +1,6 @@
+# Base data config — override per experiment
+data:
+  canonical_v0_dir: data/derived/canonical/v0
+  workbook_v4: data/media_composition_v4.xlsx
+  workbook_sheet: Media_Components_ML
+  embedding_dir: data/processed/ProtLM_embeddings_layer8

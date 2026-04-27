@@ -22,8 +22,9 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["data_processing*", "embeddings*", "evaluation*", "modeling*", "splits*"]
+where = ["."]
+include = ["src*"]
 
 [tool.setuptools]
-# repo_paths.py is a top-level module (no package dir) — register it explicitly.
-py-modules = ["repo_paths"]
+# src/ layout — no top-level py-modules needed
+

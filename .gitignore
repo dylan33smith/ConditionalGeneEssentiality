@@ -1,2 +1,36 @@
+## Large / generated data (never commit raw DB or embeddings)
 data/
+
+## Run artifacts (model checkpoints, metrics, logs)
 runs/
+
+## Preprocessing / materialization caches — contents only, not the skeleton
+artifacts/runs/*/
+artifacts/indexes/*/
+data/materialized/
+
+## Python build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+## Jupyter
+.ipynb_checkpoints/
+
+## Environment / IDE
+.env
+.venv
+venv/
+.idea/
+.vscode/
+*.swp
+*~
+
+## OS
+.DS_Store
+Thumbs.db
