@@ -1,48 +1,183 @@
-# S1 emits this. Each entry describes a candidate val/test split.
-# S2 consumes the entries to compute null baselines and a metric power report
-# per candidate. S3 selects one as the locked primary protocol.
-#
-# Status: pending — populated by src/experiments/stage1/run.py.
-
-status: pending
+status: populated
 emitted_by: stage1
-
-# Schema for entries (each item in `candidates` must conform):
-#
-# - protocol_id: string                # short stable id (snake_case)
-#   description: string                # 1–2 sentence summary
-#   val_org_ids: list[string]          # held-out organisms for validation
-#   test_org_ids: list[string]         # held-out organisms for testing
-#   selection_strategy: string         # how this protocol was chosen
-#                                      # e.g. "largest-by-rows", "stratified-overlap",
-#                                      #      "low-overlap-stress", "homology-aware"
-#   support:
-#     train_rows: int                  # row count after split
-#     val_rows: int
-#     test_rows: int
-#     val_n_genes: int                 # unique gene_keys in val
-#     test_n_genes: int
-#     val_n_conditions: int            # unique expNames in val
-#     test_n_conditions: int
-#   chemistry_overlap:                 # see condition_definition.yaml for granularity
-#     val_seen_rate: float             # fraction of val media whose chemistry
-#                                      # appeared in train
-#     val_unseen_rate: float
-#     test_seen_rate: float
-#     test_unseen_rate: float
-#     val_canonical_id_seen_rate: float    # at the Canonical_ID level
-#     val_canonical_id_unseen_rate: float
-#     test_canonical_id_seen_rate: float
-#     test_canonical_id_unseen_rate: float
-#   representation_mode_proportions:   # fraction of rows by representation_mode
-#     train: {physical: float, mix: float, extract: float, in_silico: float}
-#     val:   {physical: float, mix: float, extract: float, in_silico: float}
-#     test:  {physical: float, mix: float, extract: float, in_silico: float}
-#   homology_summary:                  # required if H-HOMO-01 enabled in S1
-#     val_high_sim_fraction: float     # fraction of val genes with cosine sim
-#                                      # > threshold to nearest train gene
-#     test_high_sim_fraction: float
-#     similarity_threshold: float
-#   notes: string                      # free-text caveats
-
-candidates: []
+h_homo_01_triggered: true
+h_homo_01_max_deviation_sigma: 1.6057677951452778
+homology_threshold_sigma: 0.5
+min_org_support_rows: 10000
+candidates:
+- protocol_id: largest_by_rows
+  description: Single largest val (Btheta) + second-largest test (DvH)
+  val_org_ids:
+  - Btheta
+  test_org_ids:
+  - DvH
+  selection_strategy: largest-by-rows
+  support:
+    train_rows: 23231239
+    val_rows: 2104545
+    test_rows: 2074937
+    val_n_genes: 4055
+    test_n_genes: 2741
+    val_n_conditions: 519
+    test_n_conditions: 757
+  chemistry_overlap:
+    val_seen_rate: 0.0
+    val_unseen_rate: 1.0
+    test_seen_rate: 0.07407407407407407
+    test_unseen_rate: 0.9259259259259259
+    val_canonical_id_seen_rate: 0.9861111111111112
+    val_canonical_id_unseen_rate: 0.01388888888888884
+    test_canonical_id_seen_rate: 0.9761904761904762
+    test_canonical_id_unseen_rate: 0.023809523809523836
+  representation_mode_proportions:
+    train:
+      extract: 0.4041272346726708
+      mix: 0.36761768506067394
+      physical: 0.22825508026665522
+    val:
+      extract: 0.24374463212138564
+      mix: 0.0
+      physical: 0.7562553678786144
+    test:
+      extract: 0.19859664773799515
+      mix: 0.23993769993166206
+      physical: 0.5614656523303428
+  notes: High val/test mass; chemistry overlap may be high or low depending on organism.
+  homology_summary:
+    val_high_sim_fraction: 0.006644518272425249
+    test_high_sim_fraction: 0.20364384366735233
+    similarity_threshold: 0.85
+- protocol_id: high_overlap_easy
+  description: Multi-org val (['Putida', 'psRCH2']) with >85% chemistry overlap; sanity-check
+    protocol
+  val_org_ids:
+  - Putida
+  - psRCH2
+  test_org_ids:
+  - pseudo3_N2E3
+  selection_strategy: stratified-overlap-high
+  support:
+    train_rows: 23744263
+    val_rows: 2605550
+    test_rows: 1060908
+    val_n_genes: 8127
+    test_n_genes: 5028
+    val_n_conditions: 650
+    test_n_conditions: 211
+  chemistry_overlap:
+    val_seen_rate: 0.5384615384615384
+    val_unseen_rate: 0.46153846153846156
+    test_seen_rate: 1.0
+    test_unseen_rate: 0.0
+    val_canonical_id_seen_rate: 1.0
+    val_canonical_id_unseen_rate: 0.0
+    test_canonical_id_seen_rate: 1.0
+    test_canonical_id_unseen_rate: 0.0
+  representation_mode_proportions:
+    train:
+      extract: 0.38511387571954453
+      mix: 0.3370784781585966
+      physical: 0.2778076461218589
+    val:
+      extract: 0.28656081935983446
+      mix: 0.1947085954252586
+      physical: 0.518730585214907
+    test:
+      extract: 0.386565011333196
+      mix: 0.4882234668964527
+      physical: 0.12521152177035139
+  notes: "Easy protocol \u2014 establishes whether the model can solve the in-distribution\
+    \ case."
+  homology_summary:
+    val_high_sim_fraction: 0.3196033118669049
+    test_high_sim_fraction: 0.6855705861949358
+    similarity_threshold: 0.85
+- protocol_id: low_overlap_stress
+  description: 'Stress test: lowest-overlap val (SynE, 95% chemistry overlap)'
+  val_org_ids:
+  - SynE
+  test_org_ids:
+  - Magneto
+  selection_strategy: low-overlap-stress
+  support:
+    train_rows: 27049794
+    val_rows: 244971
+    test_rows: 115956
+    val_n_genes: 1899
+    test_n_genes: 3221
+    val_n_conditions: 129
+    test_n_conditions: 36
+  chemistry_overlap:
+    val_seen_rate: 0.0
+    val_unseen_rate: 1.0
+    test_seen_rate: 0.0
+    test_unseen_rate: 1.0
+    val_canonical_id_seen_rate: 0.9473684210526315
+    val_canonical_id_unseen_rate: 0.052631578947368474
+    test_canonical_id_seen_rate: 0.9512195121951219
+    test_canonical_id_unseen_rate: 0.04878048780487809
+  representation_mode_proportions:
+    train:
+      extract: 0.3776662051197922
+      mix: 0.33095537296316213
+      physical: 0.29137842191704566
+    val:
+      extract: 0.0
+      mix: 0.32109343125254997
+      physical: 0.67890656874745
+    test:
+      extract: 0.7915662952925826
+      mix: 0.09341993949040021
+      physical: 0.11501376521701726
+  notes: "Reported but NOT promotion-gating per \xA77 S2 \u2014 likely impossible;\
+    \ diagnostic only."
+  homology_summary:
+    val_high_sim_fraction: null
+    test_high_sim_fraction: null
+    similarity_threshold: 0.85
+- protocol_id: multi_org_balanced
+  description: Four val orgs spanning overlap quartiles (['pseudo3_N2E3', 'BFirm',
+    'ANA3', 'SyringaeB728a_mexBdelta'])
+  val_org_ids:
+  - pseudo3_N2E3
+  - BFirm
+  - ANA3
+  - SyringaeB728a_mexBdelta
+  test_org_ids:
+  - PV4
+  selection_strategy: quartile-stratified
+  support:
+    train_rows: 24764047
+    val_rows: 2165234
+    test_rows: 481440
+    val_n_genes: 18406
+    test_n_genes: 3009
+    val_n_conditions: 376
+    test_n_conditions: 160
+  chemistry_overlap:
+    val_seen_rate: 1.0
+    val_unseen_rate: 0.0
+    test_seen_rate: 1.0
+    test_unseen_rate: 0.0
+    val_canonical_id_seen_rate: 1.0
+    val_canonical_id_unseen_rate: 0.0
+    test_canonical_id_seen_rate: 1.0
+    test_canonical_id_unseen_rate: 0.0
+  representation_mode_proportions:
+    train:
+      extract: 0.36642471077387456
+      mix: 0.32049045642793195
+      physical: 0.3130848327981934
+    val:
+      extract: 0.3864781986195593
+      mix: 0.4778300014568086
+      physical: 0.13569179992363212
+    test:
+      extract: 0.8071557971014492
+      mix: 0.13097426470588236
+      physical: 0.06186993819266838
+  notes: Balanced view across the overlap distribution.
+  homology_summary:
+    val_high_sim_fraction: 0.6855705861949358
+    test_high_sim_fraction: null
+    similarity_threshold: 0.85

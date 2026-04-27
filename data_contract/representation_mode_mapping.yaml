@@ -4,9 +4,11 @@
 #            `Media_Components_ML`. Five distinct values observed in S0:
 #            direct, extract, mix, salt, unrecoverable.
 #
-# Status:    proposed (S0). Will be ratified or revised in S1-DEC-001 after the
-#            empirical audit verifies that the bucketing of actual compounds
-#            in each Decomposition_type is sensible.
+# Status:    ratified (S1-DEC-001, 2026-04-27). The empirical audit confirmed
+#            all 5 Decomposition_type buckets are semantically correct.
+#            Distribution: mix=1499, salt=1392, extract=1165, direct=196,
+#            unrecoverable=0. The in_silico mode slot is reserved but currently
+#            unused (v4 has no unrecoverable rows).
 # Owner:     S1 (audits), S4 (consumes)
 # Consumers: S1 LB representation-mode audit; S4 feature contract
 #            (`representation_mode` tag per medium); T1-E (decomposition-mode
