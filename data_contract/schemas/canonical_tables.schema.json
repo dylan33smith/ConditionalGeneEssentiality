@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "canonical_tables.schema.json",
+  "title": "Canonical Modeling Tables (v0)",
+  "description": "Schema descriptors for the canonical Parquet tables under data/derived/canonical/v0/. These are descriptive (not validated row-by-row) but pin column names and dtypes.",
+  "type": "object",
+  "properties": {
+    "fitness_experiment_long": {
+      "type": "object",
+      "description": "Inner join GeneFitness ⋈ Experiment, one row per (gene_key, expName).",
+      "required_columns": [
+        "orgId",
+        "locusId",
+        "gene_key",
+        "expName",
+        "fit",
+        "t",
+        "cor12",
+        "media",
+        "abs_t",
+        "has_media_composition"
+      ]
+    },
+    "experiments": {
+      "type": "object",
+      "description": "One row per experiment.",
+      "required_columns": ["orgId", "expName", "media", "expGroup"]
+    },
+    "media_master": {
+      "type": "object",
+      "description": "One row per medium across all known media.",
+      "required_columns": ["Media"]
+    },
+    "media_components_long": {
+      "type": "object",
+      "description": "Long-form components (legacy v3 sheet structure).",
+      "required_columns": ["Media", "Component"]
+    }
+  }
+}

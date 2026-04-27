@@ -1,0 +1,9 @@
+# S3 emits this. The single primary protocol used for all tier promotion decisions.
+status: pending
+emitted_by: stage3
+protocol_id: null
+val_org_ids: []
+test_org_ids: []
+seed: null
+split_manifest_sha256: null
+selection_rationale: null

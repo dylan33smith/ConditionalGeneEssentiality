@@ -1,837 +1,545 @@
----
+# Tiered Refactor Plan v2 — Conditional Gene Essentiality Prediction
 
-# Tiered Refactor Proposal
+**Status:** plan revision (v2). Supersedes the v1 plan archived at
+`archive/docs/REFACTORPLAN_v1.md`.
 
-overview: Define a rigorous, restart-style roadmap for conditional gene essentiality prediction with regression-first objectives, strict anti-leakage preprocessing, and a tiered experimental decision process.
-todos:
+**Scope:** clean-room rebuild of a continuous-fitness regression system for
+`(gene, condition)` pairs from Tn-seq fitness data, using frozen ProteomeLM gene
+embeddings and chemistry features from `media_composition_v4.xlsx` →
+`Media_Components_ML`.
 
-- id: freeze-data-contract
-content: Finalize and document v4 Media_Components_ML data contract + train-only preprocessing artifacts
-status: pending
-- id: freeze-eval-protocol
-content: Select and lock official organism-holdout split protocol and baseline metric thresholds
-status: pending
-- id: tier1-experiments
-content: Design and run Tier 1 representation experiments with strict anti-leakage preprocessing
-status: pending
-- id: tier2-experiments
-content: Run minimal fusion ablations and lock fusion MVP winner
-status: pending
-- id: tier3-experiments
-content: Evaluate justified architecture complexity and choose final model family
-status: pending
-- id: mlops-foundation
-content: Implement clean project structure, config management, tracking, and required tests before broad sweeps
-status: pending
-isProject: false
+**Reading order:** §1 (charter) → §2 (locked decisions) → §3 (data scope) →
+§7 (stage pipeline) → §8 (tiers). §4 (hypothesis registry) and §5 (decision
+ledger) are referenced but not read end-to-end.
 
 ---
 
-# Tiered Refactor Proposal
-
-## Clean-Room Restart Charter (Authoritative Rules)
+## 1. Clean-Room Charter (Authoritative Rules)
 
 - This plan is the **single source of truth** for the restart.
-- Existing code, metrics, and prior conclusions are treated as **untrusted inputs**.
-- Prior work may only appear as explicit hypotheses to re-test; nothing is auto-promoted.
-- No tier may advance without pre-declared success criteria and an auditable decision log entry.
+- Existing code, metrics, and prior conclusions in `archive/` are **untrusted inputs**.
+  Prior work may only appear as explicit hypotheses to re-test; nothing is auto-promoted.
+- **No tier or stage may advance without** a pre-declared success criterion and a written
+  decision-ledger entry.
+- **Train-only preprocessing.** Vocab/scalers fit on train rows only per split protocol,
+  with explicit `UNK` handling at val/test. Unknown-category rate logged every run.
+- **Denominator parity.** Model and any baseline being compared against must be
+  evaluated on the *exact same scored row set* (same row ids, same count).
+- **Co-primary metrics.** RMSE and MAE are co-primary; neither may be omitted from a
+  promotion decision. Within-gene Spearman is reported alongside but its gating role is
+  decided in Stage 2 based on power.
 
-## Locked Decisions
+## 2. Locked Decisions
 
-- Primary task: **continuous fitness regression** (`fit`) for `(gene, condition)` pairs.
-- Authoritative condition source: `[media_composition_v4.xlsx](/home/ds85/projects/ConditionalGeneEssentiality/data/media_composition_v4.xlsx)`, sheet `Media_Components_ML`.
-- Leakage policy: **train-only** condition vocab/scalers per split protocol, with explicit `UNK` handling at val/test.
+| # | Decision | Reason it's locked |
+|---|---|---|
+| L1 | Primary task is continuous regression on raw `fit`. | Conditional essentiality is a continuous quantitative phenotype; thresholding throws away signal. |
+| L2 | Authoritative condition source is `data/media_composition_v4.xlsx`, sheet `Media_Components_ML`. | v4 is the only workbook with `Include_in_ml`, `Canonical_ID`, and a `Decomposition_type` column suitable for ML preprocessing. v1–v3 archived. |
+| L3 | Gene embeddings: frozen ProteomeLM layer-8 vectors at `data/processed/ProtLM_embeddings_layer8/*.pt`. | Compute budget; fine-tuning is testable as `H-EMB-01` if a tier plateaus. |
+| L4 | Co-primary metrics: RMSE + MAE. Within-gene Spearman is conditional on Stage-2 power evidence. | Tn-seq fit residuals are heavy-tailed; either-or reporting hides regimes. |
+| L5 | Hydra is the config framework. | Composable YAML is required; ad-hoc loaders fragment quickly across stages and tiers. |
+| L6 | Project structure follows §9. Logic lives only in `src/`. | Prevents code drift across tiers. |
 
-## Authoritative Data Scope (Use vs Do-Not-Use)
+## 3. Authoritative Data Scope
 
-This section defines exactly which local data artifacts are in scope for the restart. Any deviation requires a decision-ledger entry and version bump.
+### Required inputs
 
-### Required inputs (authoritative)
+| Artifact | Path | Notes |
+|---|---|---|
+| Raw fitness DB | `data/raw/feba.db` | Never modified |
+| Condition workbook | `data/media_composition_v4.xlsx`, sheet `Media_Components_ML` | Schema verified in S0 |
+| Gene embeddings | `data/processed/ProtLM_embeddings_layer8/*.pt` | Frozen |
+| Canonical fitness | `data/derived/canonical/v0/fitness_experiment_long.parquet` | Inner join `GeneFitness ⋈ Experiment` |
+| Canonical experiments | `data/derived/canonical/v0/experiments.parquet` | |
+| Media master | `data/derived/canonical/v0/media_master.parquet` | |
+| Media components | `data/derived/canonical/v0/media_components_long.parquet` | |
 
-- Raw fitness source of truth:
-  - `/home/ds85/projects/ConditionalGeneEssentiality/data/raw/feba.db`
-- Condition composition source of truth:
-  - `/home/ds85/projects/ConditionalGeneEssentiality/data/media_composition_v4.xlsx`
-  - required sheet: `Media_Components_ML`
-- Frozen gene embedding bundle:
-  - `/home/ds85/projects/ConditionalGeneEssentiality/data/processed/ProtLM_embeddings_layer8/*.pt`
-- Canonical modeling tables (required operational artifacts for reproducible runs):
-  - `/home/ds85/projects/ConditionalGeneEssentiality/data/derived/canonical/v0/fitness_experiment_long.parquet`
-  - `/home/ds85/projects/ConditionalGeneEssentiality/data/derived/canonical/v0/experiments.parquet`
-  - `/home/ds85/projects/ConditionalGeneEssentiality/data/derived/canonical/v0/media_components_long.parquet`
-  - `/home/ds85/projects/ConditionalGeneEssentiality/data/derived/canonical/v0/media_master.parquet`
+### Explicitly out of scope
 
-### Optional inputs (explicitly non-authoritative defaults)
+- Older workbooks: `data/media_composition.xlsx`, `media_composition_v2.xlsx`,
+  `media_composition_v3.xlsx`. Diagnostic comparison only.
+- All `archive/` code, prior labeled-embedding artifacts, prior threshold-derived
+  label bundles. Forbidden as supervision sources.
+- `data/derived/condition_encoding/v0/` — diagnostic only.
+- `data/materialized/` — candidate caches, never source of truth for promotion metrics.
 
-- `/home/ds85/projects/ConditionalGeneEssentiality/data/raw/aaseqs` (needed only if regenerating embeddings)
-- `/home/ds85/projects/ConditionalGeneEssentiality/data/derived/condition_encoding/v0/experiments_condition.parquet` (diagnostic/legacy compatibility only unless promoted by test)
-- `/home/ds85/projects/ConditionalGeneEssentiality/data/materialized/`* (candidate caches only; never source of truth for published metrics)
+### Data-contract hard gate (per run)
 
-### Out-of-scope by default
+Every reported run must log:
+- `feba_db_sha256`
+- `workbook_v4_sha256` + sheet id (`Media_Components_ML`)
+- `embedding_manifest_id` (sha256 of the bundle manifest)
+- `canonical_manifest_id` (sha256 of the canonical-build manifest)
 
-- older workbook versions:
-  - `/home/ds85/projects/ConditionalGeneEssentiality/data/media_composition.xlsx`
-  - `/home/ds85/projects/ConditionalGeneEssentiality/data/media_composition_v2.xlsx`
-  - `/home/ds85/projects/ConditionalGeneEssentiality/data/media_composition_v3.xlsx`
-- any prior labeled-embedding artifacts or threshold-derived label bundles (if present elsewhere in repo) are forbidden as supervision sources.
+Any run using non-authoritative inputs is `exploratory` and ineligible for promotion.
 
-### Data-contract hard gate
+---
 
-- All reported experiments must log:
-  - raw source id (`feba.db` checksum),
-  - workbook checksum + sheet id (`Media_Components_ML`),
-  - embedding manifest/checksum,
-  - canonical-table manifest/checksum.
-- If any run uses non-authoritative inputs, mark as exploratory and block promotion decisions.
+## 4. Hypothesis Registry & Experiment Matrix
 
-## Program-Level Decision Ledger (Required)
+Every hypothesis below has exactly one "owner" — the stage or tier that tests it.
+Hypotheses without a clear owner are dropped.
 
-- For each assumption, record:
-  - assumption id,
-  - tier tested,
-  - experiment ids,
-  - evidence summary,
-  - pass/fail decision,
-  - promoted default (or rejection).
-- Required assumption classes:
-  - data contract assumptions,
-  - split and leakage assumptions,
-  - representation assumptions,
-  - fusion assumptions,
-  - architecture assumptions,
-  - optimization assumptions.
+| ID | Hypothesis | Owner | Concrete test |
+|---|---|---|---|
+| H-DATA-01 | Explicit mapped/unmapped chemistry handling improves robustness vs silent drop. | S1 | Audit unmapped rows; pre-register handling policy. |
+| H-DATA-02 | Organism support thresholds materially affect metric stability. | S1 → S3 | Measure RMSE/Spearman variance across candidate val orgs at varying support. |
+| H-EMB-01 | Frozen ProteomeLM embeddings carry sufficient gene-level signal for fitness regression. | T3 (re-test only if T2 winner plateaus). | Fine-tune top-N layers vs frozen, controlled by null-baseline delta. |
+| H-EVAL-01 | Within-gene Spearman is sufficiently powered for promotion decisions. | S2 | Bootstrap CI on locked val; report `n_genes_eligible`. |
+| H-EVAL-02 | RMSE gains must be interpreted relative to protocol-specific nulls. | S2 (policy) | Always-on policy; not a separately-tested hypothesis. |
+| H-BASE-01 | A model that does not beat the additive baseline is not learning gene×condition interactions and is ineligible for promotion. | S2 → all tiers | Fit `fit ~ a + α[gene] + β[condition]`; record additive RMSE/MAE; gate every tier promotion. |
+| H-SPLIT-01 | Split outcomes depend on chemistry overlap between train and val. | S1 → S3 | Per candidate protocol: report val/test chemistry seen-rate vs train. |
+| H-SPLIT-02 | Stratified val-org selection produces tighter cross-seed metric stability than random selection. | S3 | Run k=5 random vs k=5 stratified; compare metric std across seeds. |
+| H-POLICY-01 | Weighted-full retains more supervision mass than strict-slice without harming primary metrics. | S5 | Same split, seeds, budget; compare RMSE+MAE + null delta. |
+| H-POLICY-02 | Curated organism pools improve robustness only if primary metrics improve and generalization diagnostics do not degrade. | S5 (deferred if S1 finds support too uneven for curation to matter). | Full vs curated org pool, same protocol. |
+| H-ENC-01 | Canonical-ID chemistry multihot beats media-name-only encoding. | T1-A | Media-id encoder vs multihot encoder. |
+| H-ENC-02 | Numeric concentration transforms (log1p / bounded) outperform raw amounts. | T1-B | raw vs log1p vs bounded. |
+| H-ENC-03 | Explicit UNK + mask indicators improve robustness on novel conditions vs zero-fill. | T1-C | Zero-fill vs explicit UNK. |
+| H-ENC-04 | Adding selected experiment metadata (oxygen, growth phase, temperature) improves conditional prediction over chemistry-only features. | T1-D | Chemistry-only vs chemistry+metadata. |
+| H-ENC-05 | Explicit decomposition-mode indicators (extract/in-silico flags) mitigate over-coupling vs untagged chemistry vectors. | T1-E | Chemistry vs chemistry+mode flags. |
+| H-FUSE-01 | Shallow nonlinear fusion beats linear fusion. | T2-A | Linear head vs 1-hidden MLP head, same encoder. |
+| H-FUSE-02 | Two-tower (separate encoders → late merge) beats early concat on novelty subsets. | T2-B | Early concat vs two-tower merge. |
+| H-FUSE-03 | Condition-gated gene features (FiLM-like) improve ranking on high-condition-variance genes vs un-gated fusion. | T2-C | Un-gated vs FiLM/gating. |
+| H-CAP-01 | Adding depth + residual links to the locked fusion improves RMSE without seed instability. | T3-A | 1-layer vs 2-layer vs 4-layer residual MLP. |
+| H-CAP-02 | A smaller model can match a larger model when input representation is well-designed. | T3-B | Param/runtime vs RMSE frontier. |
+| H-LOSS-01 | Huber objective improves robustness to extreme rows vs MSE without degrading central-mass metrics. | T4 | MSE vs Huber, all else fixed. |
+| H-TARGET-01 | Per-experiment z-score normalization of `fit` aids optimization but should not be promoted unless gains persist on raw-scale metrics. | T4 | Raw vs normalized target. Promotion gated on raw-scale RMSE+MAE. |
+| H-HOMO-01 | Model performance is partially explained by train-val sequence similarity. | S1 (diagnostic) | Embedding cosine similarity bins; metric stratification. |
+| H-HOMO-02 | Homology-aware masking reduces optimistic bias vs pure organism holdout. | S3 (conditional, triggered if H-HOMO-01 effect size > 0.5σ on val Spearman). | Add homology-masked diagnostic protocol. |
+| H-METRIC-01 | RMSE and MAE may disagree under heavy-tailed noise. | Always-on policy (per L4). | Report both for every comparison. |
+| H-SPR-01 | Variability-gated Spearman eligibility better reflects conditional sensitivity than count-only eligibility. | S2 | Pre-register threshold; report eligible-gene counts. |
 
-### Decision Ledger Entry Template (Use For Every Promotion Decision)
+**Dropped from v1 (orphaned, untestable, or scope creep):**
+- v1 H-TRAIN-01 (balanced sampling): no concrete experiment owner; re-introducible as
+  T4 ablation if T1–T3 plateau.
+- v1 H-TRAIN-02 (curriculum): same reason.
+- v1 H-PAIR-01 (paired-dropout): supervision-paradigm scope creep. Stage-1 audit
+  retained as diagnostic only; no promotion track.
+- v1 H-UQ-01 (coverage probability): defer to a future post-T4 calibration project.
 
-```markdown
-## Decision: <decision_id>
+---
 
-### Header
-- decision_id: <e.g., T1-DEC-003>
-- tier: <PreTier|T1|T2|T3|T4>
-- date: <YYYY-MM-DD>
-- owner: <name>
-- status: <proposed|approved|rejected|superseded>
-- related_experiments: [<T1-E1A>, <T1-E1B>]
+## 5. Decision Ledger Protocol
 
-### Assumption Under Test
-- assumption_statement: <single falsifiable statement>
-- assumption_type: <data|split|representation|fusion|architecture|optimization|evaluation>
-- why_it_matters: <1-2 lines tied to conditional essentiality goal>
+For every promotion decision (stage gate or tier gate):
 
-### Pre-Registered Test Plan
-- comparison: <exact A vs B, or A/B/C>
-- fixed_controls:
-  - split protocol id
-  - seed set
-  - training budget
-  - loss/eval code version
-- metrics_primary: [<RMSE>]
-- metrics_secondary: [<within-gene Spearman>, <MAE>]
-- promotion_rule:
-  - primary threshold: <explicit>
-  - secondary non-degradation tolerance: <explicit>
-- failure_guardrails:
-  - leakage test pass required
-  - split integrity pass required
-  - data contract consistency pass required
+1. **Pre-register** the comparison and promotion rule **before** running the experiment.
+   Record in `research_log/decisions/<stage_or_tier>/<decision_id>.md` using the template.
+2. **Run** the comparison; persist all artifacts to `artifacts/runs/<run_id>/`.
+3. **Decide.** Update the ledger entry with evidence summary, decision outcome, rationale.
+4. **Promote** by emitting the appropriate handoff artifact (§6).
 
-### Evidence Summary
-- run_manifest_ids: [<run1>, <run2>, <run3>]
-- sample_sizes:
-  - rows_scored: <int>
-  - genes_scored: <int>
-  - organisms_scored: <int>
-- result_summary:
-  - RMSE: <A value> vs <B value>
-  - Spearman: <A value> vs <B value>
-  - MAE: <A value> vs <B value>
-- statistical_check: <mean+-std or CI across seeds>
-- quality_checks:
-  - unknown_category_rate: <value>
-  - leakage_checks: <pass/fail>
-  - split_overlap_checks: <pass/fail>
+### Promotion rubric (hard gate — all must pass)
 
-### Decision
-- decision_outcome: <promote A|promote B|no winner>
-- rationale: <evidence-based short explanation>
-- risks_remaining: <open risks>
-- next_action: <exact follow-up carried into next tier>
+- Co-primary metric thresholds met (both RMSE and MAE).
+- Secondary non-degradation rule met (Spearman, per-organism spread).
+- **Beats additive baseline** (per H-BASE-01).
+- Leakage tests pass.
+- Split-integrity tests pass.
+- Reproducibility check passes (fixed-seed rerun within tolerance).
 
-### Reproducibility Attachments
-- config_snapshot: <path_or_id>
-- split_manifest_id: <id>
-- preprocessing_artifact_id: <id>
-- code_sha: <sha>
-- report_path: <path>
+`No winner` is a permitted outcome; underpowered or unstable comparisons must not produce promotions.
+
+### Decision-ledger entry template
+
+Located at `research_log/decisions/decision_template.md`. Required header fields:
+`decision_id`, `stage_or_tier`, `date`, `owner`, `status`, `related_experiments`,
+`assumption_under_test`, `pre_registered_comparison`, `metrics_primary` (RMSE+MAE),
+`metrics_secondary`, `promotion_rule`, `evidence_summary`, `decision_outcome`,
+`reproducibility_attachments`.
+
+---
+
+## 6. Artifact Handoff Contracts
+
+Every stage and tier consumes upstream artifacts and emits downstream artifacts.
+The handoff is by file, not by prose.
+
+| Stage | Consumes | Emits |
+|---|---|---|
+| S0 | — | `data_contract/run_manifest_v1.schema.json`, `data_contract/data_contract_v1.md`, `data_contract/v4_schema_verification.json` |
+| S1 | S0 | `data_contract/splits/candidate_protocols.yaml`, `research_log/tier_reports/s1_data_characterization.md` |
+| S2 | S1 | `data_contract/policy/eval_policy.yaml`, `artifacts/baselines/baselines_per_protocol.json` |
+| S3 | S1 + S2 | `data_contract/splits/locked_protocol.yaml`, `data_contract/splits/diagnostic_protocols.yaml` |
+| S4 | S3 | `data_contract/feature_contract.yaml`, `data_contract/preprocessing/<artifact_id>/` |
+| S5 | S4 | `data_contract/policy/quality_policy.yaml` |
+| T1 | S0–S5 | `research_log/decisions/tier1/<decision_id>.md`, `data_contract/representation_winner.yaml` |
+| T2 | T1 | `research_log/decisions/tier2/<decision_id>.md`, `data_contract/fusion_winner.yaml` |
+| T3 | T2 | `research_log/decisions/tier3/<decision_id>.md`, `data_contract/architecture_winner.yaml` |
+| T4 | T3 | `research_log/decisions/tier4/<decision_id>.md`, final policy locks |
+
+Each handoff file has a JSON Schema in `data_contract/schemas/`.
+
+---
+
+## 7. Stage Pipeline (S0 → S5)
+
+### S0 — Reproducibility & Governance
+
+**Goal:** infrastructure that makes every later result reproducible and auditable.
+
+**Required outputs**
+1. **v4 schema verification** — script reads `Media_Components_ML`, asserts the expected
+   columns (`Media`, `Canonical_ID`, `Compound_name`, `Chemical_form`,
+   `Source_row_component`, `Decomposition_type`, `Ingredient_source`, `Include_in_ml`,
+   `Source_dataset`, `Source_url`), records `workbook_v4_sha256`, emits
+   `data_contract/v4_schema_verification.json`. **First action of the refactor.**
+2. **Run manifest schema** at `data_contract/schemas/run_manifest_v1.schema.json` —
+   defines the JSON shape every run output must conform to (data-contract checksums,
+   git SHA, config snapshot, seed, scored_rowset_hash, n_rows_scored,
+   inclusion/exclusion counters, unknown_category_rate, null-baseline deltas).
+3. **End-to-end smoke pipeline** — Hydra config → split → train-only preprocessing →
+   no-op model (predicts global mean) → metrics → manifest. Proves the wiring works.
+4. **Test harness** — leakage, split-integrity, metric-correctness, manifest-validation,
+   smoke-reproducibility tests, all green.
+5. **Decision-ledger template** at `research_log/decisions/decision_template.md`.
+
+**Acceptance gate**
+- Smoke run reproduces metrics within tolerance across two fixed-seed reruns.
+- All tests green.
+- v4 schema verification artifact committed.
+
+### S1 — Data Characterization
+
+**Goal:** describe the data well enough to choose split protocols rationally.
+Pure description; no parameter fitting.
+
+**Required analyses**
+- Organism-to-organism overlap: media-name overlap, component-level chemistry overlap
+  (Canonical_ID intersection), stressor/condition overlap.
+- Support and sparsity: conditions-per-gene distributions per organism; row-count per
+  organism; row-count per (org, media).
+- Quality and noise: `fit`, `t`, `cor12` distributions globally and per organism;
+  per-organism residual-spread proxies.
+- Modality coverage: mapped vs unmapped chemistry coverage; embedding coverage by organism.
+- OOD diagnostics: candidate val/test chemistry unseen-rate vs train; embedding cosine
+  similarity profile vs train genes (homology proxy for `H-HOMO-01`).
+- LB representation-mode audit: every Canonical_ID gets a `representation_mode` tag
+  (`physical` | `mix` | `in_silico`) derived from `Decomposition_type`. Fraction of
+  rows per mode, per organism, per candidate protocol.
+
+**Hard-gate decisions**
+- Mapped/unmapped chemistry handling policy (`H-DATA-01`).
+- Minimum support threshold for candidate val/test organisms (`H-DATA-02`).
+- Whether `H-HOMO-01` evidence is strong enough (effect size > 0.5σ) to require a
+  homology diagnostic in S3.
+
+**Emits:** `data_contract/splits/candidate_protocols.yaml` listing 3–5 candidate
+protocols with documented (val_orgs, test_orgs, chemistry-overlap, support) tuples.
+
+### S2 — Evaluation Trustworthiness
+
+**Goal:** lock evaluation policy and compute baselines for each candidate protocol.
+Must complete *before* S3 can choose a protocol.
+
+**Required baselines (computed per candidate protocol)**
+- **Global train mean** — predict train mean for every val row.
+- **Per-condition mean** with safe fallback to global.
+- **Per-organism mean** with safe fallback to global (cold-start documented).
+- **Additive baseline** — fit `fit ~ a + α[gene] + β[condition]` by least squares on
+  train; predict on val. Required by `H-BASE-01`.
+- **Embedding nearest-neighbour baseline** — for each val row, find the most similar
+  train gene by embedding cosine within the same condition; copy its fit. Stress test
+  for homology leakage.
+
+**Required reports**
+- **Metric power report**: bootstrap 95% CI for Spearman on each candidate val set;
+  permutation null Spearman; per-protocol `n_genes_eligible` at candidate `m` values.
+- **Spearman eligibility policy**: pre-register `m = 5` and `v_min = 25th percentile
+  of cross-gene IQR on the candidate val set`. Frozen before S3.
+- **Heteroscedastic noise diagnostics**: residual quantile profile per candidate
+  protocol; per-organism residual spread.
+
+**Hard-gate decisions**
+- Whether within-gene Spearman is a primary gate metric or diagnostic-only — decided
+  per protocol from the power report (`H-EVAL-01`).
+- Protocol-specific "meaningful gain" thresholds for RMSE and MAE (e.g., 1× vs 0.5×
+  the gap between additive baseline and global-mean baseline).
+- Final null-baseline set reused by all later models under that protocol.
+
+**Emits:** `data_contract/policy/eval_policy.yaml` (Spearman eligibility, gain
+thresholds, primary/secondary metric assignments per protocol),
+`artifacts/baselines/baselines_per_protocol.json` (the actual numbers).
+
+### S3 — Split Protocol Lock
+
+**Goal:** select one primary protocol from S1 candidates using S1 + S2 evidence.
+Pick by transparent rule, not preference.
+
+**Selection rule**
+- Primary: protocol with non-degenerate chemistry overlap (val/test chemistry seen-rate
+  in 30–80% range) AND val support sufficient for stable metrics (per S2 power report).
+- Secondary: lower-overlap stress-test protocol; reported but not gating.
+- Conditional: if `H-HOMO-01` triggered in S1, add a homology-masked diagnostic protocol.
+
+**Stratified vs random selection** (`H-SPLIT-02`): when multiple candidates qualify,
+prefer overlap/support-stratified over random; record cross-seed stability as evidence.
+
+**Emits:** `data_contract/splits/locked_protocol.yaml` (one protocol, with seeds and
+manifest hash) + `data_contract/splits/diagnostic_protocols.yaml`.
+
+### S4 — Feature Contract
+
+**Goal:** define the chemistry feature schema as an immutable contract. The split
+is locked, so train-only preprocessing has a well-defined target row set.
+
+**Required outputs**
+- `canonical_id_vocab` — ordered list of Canonical_IDs present in train rows with
+  `Include_in_ml = True`.
+- `canonical_id_to_index` — dict; index 0 reserved for `<UNK>`.
+- `media_to_multihot` — `(n_media, len(vocab))` binary contract; idempotent on
+  duplicate `(Media, Canonical_ID)` rows.
+- `representation_mode` per medium (`physical` | `in_silico` | `mix`).
+- Numeric-field registry — `Amount`, optional `temperature`, optional `concentration`,
+  with declared transforms (raw / log1p / bounded).
+- Metadata-field registry — `oxygen`, `growth_phase`, `genotype`, with encoding
+  method and missingness policy each.
+
+**Hard-gate decisions**
+- Mapped/unmapped policy from S1 instantiated as concrete `<UNK>` vs explicit drop
+  per family.
+- Train-only feature trimming policy: prevalence threshold, fit on train only.
+
+**Emits:** `data_contract/feature_contract.yaml`,
+`data_contract/preprocessing/<artifact_id>/` containing fitted vocab/scalers and
+their checksums.
+
+### S5 — Training-Recipe Lock
+
+**Goal:** lock the optimization-irrelevant training-data choices that, if left as
+sweep dimensions in T1, would confound all tier comparisons.
+
+**Required controlled comparisons** (run with the locked feature contract, no model
+architecture changes; use `concat_linear` shallow MLP fixed):
+- Weighted-full vs strict-slice (`H-POLICY-01`).
+- Curated vs full organism pool, only if S1 found pool variance large enough to matter
+  (`H-POLICY-02`); else explicitly skipped with rationale.
+
+**Hard-gate decisions**
+- Default row-quality policy (`weighted_full` | `strict_slice`).
+- Default organism pool (`full` | `curated`).
+- Frozen weighting/filtering thresholds.
+
+**Deliberately out of scope at S5** (moved to T4):
+- Loss family (MSE vs Huber). Locked in T4.
+- Target normalization. Locked in T4.
+
+**Emits:** `data_contract/policy/quality_policy.yaml`.
+
+---
+
+## 8. Tiered Modeling Roadmap (T1 → T4)
+
+Each tier has a single concern. No tier may revisit decisions made by an earlier tier
+without an explicit ledger entry justifying the re-open.
+
+### Tier 1 — Representation
+
+**Sole concern:** which condition feature schema instance gives the best regression?
+
+**Fixed controls:** locked split (S3), locked feature contract (S4), locked
+training recipe (S5), shallow MLP fusion + concat head (T2/T3 architectures NOT yet
+chosen — use the simplest viable head). Same seeds across arms.
+
+**Experiments**
+| ID | Hypothesis | Comparison |
+|---|---|---|
+| T1-A | H-ENC-01 | media-id only vs canonical-ID multihot |
+| T1-B | H-ENC-02 | raw vs log1p vs bounded numeric transform |
+| T1-C | H-ENC-03 | zero-fill UNK vs explicit-UNK + mask indicators |
+| T1-D | H-ENC-04 | chemistry-only vs chemistry + experiment metadata |
+| T1-E | H-ENC-05 | chemistry vs chemistry + decomposition-mode indicators |
+
+**Promotion rule:** one schema wins. Beats every null baseline and the additive
+baseline (H-BASE-01) on RMSE+MAE. Spearman non-degradation. Reject schemas where
+gains are explained by representation-mode confound (LB risk policy).
+
+**Emits:** `data_contract/representation_winner.yaml`.
+
+### Tier 2 — Fusion
+
+**Sole concern:** how do gene and condition vectors combine? **All fusion topology
+decisions live here.** No new fusion topologies introduced in T3.
+
+**Fixed controls:** T1 winner. Same shallow head capacity as T1.
+
+**Experiments**
+| ID | Hypothesis | Comparison |
+|---|---|---|
+| T2-A | H-FUSE-01 | linear head vs 1-hidden-layer MLP head |
+| T2-B | H-FUSE-02 | early concat vs two-tower merge |
+| T2-C | H-FUSE-03 | un-gated fusion vs FiLM/condition-gated gene features |
+
+**Promotion rule:** one fusion topology wins; beats T1-winner on co-primary metrics
+plus additive baseline. T2-C wins only if it improves ranking on high-condition-variance
+genes (H-FUSE-03 specific).
+
+**Emits:** `data_contract/fusion_winner.yaml`.
+
+### Tier 3 — Capacity
+
+**Sole concern:** given the locked fusion, what additional capacity helps? **Depth,
+residuals, regularization only — no new fusion topologies.**
+
+**Fixed controls:** T1 + T2 winners.
+
+**Experiments**
+| ID | Hypothesis | Comparison |
+|---|---|---|
+| T3-A | H-CAP-01 | 1-layer vs 2-layer vs 4-layer residual MLP head |
+| T3-B | H-CAP-02 | param/runtime vs RMSE+MAE frontier sweep; pick smallest within ε of best |
+| T3-C (conditional) | H-EMB-01 | frozen ProteomeLM vs fine-tune top-N layers — only if T3-A/B plateau against null delta. |
+
+**Promotion rule:** smallest model class within tolerance of the best.
+
+**Emits:** `data_contract/architecture_winner.yaml`.
+
+### Tier 4 — Optimization & Final Policy Locks
+
+**Concerns** (in order):
+1. Loss family (`H-LOSS-01`): MSE vs Huber, with delta search.
+2. Target normalization (`H-TARGET-01`): raw vs per-experiment z-score. Promotion
+   gated on raw-scale metric improvement.
+3. LR schedule, batch size, weight decay, dropout, early stopping.
+4. Multi-seed confidence intervals on the locked architecture.
+
+**Promotion rule:** Pareto-improving combinations only; no regression vs T3 winner
+on co-primary metrics.
+
+---
+
+## 9. Project Structure & Tooling
+
+### Layout
+
 ```
-
-### Promotion Rubric (Hard Gate)
-
-- **Pass** only if:
-  - primary metric threshold is met,
-  - secondary non-degradation rule is met,
-  - leakage and split-integrity tests pass,
-  - reproducibility checks pass.
-- **Fail** if any hard gate fails, even if primary metric improves.
-- **No winner** is allowed when results are inconclusive, unstable, or underpowered.
-
-## Stage 0: Reproducibility and Governance (Before Any Modeling Tier)
-
-**Goal:** establish infrastructure so every downstream result is reproducible and attributable.
-
-### Required outputs
-
-- frozen data contract document (v4 + `Media_Components_ML` parsing rules),
-- immutable split manifest(s) with seeds,
-- run manifest schema,
-- decision-ledger template,
-- minimal test harness for data/split/metric invariants.
-
-### Stage-0 acceptance gate
-
-- A run can be recreated from artifacts + config + seed with equivalent metrics inside tolerance.
-- Leakage checks pass by test, not by manual inspection.
-- If reproducibility is not proven, Tier 1 cannot start.
-
-## Pre-Tier Baseline: Evaluate the Measurement System First
-
-**Goal:** validate that evaluation is trustworthy before comparing model choices.
-
-### Data-splitting strategy (anti-leakage)
-
-- Use organism-level holdout as primary benchmark axis.
-- Select one official protocol for tier decisions; keep others as secondary diagnostics.
-- Add novelty buckets for condition/media exposure where possible.
-- Freeze split manifest and disallow split edits during a tier.
-
-### Baseline hierarchy (must be re-established from scratch)
-
-- Null baseline set (required):
-  - global mean predictor,
-  - per-condition/group mean with safe fallback,
-  - per-organism mean with safe fallback (document cold-start behavior).
-- Legacy baseline ideas are treated as hypotheses, not truths.
-- Compute baselines on the exact scored row set used by each model comparison.
-
-### Metrics and decision criteria
-
-- Primary metric: **RMSE** on val/test for `fit`.
-- Secondary metrics:
-  - within-gene condition ranking Spearman,
-  - MAE,
-  - per-organism spread,
-  - residual slicing by condition categories.
-- A candidate wins only if it beats current MVP on RMSE and does not violate ranking stability tolerance.
-
-### Pre-Tier acceptance gate
-
-- Baseline numbers are stable across reruns with fixed seeds.
-- Metric code and row-set alignment are verified by tests.
-- Decision ledger contains baseline selection rationale.
-
-## Pre-Tier Addendum: Data and Evaluation Trustworthiness (Required Before Tier 1)
-
-This addendum promotes previously observed risks to explicit gates. Tier-1 work cannot start until these stages are complete and logged in the decision ledger.
-
-### Revised early-stage flow (authoritative)
-
-1. **Stage 0 - Reproducibility and governance lock** (existing section)
-2. **Stage 0.5 - Evaluation trustworthiness lock** (new hard gate)
-3. **Stage 1 - Deep data-sheet analysis lock** (new hard gate)
-4. **Stage 2 - Split protocol lock (chemistry-aware organism holdout)** (new hard gate)
-5. **Stage 2.5 - Data-quality policy lock** (weighted-full vs strict-slice + organism-tier policy)
-6. **Tier 1-4** proceed only after Stages 0-2.5 are approved
-
-### Stage 0.5 - Evaluation trustworthiness lock
-
-**Goal:** define what "good" means without external benchmark papers by anchoring model results to protocol-specific nulls and estimated noise floors.
-
-#### Required outputs
-
-- null-baseline suite for each protocol:
-  - global train mean,
-  - per-condition/per-experiment mean with safe fallback,
-  - per-organism mean with safe fallback (document cold-start behavior),
-  - embedding nearest-neighbor baseline once embedding lookup is active.
-- optional stronger checks (if feasible):
-  - component-vector chemistry mean baseline,
-  - additive baseline (`embedding prior + condition prior`) as interaction sanity check.
-- metric power report:
-  - within-gene Spearman eligibility counts for candidate `m`,
-  - bootstrap CI for Spearman on locked val set,
-  - permutation/null Spearman check.
-- estimated irreducible-noise reference from replicate-quality proxies (document method and assumptions).
-
-#### Hard-gate decisions
-
-- whether within-gene Spearman is primary gate metric or diagnostic-only (based on power, not preference),
-- protocol-specific "meaningful gain" thresholds for RMSE and ranking metrics,
-- final null-baseline set reused by all models under that protocol.
-
-#### Heteroscedastic-noise metric policy (required)
-
-- Treat Tn-seq `fit` residuals as potentially heavy-tailed/heteroscedastic unless disproven by diagnostics.
-- Report **RMSE and MAE as co-primary metrics** for promotion decisions; neither metric may be omitted.
-- Add residual diagnostics to every protocol report:
-  - residual quantiles (including tail quantiles),
-  - per-organism residual spread,
-  - residual slicing by fit-magnitude buckets.
-- Any improvement claim must disclose whether gains occur in central-mass errors, tail errors, or both.
-
-#### Evaluation integrity checks (hard gate)
-
-- **Variance decomposition status control**
-  - treat any sum-of-squares decomposition run on convenience subsamples as exploratory-only evidence,
-  - do not use exploratory decomposition outputs as sole justification for split-policy choices,
-  - require at least one stronger confirmatory analysis (mixed-effects or documented robustness checks across sampling schemes) before promoting variance-based conclusions to policy.
-- **LOOO null-definition audit**
-  - for each LOOO fold, explicitly record null definition and fallback path,
-  - verify whether the effective null is truly global train mean (excluding held-out organism) or includes any organism-conditioned information,
-  - block cross-protocol interpretation if null definitions differ without explicit disclosure.
-- **Denominator parity requirement**
-  - model and baseline comparisons must use the exact same scored row set (identical row ids/counts),
-  - embedding-join filters, quality filters, and split masks must be applied identically before metric computation,
-  - fail the comparison if row-set parity checks fail; no promotion decision allowed on mismatched denominators.
-- **Evaluation-manifest minimum fields**
-  - scored_rowset_id/hash,
-  - n_rows_scored for model and each baseline,
-  - null_definition_id (per protocol/fold),
-  - inclusion/exclusion counters (pre-join, post-join, post-filter, post-split),
-  - spearman_eligibility_policy_id (`m`, variability threshold, exclusion counters).
-
-### Stage 1 - Deep data-sheet analysis lock
-
-**Goal:** decide split feasibility and evaluation limits from empirical overlap and support, not assumptions.
-
-#### Required analysis questions
-
-- organism-to-organism overlap:
-  - media-name overlap,
-  - component-level chemistry overlap,
-  - stressor/condition overlap.
-- support and sparsity:
-  - conditions-per-gene distributions per organism,
-  - genes eligible for Spearman at candidate `m` thresholds,
-  - minimum support thresholds for valid val/test organisms.
-- quality and noise structure:
-  - `fit`, `t`, `cor12` distributions globally and per organism,
-  - impact of candidate quality filters on retained supervision mass.
-- modality coverage:
-  - mapped vs unmapped chemistry coverage and policy implications,
-  - embedding coverage/drop rates by organism and by split candidate.
-- OOD diagnostics:
-  - candidate val/test chemistry unseen-rate versus train,
-  - optional embedding-distance OOD profile versus train genes.
-- homology-leakage diagnostics:
-  - nearest-train sequence-similarity proxy for each val/test gene (embedding cosine required baseline; alignment/MMseqs optional upgrade),
-  - metric stratification by similarity bins (high/medium/low),
-  - error-versus-similarity trend checks to detect memorization-like behavior.
-
-#### Condition encoding specification (required before Tier 1)
-
-- Build chemistry vocabulary from `Media_Components_ML` using rows with `Include_in_ml == True`.
-- Define and freeze deterministic mapping artifacts:
-  - `canonical_id_vocab` (ordered list),
-  - `canonical_id_to_index`,
-  - `media_to_multihot` matrix contract,
-  - duplicate handling rule for repeated `(Media, Canonical_ID)` rows (must be idempotent).
-- Keep feature-family registry explicit:
-  - chemistry multihot features,
-  - condition/stressor categorical features,
-  - optional numeric fields (concentration, temperature) with documented transforms.
-- Any prevalence/variance-based feature trimming must be fit on **train only** per split and persisted as an artifact.
-
-#### Experiment metadata feature policy (required)
-
-- Audit and document candidate metadata fields for predictive use:
-  - organism id,
-  - genotype/background,
-  - oxygen/aerobic state,
-  - growth phase / harvest state,
-  - temperature,
-  - stressor/concentration/unit fields where present.
-- For each field, pre-register:
-  - encoding method,
-  - missingness policy,
-  - leakage risk check,
-  - ablation priority (include vs exclude decision test).
-
-#### Paired-dropout feasibility audit (required)
-
-- Detect candidate medium pairs via explicit naming/set-difference rules (for example `_no_`*, `_minus_`*, or controlled component-delta patterns).
-- Hard validity requirement: a usable pair must be within the **same organism** and compatible protocol context; cross-organism pairings are diagnostic-only and cannot define causal delta targets.
-- Emit a pair manifest with:
-  - pair ids,
-  - dropped component(s),
-  - organisms represented,
-  - number of experiments and genes eligible per pair.
-- If pair coverage is insufficient or heavily confounded, paired-dropout remains secondary/diagnostic only.
-
-#### Target-scale and normalization policy (required)
-
-- Authoritative default target remains raw `fit` regression.
-- Any target normalization (for example per-experiment z-score) is allowed only as a controlled ablation with train-only fitted parameters where applicable.
-- Promotion decisions must report whether gains persist on raw-scale metrics versus null baselines.
-
-#### Spearman eligibility refinement (required)
-
-- Within-gene Spearman is computed only for genes that satisfy both:
-  - minimum validation condition count `m`,
-  - minimum observed validation variability threshold `v_min` (pre-registered robust spread rule, such as IQR/std threshold).
-- Genes failing eligibility are excluded from Spearman aggregation and counted explicitly in reports.
-- Eligibility thresholds must be fixed before tier comparisons and recorded in the decision ledger.
-
-#### Biological sanity-check set (required)
-
-- Define a small set of known biological expectation checks (for example, nutrient-dropout/auxotrophy-style plausibility cases) used as non-promotion guardrails.
-- A model that fails these checks cannot be promoted without documented exception rationale.
-
-#### Hard-gate decisions
-
-- explicit mapped/unmapped chemistry policy,
-- minimum support policy for organisms used in val/test,
-- approved overlap diagnostics that must be reported with every split protocol.
-- homology-diagnostic readiness policy:
-  - whether Stage-1 similarity evidence requires a dedicated homology-aware diagnostic protocol for promotion reporting.
-
-#### LB mixed-representation risk policy (required)
-
-**Risk statement:** a large fraction of rows use LB-family media, and historical workbook versions mixed physical-ingredient semantics with in-silico metabolite semantics for LB-like entries. This can create spurious overlap, unstable vocabularies, and misleading chemistry generalization claims if not controlled.
-
-**Required controls**
-
-- normalize LB naming to a single canonical alias policy before feature construction (for example, `LB`, `LB (Miller)`, and related synonyms must map deterministically);
-- assign and persist a `representation_mode` tag per medium (`physical`, `in_silico`, or `mixed`) in the condition data contract;
-- forbid silent merging of physical and in-silico component vectors into one untagged feature space;
-- require split diagnostics to report representation-mode proportions for train/val/test and within novelty buckets;
-- require at least one ablation that compares:
-  - strict physical-only chemistry encoding,
-  - strict in-silico-aware encoding with explicit mode indicators,
-  - fallback policy for media lacking one representation mode.
-
-**Promotion guardrail**
-
-- no representation/fusion promotion is allowed if gains are explained only by representation-mode leakage (for example, train/val differences in LB encoding mode that are not controlled by explicit features and diagnostics).
-
-### Stage 2 - Split protocol lock (chemistry-aware organism holdout)
-
-**Goal:** lock split definitions that test scientifically meaningful generalization instead of accidental impossibility.
-
-#### Split-design policy
-
-- Organism holdout remains primary axis.
-- Chemistry overlap is a required companion axis; each protocol must report val/test chemistry seen-rate and unseen-rate versus train.
-- At least one protocol must avoid near-zero chemistry overlap scenarios that make success unattainable regardless of architecture.
-- If using multiple held-out organisms, select them by pre-declared overlap/support strata, not random choice.
-- If paired-dropout protocols are used, pair assignments must satisfy within-organism validity requirements and be reported separately from standard organism-holdout metrics.
-- Homology-aware evaluation is a required secondary axis when Stage-1 diagnostics show strong similarity dependence:
-  - keep organism-holdout as primary promotion protocol,
-  - add homology-aware masking/partition as a diagnostic protocol (do not silently replace the primary axis).
-
-#### Recommended protocol set
-
-- **Primary promotion protocol:** organism holdout with non-trivial but not degenerate chemistry overlap.
-- **Secondary diagnostic protocol:** lower-overlap stress test (reported, not necessarily promotion-gating).
-- **Optional robustness protocol:** LOOO or leave-k-organisms-out summary once candidate defaults are near locked.
-- **Homology diagnostic protocol (conditional required):** if enabled by Stage-1 evidence, evaluate with train-time homology masking/partition or clustering constraints and report similarity-stratified outcomes.
-
-#### Hard-gate decisions
-
-- official primary protocol id for tier promotions,
-- official secondary diagnostic protocol(s),
-- allowed val/test organism pool with documented support and overlap rationale.
-- paired-dropout protocol status (`not_used|diagnostic_only|promotion_eligible`) with explicit justification.
-- homology protocol status (`not_used|diagnostic_only|required_diagnostic`) and thresholding method (`embedding-sim bins|MMseqs/cluster`) with rationale.
-
-### Stage 2.5 - Data-quality policy lock
-
-**Goal:** resolve data-policy questions before architecture expansion.
-
-#### Required controlled comparisons
-
-- weighted-full vs strict-slice (same split, seeds, budget),
-- full vs curated vs curated-strict organism pool (if curation policy is under consideration),
-- all comparisons include null deltas and ranking diagnostics.
-- extract-handling policy comparison:
-  - keep decomposition-derived component features as-is,
-  - add explicit extract-indicator features (for example yeast extract/tryptone-like flags),
-  - optional restrictive filter policy for decomposition-derived features if justified.
-- metadata contribution ablations:
-  - chemistry-only,
-  - chemistry + selected experiment metadata,
-  - chemistry + metadata + extract-indicator features.
-- target normalization ablation:
-  - raw `fit` target baseline,
-  - normalized-target variant (if tested), both scored with denominator parity and protocol-specific null context.
-- loss-family policy comparison (before architecture expansion):
-  - MSE objective baseline,
-  - Huber objective baseline with pre-registered delta candidates,
-  - same split, seeds, budget, and denominator parity.
-- optional uncertainty diagnostic comparison (if enabled):
-  - interval estimation method(s),
-  - empirical coverage probability by organism and fit-magnitude bucket,
-  - interval sharpness/width summary.
-
-#### Hard-gate decisions
-
-- default row-quality policy,
-- default organism-pool policy,
-- frozen thresholds/functions for quality weighting or filtering.
-- default condition-feature bundle (chemistry-only vs chemistry+metadata vs chemistry+metadata+extract flags),
-- default target-scale policy (raw only vs raw+normalized dual reporting),
-- paired-dropout track disposition (deferred vs active secondary track),
-- default loss family for Tier 3+ (`MSE|Huber`) and, if Huber, default delta policy,
-- uncertainty diagnostics status (`off|diagnostic_only|required_diagnostic`) for downstream tiers.
-
-### Added cross-tier hypotheses (must be pre-registered in ledger)
-
-- **H-DATA-01:** Explicit mapped/unmapped chemistry handling improves robustness versus silent drop or naive fallback.
-- **H-DATA-02:** Organism support thresholds materially affect metric stability and decision confidence.
-- **H-EVAL-01:** Within-gene Spearman is sufficiently powered for promotion decisions under the locked protocol.
-- **H-EVAL-02:** RMSE gains should be interpreted relative to protocol-specific null and documented noise references.
-- **H-SPLIT-01:** Split outcomes depend strongly on chemistry overlap; protocol must report this dependence explicitly.
-- **H-SPLIT-02:** Random held-out organism choice is inferior to overlap/support-stratified selection for fair comparison.
-- **H-POLICY-01:** Weighted-full can match or beat strict-slice while preserving more supervision mass.
-- **H-POLICY-02:** Curated organism pools improve robustness only if they improve primary metrics without harming generalization diagnostics.
-- **H-TRAIN-01:** Balanced sampling across organisms/conditions may outperform naive row-proportional sampling.
-- **H-TRAIN-02:** Curriculum-style training (quality-first or simpler-to-harder) may improve stability and ranking consistency; treat as controlled Tier-4-style optimization hypotheses unless promoted earlier by evidence.
-- **H-ENC-01:** Canonical-ID chemistry multihot with train-only trimming outperforms media-name-only encoding without causing instability.
-- **H-ENC-02:** Adding experiment metadata (oxygen/temperature/genotype/growth state where available) improves conditional prediction over chemistry-only features.
-- **H-ENC-03:** Explicit extract-indicator features mitigate decomposition-induced over-coupling better than chemistry-only vectors.
-- **H-PAIR-01:** Within-organism paired-dropout deltas provide stronger conditional signal than unpaired medium-level supervision for affected nutrient families.
-- **H-TARGET-01:** Normalized targets may aid optimization but should not be promoted unless gains persist on raw-scale protocol metrics.
-- **H-HOMO-01:** Model performance is partially explained by train-val sequence similarity; low-similarity bins must be reported to avoid overclaiming generalization.
-- **H-HOMO-02:** Homology-aware masking/clustering reduces optimistic bias versus pure organism holdout while preserving enough supervision mass for stable evaluation.
-- **H-METRIC-01:** MAE and RMSE may disagree under heavy-tailed noise; robust improvements should improve or hold both.
-- **H-LOSS-01:** Huber objective improves robustness to extreme noisy rows versus MSE without degrading central-mass performance.
-- **H-UQ-01:** Coverage probability diagnostics reveal whether predictive intervals are calibrated across organisms and fit-magnitude regimes.
-- **H-SPR-01:** Spearman computed with variability-gated eligibility better reflects conditional sensitivity than count-only eligibility.
-
-## Tiered Experimental Roadmap
-
-## Tier 1: Input Representation
-
-**Core question:** what condition encoding from `Media_Components_ML` best supports conditional ranking and error reduction?
-
-### Tier-1 MVP baseline
-
-- Gene input: frozen ProteomeLM embeddings.
-- Condition input: simple categorical + numeric encoding built from train-only vocab/scalers.
-- Model head: shallow regression MLP.
-
-### Experiments (2-3)
-
-1. **Exp 1A - Granularity Test**
-  - Hypothesis: component-level composition beats coarse media-id encoding.
-  - Implementation: compare media-id/category-only vs component presence/amount vectors.
-  - Success criteria: RMSE decrease plus Spearman non-degradation.
-2. **Exp 1B - Numeric Transform Test**
-  - Hypothesis: transformed concentrations (log/scaled) outperform raw values.
-  - Implementation: compare raw vs log1p vs bounded normalization.
-  - Success criteria: consistent gains across seeds with stable variance.
-3. **Exp 1C - Unknown Handling Test**
-  - Hypothesis: explicit `UNK` + unknown-rate diagnostics improves robustness on novel conditions.
-  - Implementation: compare naive drop/zero-fill vs explicit UNK + mask indicators.
-  - Success criteria: stronger novelty-bucket performance and fewer brittle failures.
-
-### Tier-1 required representation ablations (must run before promotion)
-
-- chemistry-only vs chemistry+experiment-metadata feature bundles,
-- chemistry-only vs chemistry+extract-indicator feature bundles,
-- train-only feature trimming policy sensitivity (no trim vs conservative trim),
-- if paired-dropout is promotion-eligible at Stage 2, include at least one paired-delta representation comparison as a secondary diagnostic.
-
-### Tier-1 promotion rule
-
-- Promote exactly one representation schema and artifact contract to Tier 2.
-- Record rejected alternatives and reasons in decision ledger.
-
-## Tier 2: Fusion MVP
-
-**Core question:** what is the simplest reliable fusion strategy once representation is fixed?
-
-### Tier-2 MVP baseline
-
-- Tier-1 winning representation frozen.
-- Initial fusion: `concat([gene_emb, condition_vec]) -> regression head`.
-
-### Experiments (2-3)
-
-1. **Exp 2A - Linear vs Shallow MLP Fusion**
-  - Hypothesis: shallow nonlinearity captures useful interaction signal.
-  - Implementation: linear head vs one-hidden-layer head.
-  - Success criteria: better RMSE/Spearman at similar runtime budget.
-2. **Exp 2B - Early vs Late Fusion**
-  - Hypothesis: separate towers then merge improves compositional robustness.
-  - Implementation: direct concat vs two-tower merge.
-  - Success criteria: gains on novelty subsets with acceptable complexity.
-3. **Exp 2C - Minimal Gating**
-  - Hypothesis: condition-gated gene features improve conditional sensitivity.
-  - Implementation: small gating module over gene embedding.
-  - Success criteria: improved ranking on high-condition-variance genes.
-
-### Tier-2 promotion rule
-
-- Promote one fusion method only.
-- Freeze fusion defaults before architecture scaling.
-
-## Tier 3: Architectural Complexity
-
-**Core question:** which complexity is justified after representation and fusion are locked?
-
-### Tier-3 MVP baseline
-
-- Tier-1 and Tier-2 winners fixed.
-- Training recipe fixed to isolate architecture effects.
-
-### Experiments (2-3)
-
-1. **Exp 3A - Depth/Residual Test**
-  - Hypothesis: deeper residual MLP improves performance without instability.
-  - Implementation: 2-4 layer MLP, with/without residual links.
-  - Success criteria: consistent gain and acceptable seed variance.
-2. **Exp 3B - Interaction Block Test**
-  - Hypothesis: lightweight interaction block improves gene-condition coupling.
-  - Implementation: small FiLM-like or attention-like interaction block.
-  - Success criteria: meaningful gain over Tier-2 winner at bounded compute.
-3. **Exp 3C - Efficiency Frontier Test**
-  - Hypothesis: smaller models can match larger models when inputs are well designed.
-  - Implementation: parameter/runtime vs RMSE/Spearman frontier sweep.
-  - Success criteria: choose smallest model within predefined delta of best score.
-
-### Tier-3 promotion rule
-
-- Promote single model class and default size.
-- Archive full comparison evidence for reproducibility.
-
-## Tier 4: Optimization (Brief, Post-Lock)
-
-- Tune only after Tier 1-3 are frozen:
-  - LR schedule, batch size, weight decay, dropout, Huber delta, early stopping.
-- Re-test data quality policy choices (weighted vs strict filtering) as controlled experiments.
-- Finalize multi-seed confidence intervals and robustness report for locked architecture.
-
-## Canonical Starter Structure (Authoritative)
-
-```text
 project_root/
-  README.md
-  pyproject.toml
-  .gitignore
+  README.md  pyproject.toml  .gitignore  CLAUDE.md
 
   data_contract/
     data_contract_v1.md
+    v4_schema_verification.json    # S0
+    feature_contract.yaml          # S4
+    representation_winner.yaml     # T1
+    fusion_winner.yaml             # T2
+    architecture_winner.yaml       # T3
     schemas/
+      run_manifest_v1.schema.json
       canonical_tables.schema.json
       condition_features.schema.json
     splits/
-      split_protocol_primary.yaml
-      split_protocol_diagnostic.yaml
+      candidate_protocols.yaml     # S1
+      locked_protocol.yaml         # S3
+      diagnostic_protocols.yaml    # S3
+    policy/
+      eval_policy.yaml             # S2
+      quality_policy.yaml          # S5
     preprocessing/
-      vocab_policy.md
-      scaler_policy.md
+      <artifact_id>/               # S4 fitted vocab + scalers
 
   src/
-    domain/
-      entities.py
-      contracts.py
-      metrics_contract.py
-      split_contract.py
+    domain/         # entities, contracts, metrics_contract, split_contract
     data/
-      ingestion/
-        load_v4_media_components_ml.py
-        load_embeddings.py
-        load_fitness_tables.py
-      preprocessing/
-        fit_condition_vocab.py
-        fit_condition_scalers.py
-        transform_conditions.py
-        unknown_category_policy.py
-      datasets/
-        build_model_dataset.py
-        dataset_audits.py
+      ingestion/    # load_v4_media_components_ml, load_embeddings, load_fitness_tables
+      preprocessing/# fit_condition_vocab, fit_condition_scalers, transform_conditions, unknown_category_policy
+      datasets/     # build_model_dataset, dataset_audits
     models/
-      representations/
-        condition_encoders.py
-      fusion/
-        concat_linear.py
-        towers_merge.py
-        gated_fusion.py
-      architectures/
-        shallow_mlp.py
-        residual_mlp.py
-        interaction_block.py
-    train/
-      loop.py
-      losses.py
-      optimizer_factory.py
-      evaluator.py
-      checkpointing.py
-    evaluation/
-      null_baselines.py
-      metrics.py
-      reporting.py
-    experiments/
-      registry.py
-      tier0/
-        run_stage0_reproducibility.py
-      pretier/
-        run_baselines.py
-      tier1/
-        run_representation_ablation.py
-      tier2/
-        run_fusion_ablation.py
-      tier3/
-        run_architecture_ablation.py
-      tier4/
-        run_optimization_sweeps.py
-    cli/
-      run_experiment.py
+      representations/  # condition_encoders
+      fusion/           # concat_linear, towers_merge, gated_fusion (FiLM)
+      architectures/    # shallow_mlp, residual_mlp
+    train/          # loop, losses, optimizer_factory, evaluator, checkpointing
+    evaluation/     # null_baselines, additive_baseline, nn_baseline, metrics, reporting
+    experiments/    # registry + per-stage/tier runners
+      stage0/  stage1/  stage2/  stage3/  stage4/  stage5/
+      tier1/   tier2/   tier3/   tier4/
+    cli/            # run_experiment.py — Hydra entrypoint
 
-  configs/
-    base/
-      data.yaml
-      model.yaml
-      train.yaml
-      eval.yaml
-    stage0/
-      reproducibility.yaml
-    pretier/
-      baseline_eval.yaml
-    tier1/
-      exp_1a_granularity.yaml
-      exp_1b_numeric_transform.yaml
-      exp_1c_unknown_handling.yaml
-    tier2/
-      exp_2a_linear_vs_mlp.yaml
-      exp_2b_early_vs_late.yaml
-      exp_2c_gated.yaml
-    tier3/
-      exp_3a_depth_residual.yaml
-      exp_3b_interaction_block.yaml
-      exp_3c_efficiency_frontier.yaml
-    tier4/
-      optimization_sweep.yaml
+  configs/                   # Hydra config tree
+    config.yaml              # root; defines defaults list
+    data/                    # data input groups
+    model/
+    train/
+    eval/
+    stage/                   # one yaml per stage
+    tier/                    # one yaml per tier
+    experiment/              # one yaml per experiment (T1-A, T2-B, etc.)
 
   tests/
-    unit/
-      test_metrics.py
-      test_unknown_category_policy.py
-      test_scaler_fit_train_only.py
-    integration/
-      test_split_integrity.py
-      test_no_feature_leakage.py
-      test_dataset_build_determinism.py
-      test_baseline_reproducibility.py
-    fixtures/
-      mini_canonical.parquet
-      mini_conditions.parquet
+    unit/  integration/  fixtures/
 
   research_log/
-    decisions/
-      decision_template.md
-      pretier/
-      tier1/
-      tier2/
-      tier3/
-      tier4/
+    decisions/decision_template.md
+    decisions/{stage0..stage5,tier1..tier4}/
     tier_reports/
-      stage0_report.md
-      pretier_report.md
-      tier1_report.md
-      tier2_report.md
-      tier3_report.md
-      tier4_report.md
 
   artifacts/
-    runs/
-      <run_id>/
-        config_snapshot.yaml
-        split_manifest.yaml
-        preprocessing_artifacts/
-        metrics.json
-        baseline_comparison.json
-        diagnostics.json
-        model_checkpoint.pt
+    runs/<run_id>/
+    baselines/
     indexes/
-      run_index.csv
+
+  archive/    # legacy pre-refactor code (reference only)
 ```
 
-### Structure Rules (Non-Negotiable)
+### Configuration: Hydra
 
-- Core implementation logic lives only in `src/` (single source of truth).
-- Tier-specific differences are expressed in `configs/tier*/` and `src/experiments/tier*/`, not duplicated code trees.
-- Every promoted decision must have a corresponding file in `research_log/decisions/<tier>/`.
-- Failed experiments remain in `artifacts/runs/<run_id>/` with diagnostics; do not keep dead experimental branches in core modules.
-- Any change to dataset schema, split policy, or preprocessing policy must update `data_contract/` first.
+- **Framework:** `hydra-core>=1.3` (added to `pyproject.toml`).
+- **Composition:** root `configs/config.yaml` has a `defaults` list pulling from
+  `data/`, `model/`, `train/`, `eval/`, `stage/` or `tier/`, `experiment/`.
+- **Override style:** experiments are run as
+  `python -m src.cli.run_experiment +experiment=tier1/T1-A`.
+- **Output dirs:** Hydra writes per-run dirs under `artifacts/runs/${now:%Y%m%d_%H%M%S}_${experiment_id}/`.
+- **Sweep:** Hydra's multirun (`-m`) handles seed sweeps and arm sweeps. No hand-rolled
+  sweep loops in `src/experiments/*`.
 
-### Why This Is Preferred Over Full Per-Tier Code Directories
+### Tracking policy
 
-- Preserves readability by tier (configs, runners, logs are tier-scoped).
-- Prevents code drift and copy-paste divergence in critical data/model/train logic.
-- Makes bug fixes and reproducibility checks centralized and auditable.
-- Keeps failed ideas discoverable via immutable artifacts instead of polluting production code.
+Persist for every run (in the run's manifest, conforming to `run_manifest_v1.schema.json`):
+- git SHA, hydra config snapshot (`.hydra/config.yaml`)
+- split protocol id, preprocessing artifact id
+- seed, code SHA
+- `feba_db_sha256`, `workbook_v4_sha256`, `embedding_manifest_id`, `canonical_manifest_id`
+- metrics (RMSE, MAE, Spearman) with `n_rows_scored`, `n_genes_eligible`
+- null-baseline deltas (one per baseline)
+- `unknown_category_rate`
+- `scored_rowset_hash` for denominator parity
 
-### Configuration and tracking policy
+### Structure rules (non-negotiable)
 
-- Use YAML-based composed configs (Hydra-style or equivalent).
-- Persist for every run:
-  - git SHA,
-  - split id,
-  - preprocessing artifact id,
-  - config snapshot,
-  - seed,
-  - metrics,
-  - null-baseline deltas,
-  - unknown-category rates.
-- Track experiments with consistent tags:
-  - `stage`,
-  - `tier`,
-  - `experiment_id`,
-  - `split_protocol`,
-  - `data_contract_version`.
+- Logic only in `src/`. Configs are data, never code.
+- Tier-specific differences live in `configs/experiment/` and thin wrappers in
+  `src/experiments/<tier>/`. Core data/model/train modules are tier-agnostic.
+- Every promoted decision has a file in `research_log/decisions/<stage_or_tier>/`.
+- Failed experiments stay in `artifacts/runs/<run_id>/` with diagnostics; never in `src/`.
+- Any change to `data_contract/` triggers a version bump and a decision-ledger entry.
 
-## Minimal Test Plan Required Before Tier 1
+---
 
-- Leakage tests:
-  - vocab/scalers fit only on train rows,
-  - val/test unseen categories map to `UNK`,
-  - no transform statistics derived from val/test.
-- Split tests:
-  - no organism overlap across split partitions,
-  - deterministic split reproduction from manifest/seed.
-- Data integrity tests:
-  - join key cardinality and duplicate checks for `orgId`, `locusId`, `expName`, `gene_key`.
-- Metric tests:
-  - RMSE/Spearman correctness on synthetic fixtures.
-- Smoke reproducibility tests:
-  - fixed-seed rerun reproduces metrics inside tolerance.
+## 10. Test Plan (Required Before Any Tier)
 
-## Prompt Refinement (Authoritative Restart Prompt)
+**Leakage tests**
+- Vocab/scalers fit only on train rows; assertion check.
+- Val/test unseen categories map to `<UNK>`; explicit policy test.
+- No transform statistics derived from val/test.
 
-"Start a clean-room refactor of this project into a strict, tiered ML research system for conditional gene essentiality prediction from Tn-seq.
+**Split tests**
+- No organism overlap across train/val/test partitions.
+- Deterministic split reproduction from manifest + seed.
 
-Hard constraints:
+**Data integrity tests**
+- Join-key cardinality and duplicate checks for `orgId`, `locusId`, `expName`, `gene_key`.
+- Canonical-table schema conforms to `canonical_tables.schema.json`.
+- v4 workbook conforms to `condition_features.schema.json`.
 
-1. Primary objective is regression on continuous fitness (`fit`).
-2. Condition source is `media_composition_v4.xlsx`, sheet `Media_Components_ML`.
-3. Preprocessing is split-aware and train-only: build condition vocab/scalers on train data only; map unseen val/test categories to `UNK`; log unknown-category rates.
-4. Existing code and results are untrusted by default and may only be used as hypotheses to re-test.
-5. No tier promotion without pre-declared success criteria and a written decision-ledger entry.
+**Metric tests**
+- RMSE / MAE / within-gene Spearman correctness on synthetic fixtures.
+- Eligibility filter behaves as specified (`m`, `v_min`).
 
-Required deliverables:
+**Manifest tests**
+- Every run output validates against `run_manifest_v1.schema.json`.
+- Required checksum fields are non-empty.
 
-- Stage 0 reproducibility/governance setup.
-- Pre-Tier evaluation baseline re-established from scratch (including null baselines).
-- Tier 1-4 experiment plans with hypothesis, implementation, and success criteria.
-- Strictly separated project structure for data, models, and training.
-- Config/experiment tracking design for full reproducibility.
-- Test suite focused on leakage prevention, split integrity, and metric correctness.
+**Smoke reproducibility tests**
+- Fixed-seed rerun of S0 smoke pipeline reproduces metrics within `1e-6` tolerance.
 
-Process policy:
-
-- Re-learn every major assumption through controlled tier experiments.
-- Promote only one winner per tier.
-- Record all accepted/rejected decisions with evidence."
-
+`pytest tests/` must stay green before any commit. Stage gates require this plus
+the stage-specific acceptance criteria.

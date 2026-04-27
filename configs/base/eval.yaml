@@ -1,9 +1,0 @@
-# Base evaluation config — override per experiment
-eval:
-  spearman_min_conditions: 5
-  spearman_min_variability: null   # IQR threshold; null = no variability filter
-  compute_null_baselines: true
-  null_baselines:
-    - global_train_mean
-    - per_condition_mean
-    - per_organism_mean

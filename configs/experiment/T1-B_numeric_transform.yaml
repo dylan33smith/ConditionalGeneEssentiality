@@ -1,0 +1,16 @@
+# @package _global_
+# T1-B — Numeric Transform Test. Hypothesis H-ENC-02.
+
+experiment_id: T1-B_numeric_transform
+stage_or_tier: T1
+
+experiment:
+  hypothesis: H-ENC-02
+  arms:
+    - amount_transform: raw
+    - amount_transform: log1p
+    - amount_transform: bounded
+  seeds: [0, 1, 2]
+  promotion_rule:
+    additive_baseline_gate: required
+    primary: [rmse_decrease, mae_decrease]

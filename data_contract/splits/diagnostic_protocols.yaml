@@ -1,0 +1,4 @@
+# S3 emits this. Secondary protocols for stress tests and homology diagnostic.
+status: pending
+emitted_by: stage3
+protocols: []

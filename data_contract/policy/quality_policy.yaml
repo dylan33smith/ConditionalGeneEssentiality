@@ -1,0 +1,6 @@
+# S5 emits this.
+status: pending
+emitted_by: stage5
+row_quality_policy: null   # "weighted_full" | "strict_slice"
+organism_pool: null        # "full" | "curated"
+weighting_thresholds: {}

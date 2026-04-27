@@ -1,4 +1,6 @@
 """Unit tests for unknown category policy."""
+import pytest
+
 from src.data.preprocessing.unknown_category_policy import apply_unk_policy
 
 
@@ -19,6 +21,3 @@ def test_mixed():
     assert cats[0] == "LB"
     assert cats[1] == "<UNK>"
     assert rate == pytest.approx(0.5)
-
-
-import pytest  # noqa: E402  (placed after body for readability in stub)

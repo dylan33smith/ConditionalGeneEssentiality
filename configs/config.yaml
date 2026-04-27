@@ -1,0 +1,29 @@
+# Hydra root config for the conditional gene essentiality refactor.
+#
+# Usage:
+#   python -m src.cli.run_experiment +experiment=T1-A_granularity
+#   python -m src.cli.run_experiment +stage=s0_reproducibility
+#
+# Composition: each group below has a default. Override at the CLI:
+#   python -m src.cli.run_experiment +experiment=T1-A_granularity train.seed=1
+
+defaults:
+  - data: default
+  - model: default
+  - train: default
+  - eval: default
+  - _self_
+
+# Top-level run identity (override per experiment)
+experiment_id: unset
+stage_or_tier: exploratory
+
+# Hydra writes outputs under here
+hydra:
+  run:
+    dir: artifacts/runs/${now:%Y%m%d_%H%M%S}_${experiment_id}_s${train.seed}
+  sweep:
+    dir: artifacts/runs/${now:%Y%m%d_%H%M%S}_${experiment_id}_sweep
+    subdir: s${train.seed}
+  job:
+    chdir: false

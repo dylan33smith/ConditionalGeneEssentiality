@@ -1,0 +1,16 @@
+# @package _global_
+# T1-C — Unknown Handling Test. Hypothesis H-ENC-03.
+
+experiment_id: T1-C_unknown_handling
+stage_or_tier: T1
+
+experiment:
+  hypothesis: H-ENC-03
+  arms:
+    - unk_policy: zero_fill
+    - unk_policy: explicit_unk_with_mask
+  seeds: [0, 1, 2]
+  promotion_rule:
+    additive_baseline_gate: required
+    primary: [rmse_decrease, mae_decrease]
+    secondary: novelty_bucket_non_degradation

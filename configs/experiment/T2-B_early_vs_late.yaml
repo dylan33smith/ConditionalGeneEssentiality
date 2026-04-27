@@ -1,0 +1,16 @@
+# @package _global_
+# T2-B — Early vs Late Fusion. Hypothesis H-FUSE-02.
+
+experiment_id: T2-B_early_vs_late
+stage_or_tier: T2
+
+experiment:
+  hypothesis: H-FUSE-02
+  arms:
+    - fusion: early_concat
+    - fusion: two_tower_merge
+  seeds: [0, 1, 2]
+  promotion_rule:
+    additive_baseline_gate: required
+    primary: [rmse_decrease, mae_decrease]
+    secondary: novelty_bucket_non_degradation

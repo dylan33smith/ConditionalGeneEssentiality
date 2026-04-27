@@ -1,0 +1,18 @@
+# @package _global_
+# S4 — Feature Contract. Fits train-only vocab/scalers; defines the immutable schema.
+
+experiment_id: S4_feature_contract
+stage_or_tier: S4
+
+stage:
+  s4:
+    locked_protocol_path: data_contract/splits/locked_protocol.yaml
+    include_in_ml_only: true
+    unk_token: <UNK>
+    unk_index: 0
+    trimming:
+      prevalence_threshold: 0.001   # train-only, frozen here
+    numeric_transforms:
+      Amount: log1p   # default; T1-B may sweep
+    output_feature_contract: data_contract/feature_contract.yaml
+    output_artifact_dir: data_contract/preprocessing

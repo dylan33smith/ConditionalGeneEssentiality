@@ -1,0 +1,13 @@
+# S4 emits this. Concrete artifact ids point at fitted vocab/scalers under
+# data_contract/preprocessing/<artifact_id>/.
+status: pending
+emitted_by: stage4
+canonical_id_vocab_artifact: null
+canonical_id_to_index_artifact: null
+media_to_multihot_contract: null
+representation_mode_tag: null
+numeric_field_registry: {}
+metadata_field_registry: {}
+trimming_policy:
+  prevalence_threshold: null
+  fit_on_train_only: true

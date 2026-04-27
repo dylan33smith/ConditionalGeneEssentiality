@@ -1,0 +1,6 @@
+# S1 emits this. List of candidate val/test protocols for evaluation in S2.
+# Each entry must include val_org_ids, test_org_ids, chemistry_overlap_seen_rate,
+# support metrics, and a rationale.
+status: pending
+emitted_by: stage1
+candidates: []   # filled by src/experiments/stage1/run_data_characterization.py

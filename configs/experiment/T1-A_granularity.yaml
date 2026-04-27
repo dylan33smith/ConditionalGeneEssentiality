@@ -1,0 +1,17 @@
+# @package _global_
+# T1-A — Granularity Test. Hypothesis H-ENC-01.
+# Comparison: media-id-only vs canonical-ID multihot.
+
+experiment_id: T1-A_granularity
+stage_or_tier: T1
+
+experiment:
+  hypothesis: H-ENC-01
+  arms:
+    - condition_encoder: media_id
+    - condition_encoder: multihot_canonical_id
+  seeds: [0, 1, 2]
+  promotion_rule:
+    additive_baseline_gate: required
+    primary: [rmse_decrease, mae_decrease]
+    secondary: spearman_non_degradation

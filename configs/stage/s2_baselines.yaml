@@ -1,0 +1,20 @@
+# @package _global_
+# S2 — Evaluation Trustworthiness.
+# Computes the full null-baseline suite for every candidate protocol from S1.
+
+experiment_id: S2_baselines
+stage_or_tier: S2
+
+stage:
+  s2:
+    candidate_protocols_path: data_contract/splits/candidate_protocols.yaml
+    baselines_to_compute:
+      - global_train_mean
+      - per_condition_mean
+      - per_organism_mean
+      - additive_baseline       # H-BASE-01
+      - embedding_nn
+    compute_metric_power_report: true
+    bootstrap_samples: 1000
+    output_baselines_path: artifacts/baselines/baselines_per_protocol.json
+    output_eval_policy_path: data_contract/policy/eval_policy.yaml

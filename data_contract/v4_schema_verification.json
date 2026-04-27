@@ -1,0 +1,11 @@
+{
+  "status": "pending",
+  "emitted_by": "stage0",
+  "workbook_path": "data/media_composition_v4.xlsx",
+  "workbook_sha256": null,
+  "sheet_name": "Media_Components_ML",
+  "verified_columns": null,
+  "verified_row_count": null,
+  "decomposition_type_values": null,
+  "verified_at": null
+}

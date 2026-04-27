@@ -1,0 +1,13 @@
+# @package _global_
+# S1 — Data Characterization. Pure description; emits candidate protocols.
+
+experiment_id: S1_data_characterization
+stage_or_tier: S1
+
+stage:
+  s1:
+    output_candidate_protocols: data_contract/splits/candidate_protocols.yaml
+    output_report: research_log/tier_reports/s1_data_characterization.md
+    homology_diagnostic_threshold_sigma: 0.5
+    n_candidate_protocols: 5
+    min_org_support_rows: 10000   # candidate threshold; adjusted by analysis

@@ -1,0 +1,17 @@
+# S2 emits this. Frozen evaluation policies reused by all later models.
+status: pending
+emitted_by: stage2
+spearman_eligibility:
+  m: 5
+  v_min_method: cross_gene_iqr_p25   # 25th percentile of cross-gene IQR on locked val
+  v_min_value: null                  # filled after S3 lock
+  policy_id: null
+co_primary_metrics: [rmse, mae]
+spearman_role: null                  # "primary" | "diagnostic_only", decided by S2 power report
+gain_thresholds: {}                  # per-protocol meaningful-gain thresholds
+null_baselines_required:
+  - global_train_mean
+  - per_condition_mean
+  - per_organism_mean
+  - additive_baseline
+  - embedding_nn

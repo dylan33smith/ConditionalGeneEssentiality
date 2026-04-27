@@ -1,0 +1,17 @@
+# @package _global_
+# S0 — reproducibility & governance smoke pipeline.
+# Verifies the wiring works end-to-end with a no-op model that predicts the global mean.
+
+experiment_id: S0_smoke
+stage_or_tier: S0
+
+# Override training to a no-op
+train:
+  epochs: 0
+  batch_size: 4096
+
+stage:
+  s0:
+    verify_v4_schema: true
+    write_run_manifest: true
+    require_smoke_reproducibility: true

@@ -1,0 +1,14 @@
+# @package eval
+# Evaluation policy. Spearman variability threshold pinned in S2 (REFACTORPLAN §7 S2).
+spearman_min_conditions: 5
+spearman_min_variability_method: cross_gene_iqr_p25
+spearman_min_variability_value: null   # filled by S2 output, frozen before any tier
+compute_null_baselines: true
+null_baselines:
+  - global_train_mean
+  - per_condition_mean
+  - per_organism_mean
+  - additive_baseline       # required by H-BASE-01
+  - embedding_nn
+co_primary_metrics: [rmse, mae]
+spearman_role: diagnostic_only   # overridden to "primary" by S2 power evidence if applicable

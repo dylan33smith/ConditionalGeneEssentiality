@@ -1,0 +1,15 @@
+# @package _global_
+# T4 — Target Normalization Lock. Hypothesis H-TARGET-01.
+
+experiment_id: T4_target_normalization
+stage_or_tier: T4
+
+experiment:
+  hypothesis: H-TARGET-01
+  arms:
+    - target: raw
+    - target: per_experiment_zscore
+  seeds: [0, 1, 2]
+  promotion_rule:
+    require_raw_scale_improvement: true   # H-TARGET-01 promotion guardrail
+    primary: [rmse_decrease, mae_decrease]

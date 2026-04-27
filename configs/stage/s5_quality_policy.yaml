@@ -1,0 +1,16 @@
+# @package _global_
+# S5 — Training-Recipe Lock. Locks row-quality and organism-pool policies.
+
+experiment_id: S5_quality_policy
+stage_or_tier: S5
+
+stage:
+  s5:
+    feature_contract_path: data_contract/feature_contract.yaml
+    arms:
+      - row_quality_policy: weighted_full
+        organism_pool: full
+      - row_quality_policy: strict_slice
+        organism_pool: full
+    seeds: [0, 1, 2]
+    output_quality_policy: data_contract/policy/quality_policy.yaml

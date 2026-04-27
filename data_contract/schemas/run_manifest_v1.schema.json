@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "run_manifest_v1.schema.json",
+  "title": "Run Manifest v1",
+  "description": "Schema every run output must conform to. Enforces the data-contract hard gate (REFACTORPLAN §3).",
+  "type": "object",
+  "required": [
+    "run_id",
+    "experiment_id",
+    "stage_or_tier",
+    "git_sha",
+    "code_sha",
+    "seed",
+    "data_contract_checksums",
+    "split_protocol",
+    "scored_rowset",
+    "metrics",
+    "null_baseline_deltas",
+    "unknown_category_rate",
+    "preprocessing_artifact_id",
+    "config_snapshot_path"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "description": "Unique id for this run, e.g. <timestamp>_<experiment_id>_s<seed>_<short_sha>"
+    },
+    "experiment_id": {
+      "type": "string",
+      "description": "Identifier from the registry, e.g. T1-A, S0-smoke, T2-C"
+    },
+    "stage_or_tier": {
+      "type": "string",
+      "enum": ["S0", "S1", "S2", "S3", "S4", "S5", "T1", "T2", "T3", "T4", "exploratory"]
+    },
+    "git_sha": {"type": "string", "minLength": 7},
+    "code_sha": {"type": "string"},
+    "seed": {"type": "integer"},
+    "data_contract_checksums": {
+      "type": "object",
+      "required": [
+        "feba_db_sha256",
+        "workbook_v4_sha256",
+        "workbook_v4_sheet",
+        "embedding_manifest_id",
+        "canonical_manifest_id"
+      ],
+      "properties": {
+        "feba_db_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "workbook_v4_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "workbook_v4_sheet": {"type": "string", "const": "Media_Components_ML"},
+        "embedding_manifest_id": {"type": "string"},
+        "canonical_manifest_id": {"type": "string"}
+      }
+    },
+    "split_protocol": {
+      "type": "object",
+      "required": ["protocol_id", "split_manifest_sha256"],
+      "properties": {
+        "protocol_id": {"type": "string"},
+        "split_manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "preprocessing_artifact_id": {"type": "string"},
+    "config_snapshot_path": {"type": "string", "description": "Hydra .hydra/config.yaml relative path"},
+    "scored_rowset": {
+      "type": "object",
+      "required": ["scored_rowset_hash", "n_rows_scored", "n_genes_eligible", "inclusion_counters"],
+      "properties": {
+        "scored_rowset_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "n_rows_scored": {"type": "integer", "minimum": 0},
+        "n_genes_eligible": {"type": "integer", "minimum": 0},
+        "inclusion_counters": {
+          "type": "object",
+          "required": ["pre_join", "post_join", "post_filter", "post_split"],
+          "properties": {
+            "pre_join":   {"type": "integer", "minimum": 0},
+            "post_join":  {"type": "integer", "minimum": 0},
+            "post_filter":{"type": "integer", "minimum": 0},
+            "post_split": {"type": "integer", "minimum": 0}
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["rmse", "mae"],
+      "properties": {
+        "rmse": {"type": "number"},
+        "mae":  {"type": "number"},
+        "within_gene_spearman": {
+          "type": ["object", "null"],
+          "properties": {
+            "mean": {"type": "number"},
+            "n_genes_used": {"type": "integer"},
+            "eligibility_policy_id": {"type": "string"}
+          }
+        }
+      }
+    },
+    "null_baseline_deltas": {
+      "type": "object",
+      "description": "Delta of model metric vs each null baseline (positive = model better).",
+      "required": ["global_train_mean", "additive_baseline"],
+      "properties": {
+        "global_train_mean":   {"$ref": "#/$defs/baseline_delta"},
+        "per_condition_mean":  {"$ref": "#/$defs/baseline_delta"},
+        "per_organism_mean":   {"$ref": "#/$defs/baseline_delta"},
+        "additive_baseline":   {"$ref": "#/$defs/baseline_delta"},
+        "embedding_nn":        {"$ref": "#/$defs/baseline_delta"}
+      }
+    },
+    "unknown_category_rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "leakage_checks": {
+      "type": "object",
+      "properties": {
+        "vocab_train_only_pass": {"type": "boolean"},
+        "scaler_train_only_pass": {"type": "boolean"},
+        "split_overlap_pass": {"type": "boolean"}
+      }
+    },
+    "notes": {"type": "string"}
+  },
+  "$defs": {
+    "baseline_delta": {
+      "type": "object",
+      "required": ["baseline_rmse", "baseline_mae", "delta_rmse", "delta_mae"],
+      "properties": {
+        "baseline_rmse": {"type": "number"},
+        "baseline_mae":  {"type": "number"},
+        "delta_rmse":    {"type": "number"},
+        "delta_mae":     {"type": "number"}
+      }
+    }
+  }
+}

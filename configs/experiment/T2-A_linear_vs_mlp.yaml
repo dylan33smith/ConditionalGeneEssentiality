@@ -1,0 +1,15 @@
+# @package _global_
+# T2-A — Linear vs Shallow MLP Fusion. Hypothesis H-FUSE-01.
+
+experiment_id: T2-A_linear_vs_mlp
+stage_or_tier: T2
+
+experiment:
+  hypothesis: H-FUSE-01
+  arms:
+    - fusion: linear_head
+    - fusion: shallow_mlp_head
+  seeds: [0, 1, 2]
+  promotion_rule:
+    additive_baseline_gate: required
+    primary: [rmse_decrease, mae_decrease]

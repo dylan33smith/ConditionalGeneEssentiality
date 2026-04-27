@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "condition_features.schema.json",
+  "title": "Condition Features (Media_Components_ML v4)",
+  "description": "Schema for the authoritative condition source. Verified in S0.",
+  "type": "object",
+  "required": ["workbook_path", "sheet_name", "required_columns"],
+  "properties": {
+    "workbook_path": {
+      "type": "string",
+      "const": "data/media_composition_v4.xlsx"
+    },
+    "sheet_name": {
+      "type": "string",
+      "const": "Media_Components_ML"
+    },
+    "required_columns": {
+      "type": "array",
+      "items": {"type": "string"},
+      "const": [
+        "Media",
+        "Canonical_ID",
+        "Compound_name",
+        "Chemical_form",
+        "Source_row_component",
+        "Decomposition_type",
+        "Ingredient_source",
+        "Include_in_ml",
+        "Source_dataset",
+        "Source_url"
+      ]
+    },
+    "row_count_lower_bound": {
+      "type": "integer",
+      "const": 4000,
+      "description": "Verified: workbook contains >4,000 component rows."
+    },
+    "representation_mode_mapping": {
+      "type": "object",
+      "description": "How Decomposition_type maps to representation_mode.",
+      "properties": {
+        "physical": {"type": "array", "items": {"type": "string"}},
+        "mix":      {"type": "array", "items": {"type": "string"}},
+        "in_silico":{"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}
