@@ -232,14 +232,14 @@ def fig_15_embedding_coverage_by_org(emb_cov: pd.DataFrame) -> None:
 
 
 def fig_16_canonical_id_prevalence_distribution(ubiquity: pd.DataFrame) -> None:
-    df = ubiquity.copy()
-    df["_"] = "all"
-    R.save_distribution_per_group(
-        df, "n_organisms", "_", kind="violin",
-        title="Distribution of Canonical_ID prevalence (number of organisms using each)",
+    R.save_histogram(
+        ubiquity["n_organisms"].values,
+        # 48 organisms total → one bin per integer value 1..48
+        bins=np.arange(0.5, 49.5, 1.0),
+        title="Distribution of Canonical_ID prevalence: how many organisms each chemical appears in",
         path=fig_dir() / "16_canonical_id_prevalence_distribution.png",
-        sort_groups_by="name",
-        ylabel="number of organisms",
+        xlabel="number of organisms using this Canonical_ID",
+        ylabel="number of chemicals",
     )
 
 
@@ -347,14 +347,13 @@ def fig_21_representation_mode_per_protocol(candidates: list[dict]) -> None:
 # ---------------------------------------------------------------------------
 
 def fig_22_chemical_ubiquity_histogram(ubiquity: pd.DataFrame) -> None:
-    df = ubiquity[["n_organisms"]].copy()
-    df["_"] = "all_chemicals"
-    R.save_distribution_per_group(
-        df, "n_organisms", "_", kind="violin",
-        title="Cross-organism reuse: how many organisms use each Canonical_ID",
+    R.save_histogram(
+        ubiquity["n_organisms"].values,
+        bins=np.arange(0.5, 49.5, 1.0),
+        title="Chemical ubiquity: how many organisms use each Canonical_ID",
         path=fig_dir() / "22_chemical_ubiquity_histogram.png",
-        sort_groups_by="name",
-        ylabel="number of organisms using this chemical",
+        xlabel="number of organisms using this chemical",
+        ylabel="number of chemicals",
     )
 
 

@@ -96,6 +96,51 @@ def save_heatmap(
     )
 
 
+def save_histogram(
+    values: np.ndarray | pd.Series,
+    *,
+    bins: int | Sequence[float] | str = "auto",
+    title: str,
+    path: Path,
+    xlabel: Optional[str] = None,
+    ylabel: str = "count",
+    log_y: bool = False,
+    annotate_summary: bool = True,
+) -> None:
+    """Save a 1-D histogram as PNG + CSV.
+
+    Use cases: distributions of a single integer- or real-valued quantity
+    (e.g. number of organisms each chemical appears in).
+
+    CSV format: per-bin table with bin_left, bin_right, count.
+    """
+    path = _ensure_parent(Path(path))
+    arr = np.asarray(pd.Series(values).dropna(), dtype=float)
+    fig, ax = plt.subplots(figsize=(8, 5))
+    counts, edges, _ = ax.hist(arr, bins=bins, edgecolor="white", linewidth=0.5,
+                                color="C0", alpha=0.85)
+    if log_y:
+        ax.set_yscale("log")
+    ax.set_xlabel(xlabel or "value")
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.grid(axis="y", alpha=0.3)
+    if annotate_summary and len(arr) > 0:
+        median = float(np.median(arr))
+        mean = float(np.mean(arr))
+        ax.axvline(median, color="C3", lw=1, ls="--", alpha=0.8,
+                   label=f"median={median:g}")
+        ax.axvline(mean, color="C2", lw=1, ls=":", alpha=0.8,
+                   label=f"mean={mean:.2f}")
+        ax.legend(fontsize=8)
+    _save_and_close(fig, path)
+    pd.DataFrame({
+        "bin_left": edges[:-1],
+        "bin_right": edges[1:],
+        "count": counts.astype(int),
+    }).to_csv(_csv_sidecar(path), index=False)
+
+
 def save_distribution_per_group(
     df: pd.DataFrame,
     value_col: str,
