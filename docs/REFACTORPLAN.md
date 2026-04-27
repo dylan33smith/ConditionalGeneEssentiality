@@ -39,6 +39,7 @@ ledger) are referenced but not read end-to-end.
 | L4 | Co-primary metrics: RMSE + MAE. Within-gene Spearman is conditional on Stage-2 power evidence. | Tn-seq fit residuals are heavy-tailed; either-or reporting hides regimes. |
 | L5 | Hydra is the config framework. | Composable YAML is required; ad-hoc loaders fragment quickly across stages and tiers. |
 | L6 | Project structure follows §9. Logic lives only in `src/`. | Prevents code drift across tiers. |
+| L7 | **Scope of generalization claim:** "*Given a gene and a growth medium drawn from a known chemistry vocabulary, our model predicts conditional gene essentiality — including for organisms not seen during training, and conditions structured differently from those the gene appeared in during training.*" Locked 2026-04-27. | S1 figure 17 confirmed all 4 candidate protocols are ≥95% chemistry-seen at the Canonical_ID level. v4 has only ~112 Canonical_IDs (mostly widely shared) so the data cannot honestly support a "generalizes to any chemistry" claim. The narrower scope is testable, useful, and publishable. Going beyond requires fingerprint encoders or Canonical_ID-level holdouts (see §12 Deferred Experiments). |
 
 ## 3. Authoritative Data Scope
 
@@ -656,5 +657,43 @@ Each helper writes both the PNG and its sibling CSV.
 A stage gate cannot pass with figures missing. Tier reports without figures
 fail the promotion rubric §5. The decision-ledger entry for a stage gate must
 list each required figure path and confirm it exists.
+
+---
+
+## 12. Deferred Experiments (Future Work, Not Currently Scheduled)
+
+These ideas are tracked here so they are not forgotten. None are scheduled.
+Each has a one-line trigger that would justify scheduling it.
+
+### Chemistry-axis generalization
+
+| Experiment | What it tests | Trigger to schedule |
+|---|---|---|
+| **Chemical-fingerprint encoders** | Replace multihot Canonical_ID with structural fingerprints (Morgan / RDKit / RDF). Lets the model represent unseen chemicals via shared substructure with seen chemicals — i.e., enables "generalize to novel chemistry" claims that L7 currently locks out. | A reviewer asks for novel-chemistry generalization, OR T1+ results plateau and we suspect multihot is the bottleneck. |
+| **Canonical_ID-level holdouts** | Hold out specific Canonical_IDs in addition to organisms. Forces the model to predict for chemistry it has never seen. Requires careful construction because holding out water/glucose breaks every medium. | Same triggers as above, especially if fingerprint encoders are added (the two pair naturally). |
+| **External validation set** | Evaluate on a Tn-seq dataset from a separate publication that uses media not in v4. Ground-truth test of L7's "known media" boundary. | Once locked architecture is published-ready and we want to bound external validity. |
+
+### Training-paradigm extensions
+
+| Experiment | What it tests | Trigger to schedule |
+|---|---|---|
+| **Balanced sampling** (`H-TRAIN-01`, dropped from v2) | Up- or down-weight rows so each organism / each condition contributes equal mass to gradient updates. | T1–T3 plateau and per-organism analysis shows the model is memorizing high-mass orgs. |
+| **Curriculum training** (`H-TRAIN-02`, dropped from v2) | Train on quality-filtered or "easy" rows first, then add harder rows. | Same trigger as H-TRAIN-01. |
+| **Paired-dropout supervision** (`H-PAIR-01`, dropped from v2) | Use `_no_X` / `_minus_X` media pairs as causal-delta supervision (Δfit per dropped component). | Stage 1 paired-dropout audit (currently optional) finds enough valid within-organism pairs to support this paradigm. |
+| **Predictive uncertainty** (`H-UQ-01`, dropped from v2) | Quantile regression / conformal prediction for per-row prediction intervals. | Post-T4, if downstream users (biologists) explicitly need calibrated uncertainty. |
+
+### Embedding fine-tune
+
+| Experiment | What it tests | Trigger to schedule |
+|---|---|---|
+| **Re-embed the 2,484 missing genes** | Obtain a more complete `aaseqs` (currently has zero coverage of these genes — confirmed 2026-04-27, not just an embedding gap). | New aaseqs dump becomes available; or fallback (mean-of-org) is empirically tested and rejected. |
+| **Conditional embedding fine-tune** (`H-EMB-01`, conditional T3-C) | Already scheduled as conditional T3-C; included here for visibility. Fine-tune top-N ProteomeLM layers if T3-A/B plateau. | T3-A/B near-tie with no clear capacity winner. |
+
+### Process
+
+To schedule a deferred experiment: open a new decision-ledger entry under
+`research_log/decisions/<owning_stage_or_tier>/`, copy the row from this section
+into the entry's "assumption under test," remove it from this list, and slot
+the experiment into the appropriate stage/tier spec.
 
 

@@ -69,6 +69,17 @@ python -m src.cli.run_experiment +experiment=T1-A_granularity
 python -m src.cli.run_experiment +experiment=T1-A_granularity train.seed=0,1,2 -m
 ```
 
+## Scope of generalization claim (locked, REFACTORPLAN L7)
+
+> "Given a gene and a growth medium drawn from a known chemistry vocabulary, our
+> model predicts conditional gene essentiality — including for organisms not seen
+> during training, and conditions structured differently from those the gene
+> appeared in during training."
+
+S1 confirmed v4 chemistry overlap is ≥95% in every candidate protocol. We do
+NOT claim "generalizes to any chemistry." Going beyond requires fingerprint
+encoders or Canonical_ID-level holdouts (REFACTORPLAN §12, Deferred Experiments).
+
 ## Hard rules (clean-room charter)
 
 - **No tier or stage promotion** without pre-declared success criteria + decision-ledger entry.

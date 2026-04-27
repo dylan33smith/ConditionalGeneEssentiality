@@ -397,11 +397,21 @@ beyond the global mean and can be dropped without harm.**
 **D. Embedding coverage and the "unusable rows" question.**
 Per fig 15: ~98.7% of fitness rows have embeddings. The dropped ~1.3% have no
 ProteomeLM vector for the gene → genuinely unusable for an embedding-based model.
-Two recovery options exist but are out of scope: (a) compute embeddings for the
-missing genes from `data/raw/aaseqs`, (b) use a fallback embedding (mean of
-the organism's known genes). **Pre-S2 decision: inner-join and drop. Log
-per-organism uncovered fraction in run manifest; flag azobra (~13.6% loss)
-as the worst case.**
+
+**Investigation (2026-04-27): aaseqs and embeddings are 1:1.** Both contain
+exactly 221,030 gene_keys; every aaseqs entry has an embedding and vice versa.
+The 2,484 fitness genes missing embeddings are **also absent from aaseqs**
+— they have no protein sequence in our database at all. Likely causes: Tn-seq
+insertions in non-protein-coding regions (intergenic, RNAs, pseudogenes),
+genome-version drift between the fitness data and the aaseqs dump, or
+upstream pipeline gaps. There is no recovery path from current data;
+re-running ProteomeLM on aaseqs would produce the same 221,030 embeddings
+we already have.
+
+**Pre-S2 decision: inner-join and drop. Log per-organism uncovered fraction
+in run manifest; flag azobra (~13.6% loss) as the worst case.** Recovery
+would require either obtaining a more complete aaseqs dump (out of scope)
+or accepting fallback embeddings (deferred).
 
 **E. Chemistry coverage and the "unmapped media" question.**
 Per fig 14: significant per-organism variation in fraction-of-media-mapped
