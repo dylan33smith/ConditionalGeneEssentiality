@@ -51,3 +51,48 @@ def test_metrics_shape():
     assert m["rmse"] == pytest.approx(0.0)
     assert m["mae"] == pytest.approx(0.0)
     assert m["n_rows"] == 3
+
+
+def test_vectorized_recovers_additive_at_moderate_scale():
+    """Regression test: vectorized fit recovers truly-additive synthetic data
+    at 100k rows / 500 genes / 200 conds with low noise."""
+    rng = np.random.default_rng(42)
+    n_genes, n_conds, n_rows = 500, 200, 100_000
+    gene_idx = rng.integers(0, n_genes, n_rows)
+    cond_idx = rng.integers(0, n_conds, n_rows)
+    alpha = rng.normal(0, 0.5, n_genes)
+    beta = rng.normal(0, 0.3, n_conds)
+    fit = 0.5 + alpha[gene_idx] + beta[cond_idx] + rng.normal(0, 0.05, n_rows)
+    g_keys = np.array([f"g{i}" for i in gene_idx])
+    c_keys = np.array([f"c{i}" for i in cond_idx])
+
+    res = fit_additive_baseline(fit, g_keys, c_keys, max_iters=20, tol=1e-4)
+    assert res.converged, f"failed to converge in 20 iters (got {res.n_iters})"
+
+    # Recovery vs noiseless ground truth on a held-out sample
+    val_idx = rng.integers(0, n_genes, 5_000)
+    val_cidx = rng.integers(0, n_conds, 5_000)
+    truth = 0.5 + alpha[val_idx] + beta[val_cidx]
+    pred = res.predict(np.array([f"g{i}" for i in val_idx]),
+                       np.array([f"c{i}" for i in val_cidx]))
+    rmse = float(np.sqrt(np.mean((pred - truth) ** 2)))
+    assert rmse < 0.05, f"recovery RMSE too high: {rmse}"
+
+
+def test_vectorized_predict_handles_unseen_keys():
+    """predict() must use 0-fill for unseen genes/conds (cold-start fallback)."""
+    rng = np.random.default_rng(0)
+    fit = rng.normal(0, 1, 200)
+    g = np.array(["g1"] * 100 + ["g2"] * 100)
+    c = np.array(["c1"] * 60 + ["c2"] * 80 + ["c3"] * 60)
+    res = fit_additive_baseline(fit, g, c, max_iters=20)
+
+    pred = res.predict(np.array(["g_unseen", "g1", "g2"]),
+                       np.array(["c_unseen", "c1", "c_unseen"]))
+    assert pred[0] == pytest.approx(res.intercept)                     # both unseen
+    assert pred[1] == pytest.approx(
+        res.intercept + res.gene_effect["g1"] + res.condition_effect["c1"]
+    )
+    assert pred[2] == pytest.approx(
+        res.intercept + res.gene_effect["g2"]
+    )

@@ -23,6 +23,8 @@ build/
 
 ## Jupyter
 .ipynb_checkpoints/
+## Notebook scratch files at repo root (e.g. testing.ipynb)
+/*.ipynb
 
 ## Environment / IDE
 .env
