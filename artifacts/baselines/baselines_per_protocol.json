@@ -1,0 +1,524 @@
+{
+  "schema_version": "v1",
+  "emitted_by": "stage2",
+  "n_bootstrap": 1000,
+  "n_permutations": 200,
+  "candidates": {
+    "largest_by_rows": {
+      "protocol_id": "largest_by_rows",
+      "val_org_ids": [
+        "Btheta"
+      ],
+      "test_org_ids": [
+        "DvH"
+      ],
+      "n_train_rows": 23231239,
+      "n_val_rows": 2104545,
+      "baselines": {
+        "global_train_mean": {
+          "rmse": 0.5668274976346473,
+          "mae": 0.3238944676448617,
+          "n_rows": 2104545,
+          "fallback_count": 0,
+          "fallback_rate": 0.0,
+          "train_mean": -0.09637992149029137
+        },
+        "per_condition_mean": {
+          "rmse": 0.5742223658095601,
+          "mae": 0.3367677234720477,
+          "n_rows": 2104545,
+          "fallback_count": 624470,
+          "fallback_rate": 0.29672447013487474
+        },
+        "per_organism_mean": {
+          "rmse": 0.5668274976346473,
+          "mae": 0.3238944676448617,
+          "n_rows": 2104545,
+          "fallback_count": 2104545,
+          "fallback_rate": 1.0
+        },
+        "additive_baseline": {
+          "rmse": 0.5675101606156486,
+          "mae": 0.3256738396380067,
+          "n_rows": 2104545,
+          "n_iters": 8,
+          "converged": true
+        },
+        "embedding_nn": {
+          "rmse": 0.6059831477646005,
+          "mae": 0.3510419955459422,
+          "n_rows": 2104545,
+          "fallback_count": 2104545,
+          "fallback_rate": 1.0,
+          "no_embedding_count": 519,
+          "no_embedding_rate": 0.0002466091245376079
+        }
+      },
+      "power": {
+        "m": 5,
+        "v_min": 0.23784790395769634,
+        "v_min_method": "cross_gene_iqr_p25",
+        "eligibility_curve": [
+          {
+            "m": 3,
+            "n_genes_eligible": 4055
+          },
+          {
+            "m": 5,
+            "n_genes_eligible": 4055
+          },
+          {
+            "m": 8,
+            "n_genes_eligible": 4055
+          },
+          {
+            "m": 12,
+            "n_genes_eligible": 4055
+          },
+          {
+            "m": 20,
+            "n_genes_eligible": 4055
+          }
+        ],
+        "bootstrap_ci": {
+          "mean": 0.009787603502708632,
+          "ci_low": 0.0067655080616188645,
+          "ci_high": 0.012824255424360193,
+          "n_genes_used": 3041,
+          "n_bootstrap": 1000
+        },
+        "permutation_null": {
+          "null_p95": 0.0013251482323877238,
+          "null_p99": 0.001503847670698197,
+          "null_mean": 6.352567769641094e-05,
+          "null_std": 0.0007628918492744148,
+          "n_genes_used": 3041,
+          "n_permutations": 200
+        },
+        "spearman_role": "primary"
+      },
+      "noise_diagnostics": {
+        "additive_residual_quantiles": {
+          "p1": -2.5668323376636137,
+          "p5": -0.8018660193973824,
+          "p25": -0.12473294989481382,
+          "p50": 0.07496943235522517,
+          "p75": 0.24352212291812644,
+          "p95": 0.5984316280520957,
+          "p99": 1.0389773633590222
+        },
+        "per_organism_residual": [
+          {
+            "orgId": "Btheta",
+            "std": 0.5675090284604091,
+            "iqr": 0.36825507281294023
+          }
+        ]
+      },
+      "meaningful_gain_thresholds": {
+        "rmse": 0.005,
+        "mae": 0.005,
+        "rule": "max(0.005_floor, 0.5 * |global_train_mean - best_baseline|); best_baseline = min RMSE/MAE among {per_condition_mean, per_organism_mean, additive_baseline, embedding_nn}",
+        "best_baseline_rmse": 0.5668274976346473,
+        "best_baseline_mae": 0.3238944676448617,
+        "global_rmse": 0.5668274976346473,
+        "global_mae": 0.3238944676448617,
+        "rmse_gap": 0.0,
+        "mae_gap": 0.0
+      }
+    },
+    "high_overlap_easy": {
+      "protocol_id": "high_overlap_easy",
+      "val_org_ids": [
+        "Putida",
+        "psRCH2"
+      ],
+      "test_org_ids": [
+        "pseudo3_N2E3"
+      ],
+      "n_train_rows": 23744263,
+      "n_val_rows": 2605550,
+      "baselines": {
+        "global_train_mean": {
+          "rmse": 0.5865700160852934,
+          "mae": 0.28878297162582267,
+          "n_rows": 2605550,
+          "fallback_count": 0,
+          "fallback_rate": 0.0,
+          "train_mean": -0.09950233002331775
+        },
+        "per_condition_mean": {
+          "rmse": 0.5874852757693048,
+          "mae": 0.29034335576478515,
+          "n_rows": 2605550,
+          "fallback_count": 1742747,
+          "fallback_rate": 0.6688595498071425
+        },
+        "per_organism_mean": {
+          "rmse": 0.5865700160852934,
+          "mae": 0.28878297162582267,
+          "n_rows": 2605550,
+          "fallback_count": 2605550,
+          "fallback_rate": 1.0
+        },
+        "additive_baseline": {
+          "rmse": 0.5873056597363393,
+          "mae": 0.2900513151007848,
+          "n_rows": 2605550,
+          "n_iters": 8,
+          "converged": true
+        },
+        "embedding_nn": {
+          "rmse": 0.6250828588750862,
+          "mae": 0.324736358171855,
+          "n_rows": 2605550,
+          "fallback_count": 853203,
+          "fallback_rate": 0.32745600736888564,
+          "no_embedding_count": 4100,
+          "no_embedding_rate": 0.0015735641227380016
+        }
+      },
+      "power": {
+        "m": 5,
+        "v_min": 0.18547949303861722,
+        "v_min_method": "cross_gene_iqr_p25",
+        "eligibility_curve": [
+          {
+            "m": 3,
+            "n_genes_eligible": 8127
+          },
+          {
+            "m": 5,
+            "n_genes_eligible": 8127
+          },
+          {
+            "m": 8,
+            "n_genes_eligible": 8127
+          },
+          {
+            "m": 12,
+            "n_genes_eligible": 8127
+          },
+          {
+            "m": 20,
+            "n_genes_eligible": 8127
+          }
+        ],
+        "bootstrap_ci": {
+          "mean": -0.0014219954400926029,
+          "ci_low": -0.0030992765407452517,
+          "ci_high": 0.0003176482209937979,
+          "n_genes_used": 6095,
+          "n_bootstrap": 1000
+        },
+        "permutation_null": {
+          "null_p95": 0.00116879715885125,
+          "null_p99": 0.0015799776955435242,
+          "null_mean": 1.9372558591623684e-05,
+          "null_std": 0.0006529161787975457,
+          "n_genes_used": 6095,
+          "n_permutations": 200
+        },
+        "spearman_role": "primary"
+      },
+      "noise_diagnostics": {
+        "additive_residual_quantiles": {
+          "p1": -2.6060815269260003,
+          "p5": -0.608123453137399,
+          "p25": -0.06217559375285156,
+          "p50": 0.0882363114687684,
+          "p75": 0.22090644752676464,
+          "p95": 0.5359832257310312,
+          "p99": 1.0175667457582516
+        },
+        "per_organism_residual": [
+          {
+            "orgId": "Putida",
+            "std": 0.5503718619337192,
+            "iqr": 0.23584074111096054
+          },
+          {
+            "orgId": "psRCH2",
+            "std": 0.628760707034225,
+            "iqr": 0.35841903999324876
+          }
+        ]
+      },
+      "meaningful_gain_thresholds": {
+        "rmse": 0.005,
+        "mae": 0.005,
+        "rule": "max(0.005_floor, 0.5 * |global_train_mean - best_baseline|); best_baseline = min RMSE/MAE among {per_condition_mean, per_organism_mean, additive_baseline, embedding_nn}",
+        "best_baseline_rmse": 0.5865700160852934,
+        "best_baseline_mae": 0.28878297162582267,
+        "global_rmse": 0.5865700160852934,
+        "global_mae": 0.28878297162582267,
+        "rmse_gap": 0.0,
+        "mae_gap": 0.0
+      }
+    },
+    "low_overlap_stress": {
+      "protocol_id": "low_overlap_stress",
+      "val_org_ids": [
+        "SynE"
+      ],
+      "test_org_ids": [
+        "Magneto"
+      ],
+      "n_train_rows": 27049794,
+      "n_val_rows": 244971,
+      "baselines": {
+        "global_train_mean": {
+          "rmse": 0.9370312362177168,
+          "mae": 0.5353157391347653,
+          "n_rows": 244971,
+          "fallback_count": 0,
+          "fallback_rate": 0.0,
+          "train_mean": -0.09525563447921596
+        },
+        "per_condition_mean": {
+          "rmse": 0.9385705982248254,
+          "mae": 0.5366338801331014,
+          "n_rows": 244971,
+          "fallback_count": 1899,
+          "fallback_rate": 0.007751937984496124
+        },
+        "per_organism_mean": {
+          "rmse": 0.9370312362177168,
+          "mae": 0.5353157391347653,
+          "n_rows": 244971,
+          "fallback_count": 244971,
+          "fallback_rate": 1.0
+        },
+        "additive_baseline": {
+          "rmse": 0.9388191123024736,
+          "mae": 0.5364057915288253,
+          "n_rows": 244971,
+          "n_iters": 6,
+          "converged": true
+        },
+        "embedding_nn": {
+          "rmse": 0.9793434555022886,
+          "mae": 0.5798568596176893,
+          "n_rows": 244971,
+          "fallback_count": 244971,
+          "fallback_rate": 1.0,
+          "no_embedding_count": 129,
+          "no_embedding_rate": 0.000526592943654555
+        }
+      },
+      "power": {
+        "m": 5,
+        "v_min": 0.23516234649847928,
+        "v_min_method": "cross_gene_iqr_p25",
+        "eligibility_curve": [
+          {
+            "m": 3,
+            "n_genes_eligible": 1899
+          },
+          {
+            "m": 5,
+            "n_genes_eligible": 1899
+          },
+          {
+            "m": 8,
+            "n_genes_eligible": 1899
+          },
+          {
+            "m": 12,
+            "n_genes_eligible": 1899
+          },
+          {
+            "m": 20,
+            "n_genes_eligible": 1899
+          }
+        ],
+        "bootstrap_ci": {
+          "mean": -0.011911020004623024,
+          "ci_low": -0.019249461046480225,
+          "ci_high": -0.004576080384219666,
+          "n_genes_used": 1424,
+          "n_bootstrap": 1000
+        },
+        "permutation_null": {
+          "null_p95": 0.0040398416536225395,
+          "null_p99": 0.0056583357777984355,
+          "null_mean": 0.00013945322707081264,
+          "null_std": 0.0025633884068062976,
+          "n_genes_used": 1424,
+          "n_permutations": 200
+        },
+        "spearman_role": "primary"
+      },
+      "noise_diagnostics": {
+        "additive_residual_quantiles": {
+          "p1": -3.504490878720151,
+          "p5": -2.0757213633414366,
+          "p25": -0.30045881180565825,
+          "p50": 0.03423490412812437,
+          "p75": 0.23247206435847312,
+          "p95": 0.7170150477994514,
+          "p99": 1.7927604537614497
+        },
+        "per_organism_residual": [
+          {
+            "orgId": "SynE",
+            "std": 0.9239656967117318,
+            "iqr": 0.5329308761641314
+          }
+        ]
+      },
+      "meaningful_gain_thresholds": {
+        "rmse": 0.005,
+        "mae": 0.005,
+        "rule": "max(0.005_floor, 0.5 * |global_train_mean - best_baseline|); best_baseline = min RMSE/MAE among {per_condition_mean, per_organism_mean, additive_baseline, embedding_nn}",
+        "best_baseline_rmse": 0.9370312362177168,
+        "best_baseline_mae": 0.5353157391347653,
+        "global_rmse": 0.9370312362177168,
+        "global_mae": 0.5353157391347653,
+        "rmse_gap": 0.0,
+        "mae_gap": 0.0
+      }
+    },
+    "multi_org_balanced": {
+      "protocol_id": "multi_org_balanced",
+      "val_org_ids": [
+        "pseudo3_N2E3",
+        "BFirm",
+        "ANA3",
+        "SyringaeB728a_mexBdelta"
+      ],
+      "test_org_ids": [
+        "PV4"
+      ],
+      "n_train_rows": 24764047,
+      "n_val_rows": 2165234,
+      "baselines": {
+        "global_train_mean": {
+          "rmse": 0.630685168009717,
+          "mae": 0.31163793242527155,
+          "n_rows": 2165234,
+          "fallback_count": 0,
+          "fallback_rate": 0.0,
+          "train_mean": -0.09734830496013634
+        },
+        "per_condition_mean": {
+          "rmse": 0.6319475956163499,
+          "mae": 0.3159830578818741,
+          "n_rows": 2165234,
+          "fallback_count": 48920,
+          "fallback_rate": 0.022593400990377946
+        },
+        "per_organism_mean": {
+          "rmse": 0.630685168009717,
+          "mae": 0.31163793242527155,
+          "n_rows": 2165234,
+          "fallback_count": 2165234,
+          "fallback_rate": 1.0
+        },
+        "additive_baseline": {
+          "rmse": 0.6320017301809576,
+          "mae": 0.31589763077555943,
+          "n_rows": 2165234,
+          "n_iters": 11,
+          "converged": true
+        },
+        "embedding_nn": {
+          "rmse": 0.5883749173708371,
+          "mae": 0.3252808359929022,
+          "n_rows": 2165234,
+          "fallback_count": 0,
+          "fallback_rate": 0.0,
+          "no_embedding_count": 5232,
+          "no_embedding_rate": 0.0024163670069840028
+        }
+      },
+      "power": {
+        "m": 5,
+        "v_min": 0.19924517506395753,
+        "v_min_method": "cross_gene_iqr_p25",
+        "eligibility_curve": [
+          {
+            "m": 3,
+            "n_genes_eligible": 18406
+          },
+          {
+            "m": 5,
+            "n_genes_eligible": 18406
+          },
+          {
+            "m": 8,
+            "n_genes_eligible": 18406
+          },
+          {
+            "m": 12,
+            "n_genes_eligible": 18406
+          },
+          {
+            "m": 20,
+            "n_genes_eligible": 18406
+          }
+        ],
+        "bootstrap_ci": {
+          "mean": 0.0055725954531994195,
+          "ci_low": 0.0018964015329457561,
+          "ci_high": 0.009156322452140037,
+          "n_genes_used": 13804,
+          "n_bootstrap": 1000
+        },
+        "permutation_null": {
+          "null_p95": 0.0015043200221064484,
+          "null_p99": 0.0021675616885926045,
+          "null_mean": 0.0001899024054676665,
+          "null_std": 0.0009373005888304528,
+          "n_genes_used": 13804,
+          "n_permutations": 200
+        },
+        "spearman_role": "primary"
+      },
+      "noise_diagnostics": {
+        "additive_residual_quantiles": {
+          "p1": -2.76205522912571,
+          "p5": -0.6924069658550904,
+          "p25": -0.08058663813059452,
+          "p50": 0.09164940611360911,
+          "p75": 0.23925754896903506,
+          "p95": 0.5712482697316751,
+          "p99": 1.0461564603417768
+        },
+        "per_organism_residual": [
+          {
+            "orgId": "ANA3",
+            "std": 0.9552354044089348,
+            "iqr": 0.4417420944039695
+          },
+          {
+            "orgId": "BFirm",
+            "std": 0.6214659484792145,
+            "iqr": 0.3381563697480968
+          },
+          {
+            "orgId": "SyringaeB728a_mexBdelta",
+            "std": 0.42578747681955315,
+            "iqr": 0.3058924280948235
+          },
+          {
+            "orgId": "pseudo3_N2E3",
+            "std": 0.48399507550364945,
+            "iqr": 0.2777818794815155
+          }
+        ]
+      },
+      "meaningful_gain_thresholds": {
+        "rmse": 0.021155125319439916,
+        "mae": 0.005,
+        "rule": "max(0.005_floor, 0.5 * |global_train_mean - best_baseline|); best_baseline = min RMSE/MAE among {per_condition_mean, per_organism_mean, additive_baseline, embedding_nn}",
+        "best_baseline_rmse": 0.5883749173708371,
+        "best_baseline_mae": 0.31163793242527155,
+        "global_rmse": 0.630685168009717,
+        "global_mae": 0.31163793242527155,
+        "rmse_gap": 0.04231025063887983,
+        "mae_gap": 0.0
+      }
+    }
+  }
+}

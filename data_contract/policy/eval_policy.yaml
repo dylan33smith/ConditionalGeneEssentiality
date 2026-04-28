@@ -1,17 +1,77 @@
-# S2 emits this. Frozen evaluation policies reused by all later models.
-status: pending
+status: locked
 emitted_by: stage2
 spearman_eligibility:
   m: 5
-  v_min_method: cross_gene_iqr_p25   # 25th percentile of cross-gene IQR on locked val
-  v_min_value: null                  # filled after S3 lock
-  policy_id: null
-co_primary_metrics: [rmse, mae]
-spearman_role: null                  # "primary" | "diagnostic_only", decided by S2 power report
-gain_thresholds: {}                  # per-protocol meaningful-gain thresholds
+  v_min_method: cross_gene_iqr_p25
+  v_min_value_per_protocol:
+    largest_by_rows: 0.23784790395769634
+    high_overlap_easy: 0.18547949303861722
+    low_overlap_stress: 0.23516234649847928
+    multi_org_balanced: 0.19924517506395753
+  policy_id: spearman_eligibility_v1
+co_primary_metrics:
+- rmse
+- mae
+spearman_role_per_protocol:
+  largest_by_rows: primary
+  high_overlap_easy: primary
+  low_overlap_stress: primary
+  multi_org_balanced: primary
+gain_thresholds_per_protocol:
+  largest_by_rows:
+    rmse: 0.005
+    mae: 0.005
+    rule: max(0.005_floor, 0.5 * |global_train_mean - best_baseline|); best_baseline
+      = min RMSE/MAE among {per_condition_mean, per_organism_mean, additive_baseline,
+      embedding_nn}
+    best_baseline_rmse: 0.5668274976346473
+    best_baseline_mae: 0.3238944676448617
+    global_rmse: 0.5668274976346473
+    global_mae: 0.3238944676448617
+    rmse_gap: 0.0
+    mae_gap: 0.0
+  high_overlap_easy:
+    rmse: 0.005
+    mae: 0.005
+    rule: max(0.005_floor, 0.5 * |global_train_mean - best_baseline|); best_baseline
+      = min RMSE/MAE among {per_condition_mean, per_organism_mean, additive_baseline,
+      embedding_nn}
+    best_baseline_rmse: 0.5865700160852934
+    best_baseline_mae: 0.28878297162582267
+    global_rmse: 0.5865700160852934
+    global_mae: 0.28878297162582267
+    rmse_gap: 0.0
+    mae_gap: 0.0
+  low_overlap_stress:
+    rmse: 0.005
+    mae: 0.005
+    rule: max(0.005_floor, 0.5 * |global_train_mean - best_baseline|); best_baseline
+      = min RMSE/MAE among {per_condition_mean, per_organism_mean, additive_baseline,
+      embedding_nn}
+    best_baseline_rmse: 0.9370312362177168
+    best_baseline_mae: 0.5353157391347653
+    global_rmse: 0.9370312362177168
+    global_mae: 0.5353157391347653
+    rmse_gap: 0.0
+    mae_gap: 0.0
+  multi_org_balanced:
+    rmse: 0.021155125319439916
+    mae: 0.005
+    rule: max(0.005_floor, 0.5 * |global_train_mean - best_baseline|); best_baseline
+      = min RMSE/MAE among {per_condition_mean, per_organism_mean, additive_baseline,
+      embedding_nn}
+    best_baseline_rmse: 0.5883749173708371
+    best_baseline_mae: 0.31163793242527155
+    global_rmse: 0.630685168009717
+    global_mae: 0.31163793242527155
+    rmse_gap: 0.04231025063887983
+    mae_gap: 0.0
 null_baselines_required:
-  - global_train_mean
-  - per_condition_mean
-  - per_organism_mean
-  - additive_baseline
-  - embedding_nn
+- global_train_mean
+- per_condition_mean
+- per_organism_mean
+- additive_baseline
+- embedding_nn
+gain_thresholds_rule_v2: max(0.005_floor, 0.5 * |global_train_mean - best_baseline|);
+  best_baseline = min RMSE/MAE among {per_condition_mean, per_organism_mean, additive_baseline,
+  embedding_nn}

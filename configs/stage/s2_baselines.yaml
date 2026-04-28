@@ -16,5 +16,6 @@ stage:
       - embedding_nn
     compute_metric_power_report: true
     bootstrap_samples: 1000
+    permutation_samples: 200
     output_baselines_path: artifacts/baselines/baselines_per_protocol.json
     output_eval_policy_path: data_contract/policy/eval_policy.yaml

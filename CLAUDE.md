@@ -24,8 +24,8 @@ S0 → S1 → S2 → S3 → S4 → S5 → T1 → T2 → T3 → T4
 |---|---|---|
 | S0 | Reproducibility & Governance (smoke pipeline, run manifest, v4 verification) | **approved** (S0-DEC-001) |
 | S1 | Data Characterization → emits candidate protocols | **approved** (S1-DEC-001); H-HOMO-01 triggered at 1.6σ |
-| S2 | Evaluation Trustworthiness (null baselines + power report per candidate) | next |
-| S3 | Split Protocol Lock | not started |
+| S2 | Evaluation Trustworthiness (null baselines + power report per candidate) | **approved** (S2-DEC-001); 4/4 protocols → primary; H-BASE-01 reinterpreted (beat best-non-global, not additive) |
+| S3 | Split Protocol Lock | next |
 | S4 | Feature Contract (train-only vocab/scalers) | not started |
 | S5 | Training-Recipe Lock (row-quality + organism pool) | not started |
 | T1 | Representation winner | not started |

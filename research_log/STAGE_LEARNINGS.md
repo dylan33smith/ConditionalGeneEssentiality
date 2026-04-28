@@ -451,14 +451,73 @@ them in the model; it's a commitment to give T1-E something to test.
 
 ---
 
-## Stage S2 — (pending)
+## Stage S2 — Evaluation Trustworthiness
 
-*No learnings recorded here yet.* When Stage S2 closes, paste:
+**Sources.**
 
-- locked primary protocol id,
-- Spearman eligibility policy,
-- homology diagnostic disposition,
-- additive baseline (`H-BASE-01`) numbers on the locked row set.
+- `research_log/decisions/stage2/S2-DEC-001.md`
+- `artifacts/baselines/baselines_per_protocol.json`
+- `data_contract/policy/eval_policy.yaml`
+- `research_log/figures/stage2/01_*.csv` … `07_*.csv`
+
+### Cross-cutting S2 conclusions
+
+1. **Under organism-holdout, 4 of 5 baselines collapse to global_train_mean.**
+   `per_condition_mean`, `per_organism_mean`, and `additive_baseline` all
+   reduce to a constant predictor for held-out organisms because val
+   genes/conditions/orgs are all cold-start. Numerically identical
+   to ~10⁻³ in 3 of 4 protocols.
+2. **`embedding_nn` is the only meaningfully different null.** It beats
+   global_mean on `multi_org_balanced` (0.588 vs 0.631 RMSE) where val media
+   are 100% in train. On the other 3 protocols it loses to global_mean
+   because its fallback rate (val media not in train) is 33–100%.
+3. **Power is not the bottleneck.** Bootstrap-by-gene 95% CI half-widths
+   are 0.003–0.007 across protocols; n_eligible 1,400–13,800. We can
+   detect a real Spearman improvement of ≥0.02. All 4 protocols → `primary`.
+4. **Heteroscedastic noise confirmed.** Additive residual P5 is −1.4 to −2.4;
+   per-organism residual std varies 2–5× within a single protocol. RMSE+MAE
+   co-primary is the right call; Huber for T4 is empirically motivated.
+5. **H-BASE-01 reinterpreted.** "Beat additive" was the original gate for
+   "did the model learn gene×condition interactions." Under organism-holdout
+   that reduces to "beat a constant." S2-DEC-001 revises the gate: a model
+   must beat the **best non-global baseline** (NN where applicable, else
+   global_mean) by a per-protocol RMSE+MAE threshold.
+6. **Gain-threshold rule revised.** Original `0.5 × (global − additive)`
+   produced negative thresholds. New rule: `max(0.005, 0.5 × |global − best_non_global|)`.
+   Result: 3 of 4 protocols hit the 0.005 floor; `multi_org_balanced`
+   gets 0.021 RMSE (real gap to NN baseline).
+
+### Per-protocol summary (RMSE)
+
+| Protocol | global | best non-global | gain threshold | n_eligible | role |
+|---|---:|---:|---:|---:|:---:|
+| `largest_by_rows` | 0.5668 | 0.5668 (none beat) | 0.005 (floor) | 3041 | primary |
+| `high_overlap_easy` | 0.5866 | 0.5866 (none beat) | 0.005 (floor) | 6095 | primary |
+| `low_overlap_stress` | 0.9370 | 0.9370 (none beat) | 0.005 (floor) | 1424 | primary |
+| `multi_org_balanced` | 0.6307 | 0.5884 (NN) | **0.0212** | 13804 | primary |
+
+`multi_org_balanced` is structurally the most informative protocol — it has
+the highest n_eligible AND the only non-trivial NN baseline. Strong S3
+candidate for primary-promotion role.
+
+### Decisions taken
+
+- **Spearman eligibility policy locked:** m=5, v_min = cross-gene IQR p25
+  per protocol (values 0.186–0.238). See `eval_policy.yaml`.
+- **Spearman role per protocol:** all 4 → primary (auto-decision passed).
+- **Null-baseline set:** all 5 retained, with explicit reporting of
+  `embedding_nn` fallback rate per protocol.
+- **Gain thresholds:** locked per the revised rule above.
+- **H-BASE-01 gate:** reinterpreted (beat best-non-global, not additive).
+
+### Open risks
+
+- The 0.005 floor on gain thresholds is conservative. If T1 finds that real
+  improvements live consistently in 0.003–0.004 RMSE, we may revise.
+- 100% NN fallback on `largest_by_rows` and `low_overlap_stress` means those
+  protocols are essentially "beat global mean by 0.005." Weak bar.
+- Per-organism residual std varies up to 5× → averaged metrics will hide
+  per-organism failure modes. Tier reports must include per-organism panels.
 
 ---
 
