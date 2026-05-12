@@ -1,0 +1,9 @@
+orgId,arm,val_rmse
+ANA3,media_id,0.7558150215666667
+ANA3,multihot_canonical_id,0.7534808608666667
+BFirm,media_id,0.5139538725
+BFirm,multihot_canonical_id,0.5099020939666666
+SyringaeB728a_mexBdelta,media_id,0.4071391227666667
+SyringaeB728a_mexBdelta,multihot_canonical_id,0.40085067310000005
+pseudo3_N2E3,media_id,0.4099176194
+pseudo3_N2E3,multihot_canonical_id,0.4079337810333334

@@ -251,6 +251,12 @@ def train_one_arm(
                 "train_val_gap_rmse": float(train_rmse - val_rmse),
                 "train_val_gap_mae": float(train_mae - val_mae),
                 "val_residual_quantiles_json": pd.Series(_residual_quantiles(val_true, val_pred)).to_json(),
+                # T1+ uses these for bootstrap CIs and homology-bin breakdowns.
+                # Numpy arrays not JSON-serializable; downstream code must strip
+                # them before saving the summary to disk (S5's flow drops them
+                # implicitly via pd.DataFrame coercion).
+                "_best_val_pred": val_pred.copy(),
+                "_best_val_true": val_true.copy(),
             }
 
     metrics_df = pd.DataFrame(rows)

@@ -8,6 +8,7 @@ archive/runs/
 ## Preprocessing / materialization caches — contents only, not the skeleton
 artifacts/runs/*/
 artifacts/indexes/*/
+artifacts/cache/
 artifacts/checksums_cache.json
 data/materialized/
 

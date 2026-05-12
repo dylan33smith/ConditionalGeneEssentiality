@@ -1,5 +1,50 @@
-status: pending
+status: locked
 emitted_by: tier1
-winning_schema: null
-rejected_alternatives: []
-ledger_entry: null
+ledger_entry: research_log/decisions/tier1/T1-DEC-001.md
+date: 2026-05-12
+
+# Inter-arm decision on locked protocol (multi_org_balanced)
+inter_arm_outcome: no_winner
+promotion_basis: tiebreakers favor multihot (consistent per-org wins,
+  generalizes to protocols with unseen val media, beats best_non_global
+  baseline by ~0.07 RMSE, aligned with S5's already-locked substrate).
+
+winning_schema:
+  condition_encoder: multihot_canonical_id
+  source: data_contract/preprocessing/de21504134c84a6c/experiment_chemistry.parquet
+  vocab_size: 425             # 423 train chemistries + <UNK> + <UNK_STRESSOR>
+  scope: medium_plus_stressor # per S4-DEC-002 Option D
+  encoder_type: identity_passthrough  # multihot is already the feature vector
+
+rejected_alternatives:
+  - condition_encoder: media_id
+    rationale: |
+      Statistically tied on RMSE on the locked protocol (gap 0.0028 << 0.0212
+      threshold). MAE-favored direction is the H-METRIC-01 case (central-mass
+      vs tail-resistance disagreement); multihot's tail behavior is what
+      matters for heavy-tailed Tn-seq fitness. Also: media_id structurally
+      collapses (UNK fallback) on any protocol with unseen val media —
+      `multi_org_balanced` does not test that property but every other locked
+      candidate protocol does. Multihot generalizes; media_id does not.
+    metrics:
+      rmse_mean: 0.5177
+      rmse_std: 0.0010
+      mae_mean: 0.2895
+      mae_std: 0.0013
+
+winning_metrics:
+  rmse_mean: 0.5149
+  rmse_std: 0.0021
+  mae_mean: 0.2954
+  mae_std: 0.0017
+  beats_best_non_global_baseline_s2: true       # NN baseline 0.5884 RMSE
+  beats_additive_baseline_s2: true              # additive 0.6320 RMSE
+
+unresolved_followup:
+  description: |
+    H-ENC-01 is not adequately stress-tested by multi_org_balanced because
+    val_seen_rate = 1.0 at the media-name level. A protocol with unseen val
+    media (e.g. largest_by_rows, val_seen_rate = 0%) would be the proper
+    stress test.
+  refactorplan_section: §12 Deferred Experiments
+  follow_up_id: T1-A.2_stress_test_on_largest_by_rows

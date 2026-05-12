@@ -681,9 +681,70 @@ publish a causal decomposed-vs-coarse claim."
 
 ---
 
-## Tiers T1–T4 — (pending)
+## Tier T1 — Representation Winner
 
-*No learnings recorded here yet.*
+### T1-A — Granularity Test (H-ENC-01)
+
+**Sources.**
+
+- `research_log/decisions/tier1/T1-DEC-001.md`
+- `research_log/tier_reports/tier1_a_granularity.md`
+- `artifacts/runs/t1a/t1a_summary.json`
+- `research_log/figures/tier1_a/01_*.csv` … `04_*.csv`
+- `data_contract/representation_winner.yaml`
+
+### Headline conclusions
+
+1. **Inter-arm outcome: `no_winner`** on the locked `multi_org_balanced`
+   protocol. RMSE gap (multihot vs media_id) = 0.0028 (13% of the
+   S2-locked 0.0212 threshold). MAE gap = −0.0059 (media_id better; barely
+   above the 0.005 threshold but in the opposite direction). The
+   **H-METRIC-01 disagreement regime** activated under heavy-tailed
+   residuals.
+2. **Multihot promoted by tiebreakers**, not by the primary rule:
+   - Wins on RMSE on every individual val org (4/4).
+   - Beats best_non_global baseline (embedding_nn 0.5884) by ~0.07 RMSE.
+   - Generalizes to protocols with unseen val media (media_id structurally
+     collapses there).
+   - Aligned with the already-locked S5 substrate (no contract change).
+3. **The H-ENC-01 hypothesis is not adequately stress-tested by
+   `multi_org_balanced`.** This protocol has `val_seen_rate = 1.0` at the
+   media-name level — every val medium is in train, so the media_id
+   encoder never falls back to UNK. The S1-predicted advantage of
+   decomposed chemistry (generalizing across organism-unique medium names)
+   is not exercised. T1-A.2 (§12 deferred) re-runs this comparison on a
+   protocol with unseen val media (e.g., `largest_by_rows`).
+4. **Homology-bin crossover at cosine ≈ 0.70.** For val genes with low
+   similarity to training, media_id wins by ~0.01 RMSE; for val genes with
+   high similarity, multihot wins by ~0.01 RMSE. Real regime-specific
+   effect that suggests a homology-gated fusion at T2.
+5. **Both arms easily clear the H-BASE-01 gate** (revised, S2-DEC-001) —
+   each beats the locked NN baseline by ~0.07 RMSE.
+
+### Locked outputs
+
+- **Winning condition encoder:** `multihot_canonical_id` (425-dim, medium +
+  stressor, from `de21504134c84a6c/experiment_chemistry.parquet`).
+- **Carried into:** T1-B (numeric transforms), T1-C (UNK handling), T1-D
+  (metadata bundles), T1-E (decomposition mode flags), and all of T2/T3.
+- `data_contract/representation_winner.yaml` emitted.
+
+### Open risks / follow-ups
+
+- **§12 T1-A.2** filed: stress-test H-ENC-01 on `largest_by_rows`. Mandatory
+  before H-ENC-01 can be declared falsified.
+- Media_id's MAE advantage (0.006) is small but consistent. Hypothesis:
+  per-medium learnable embedding has more capacity than the implicit
+  projection out of the multihot. If T1-B / T2 widen the chemistry
+  projection, the gap may close or flip.
+- Homology-bin crossover suggests a T2 fusion candidate: gate chemistry vs.
+  medium identity by per-gene homology to training.
+
+---
+
+## Tiers T1–T4 — (T1-B and beyond pending)
+
+*T1-B through T1-E plus T2/T3/T4 have not started.*
 
 ---
 
