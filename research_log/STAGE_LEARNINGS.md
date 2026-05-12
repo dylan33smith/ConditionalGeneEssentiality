@@ -521,15 +521,140 @@ candidate for primary-promotion role.
 
 ---
 
-## Stage S3 — (pending)
+## Stage S3 — Split Protocol Lock
 
-*No learnings recorded here yet.*
+**Sources.**
+
+- `research_log/decisions/stage3/S3-DEC-001.md`
+- `research_log/tier_reports/s3_split_lock.md`
+- `data_contract/splits/locked_protocol.yaml`
+- `data_contract/splits/diagnostic_protocols.yaml`
+
+### Cross-cutting S3 conclusions
+
+1. **The plan's literal "30–80% chemistry overlap" band is degenerate on this
+   dataset.** All four S1 candidates have val_canonical_id_seen_rate ≥ 0.947,
+   so the band as written excludes every candidate. S3 used a **power-driven
+   selection rule (`s3_v1_power_driven`)** instead, documented in the ledger.
+2. **`multi_org_balanced` is the only candidate where embedding_nn beats
+   global RMSE.** That tipped the ranking — it's the only protocol where
+   the locked NN baseline is a non-trivial bar.
+3. **H-HOMO-01 diagnostic recipe locked.** Primary: similarity-bin
+   stratification of metrics. Secondary: masked homology-clean metric subset.
+   **Cosine cutoff = 0.85.** Tier reports for T1+ must include both.
+
+### Decisions taken
+
+- **Primary protocol:** `multi_org_balanced`
+  (val = {pseudo3_N2E3, BFirm, ANA3, SyringaeB728a_mexBdelta}, test = {PV4}).
+- **Secondary stress protocol:** `low_overlap_stress`
+  (val = {SynE}, test = {Magneto}) — `reported_not_gating`.
+- **Homology diagnostic:** `primary_bin_stratified_plus_secondary_masked_subset`,
+  cosine cutoff `0.85`, applied to the primary protocol.
+- **Paired-dropout track:** `not_used` (REFACTORPLAN §12 deferred).
+- **Seed set:** `[0, 1, 2]`; split_manifest_sha256 recorded in `locked_protocol.yaml`.
+
+### Open risks
+
+- The 0.85 cutoff is the S1-figure default; S5 / T1 results may motivate
+  re-tuning later. Not blocking now.
+- `low_overlap_stress` has only 1,424 eligible genes — tightest power case.
+  Useful as stress but tier comparisons there will be noisier than primary.
 
 ---
 
-## Stage S5 — Data-quality policy lock (pending)
+## Stage S4 — Feature Contract (Option D)
 
-*No learnings recorded here yet.*
+**Sources.**
+
+- `research_log/decisions/stage4/S4-DEC-001.md` (initial, superseded)
+- `research_log/decisions/stage4/S4-DEC-002.md` (locked, supersedes -001)
+- `research_log/tier_reports/s4_feature_contract.md`
+- `data_contract/feature_contract.yaml`
+- `data_contract/preprocessing/de21504134c84a6c/`
+
+### Cross-cutting S4 conclusions
+
+1. **Option D wins: per-experiment long-form chemistry + wide encoded metadata.**
+   Long chemistry preserves per-experiment chemistry granularity (medium + stressor)
+   without forcing T1 to commit to a fixed-length multihot encoding before it
+   tests granularity (T1-A).
+2. **Stressors carry chemistry signal not in `media` alone.** The locked vocab
+   merges medium chemistry with stressor chemistry resolved to Canonical_IDs via
+   `stressor_to_canonical_id.yaml`. This is the operationalization of the user's
+   "condition = media + condition_1..4 + stressors" definition from before S1.
+3. **No genotype / mutantLibrary in the wide metadata table.** The decision is
+   recorded but not the rationale here — see S4-DEC-002. T1 metadata-bundle
+   experiments operate on what's in `experiment_metadata.parquet`.
+4. **Eval row coverage is total at the Canonical_ID level.** Every val
+   row's chemistry strings appear in the train vocab; OOV / rare-encoding is
+   T1's job (handled via `<UNK>` / `<UNK_STRESSOR>` reserved slots).
+
+### Locked outputs
+
+- **Artifact id:** `de21504134c84a6c` (referenced by every T1 config).
+- Files: `experiment_chemistry.parquet`, `experiment_metadata.parquet`,
+  `canonical_id_vocab.json` (425 slots = 423 train chemistries + 2 UNK),
+  `amount_scaler.json`, `numeric_metadata_scalers.json`,
+  `representation_mode_per_canonical.parquet` (with `dominant_mode = stressor`
+  for stressor-only canonicals), `metadata_vocabs/{oxygen,experiment_group,liquid_state}.json`.
+
+### Open risks
+
+- The schema decision was revised once (S4-DEC-001 → -002). Some legacy code
+  in `src/data/preprocessing/` may still reference the old contract; verify
+  before T1 imports.
+- The vocab includes the stressor chemistry, but T1 still needs to TEST
+  whether stressor canonicals improve generalization vs media-only —
+  T1-A and T1-D both touch this question.
+
+---
+
+## Stage S5 — Training Recipe Lock
+
+**Sources.**
+
+- `research_log/decisions/stage5/S5-DEC-001.md`
+- `research_log/tier_reports/s5_quality_policy.md`
+- `research_log/figures/stage5/01_*.csv` … `07_*.csv`
+- `data_contract/policy/quality_policy.yaml`
+
+### Cross-cutting S5 conclusions
+
+1. **`weighted_full` wins on supervision mass, not on val metric.** The two
+   arms differ by only **~0.004 RMSE** and **~0.004 MAE** (`weighted_full`
+   0.5151/0.2957 vs `strict_slice` 0.5193/0.2997). That gap is *below* the
+   0.005 RMSE floor we locked in S2. The decision was made on the
+   tiebreaker: weighted_full keeps 15.8M effective train rows vs strict_slice
+   13.9M. More supervision mass at equal performance.
+2. **Both arms beat the additive baseline on RMSE** (0.515 / 0.519 vs 0.632 / 0.637).
+   H-BASE-01 RMSE gate passes for both. MAE gate also passes.
+3. **Threshold sensitivity is mild.** Moderate weight-floor perturbations
+   (p5, p15 of weight distribution) keep `weighted_full` as winner.
+4. **The "strict_slice train RMSE > val RMSE" pattern is a magnitude artifact,
+   not overfitting in reverse.** Strict filtering keeps high-|t| rows which
+   have larger-magnitude `fit` values; their RMS-of-fit is ~0.78 vs ~0.64 on
+   the full val set. RMSE scales with target magnitude, so identical model
+   skill shows higher RMSE on the strict subset. Documented for future readers;
+   no code change because `weighted_full` was selected.
+
+### Decisions taken
+
+- **Row-quality policy:** `weighted_full`.
+- **Organism pool:** `full` (H-POLICY-02 / curated pool skipped per S1
+  support gating).
+- **Frozen weights:** `weight = clamp(cor12/median_cor12, 0, 1) ×
+  clamp(|t|/median_|t|, 0, 1)`; thresholds recorded in `quality_policy.yaml`.
+- **Loss family + target normalization:** deferred to T4 (not S5).
+
+### Open risks
+
+- The Spearman gap between arms (0.0386 vs 0.0353) is small but consistent.
+  Real but not dispositive — `weighted_full` was chosen on RMSE+MAE primary,
+  not Spearman.
+- Quality filtering didn't materially change what was learned (4-5% relative
+  gap, all metrics). Suggests the model is dominated by easy rows and isn't
+  bottlenecked by noise; a smarter architecture (T2/T3) may extract more.
 
 ---
 
