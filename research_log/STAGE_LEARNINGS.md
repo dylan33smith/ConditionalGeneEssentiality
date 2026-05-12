@@ -608,6 +608,29 @@ candidate for primary-promotion role.
   whether stressor canonicals improve generalization vs media-only —
   T1-A and T1-D both touch this question.
 
+### Downstream effect on T1-A interpretation (added 2026-05-12)
+
+Because the locked `experiment_chemistry.parquet` already contains
+**medium + stressor** chemistry per experiment, the T1-A comparison
+`media_id vs multihot_canonical_id` is **not a strictly controlled
+representation ablation**. The multihot arm gets stressor chemistry the
+media-id arm structurally cannot access. The measured gap therefore
+conflates two effects:
+
+1. **Representation effect** — decomposed chemistry generalizes across
+   organism-specific medium names where a string-id encoder cannot.
+2. **Scope effect** — multihot encodes stressor chemistry that media-id
+   does not see at all.
+
+This conflation is intentional: T1-A is framed as "headline encoder vs
+strawman baseline," and that's what we care about for the project's
+overall claim. The conflation only matters if we want to publish a
+causal "decomposed chemistry helps" claim, in which case a separately-run
+T1-A.1 (concatenated stressor strings as the baseline's token) would
+isolate the representation effect. T1-A.1 is in REFACTORPLAN §12
+Deferred Experiments with the trigger "T1-A gap is large AND we want to
+publish a causal decomposed-vs-coarse claim."
+
 ---
 
 ## Stage S5 — Training Recipe Lock

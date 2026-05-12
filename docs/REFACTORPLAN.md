@@ -93,7 +93,7 @@ Hypotheses without a clear owner are dropped.
 | H-SPLIT-02 | Stratified val-org selection produces tighter cross-seed metric stability than random selection. | S3 | Run k=5 random vs k=5 stratified; compare metric std across seeds. |
 | H-POLICY-01 | Weighted-full retains more supervision mass than strict-slice without harming primary metrics. | S5 | Same split, seeds, budget; compare RMSE+MAE + null delta. |
 | H-POLICY-02 | Curated organism pools improve robustness only if primary metrics improve and generalization diagnostics do not degrade. | S5 (deferred if S1 finds support too uneven for curation to matter). | Full vs curated org pool, same protocol. |
-| H-ENC-01 | Canonical-ID chemistry multihot beats media-name-only encoding. | T1-A | Media-id encoder vs multihot encoder. |
+| H-ENC-01 | Decomposed chemistry encoding — a multihot over the locked 425-slot Canonical_ID vocab covering **both medium and stressor chemistry per experiment** (per S4-DEC-002 Option D) — beats coarse medium-name-only encoding. | T1-A | Media-name embedding (medium string only) vs canonical-ID multihot from `experiment_chemistry.parquet` (which already includes resolved stressors). T1-A's gap therefore conflates two effects: (a) decomposed vs coarse representation, and (b) chemistry scope (medium-only vs medium+stressor). The conflation is intentional — it measures the headline encoder vs the strawman baseline. A strict-stressor ablation that disentangles (a) from (b) is in §12 Deferred Experiments. |
 | H-ENC-02 | Numeric concentration transforms (log1p / bounded) outperform raw amounts. | T1-B | raw vs log1p vs bounded. |
 | H-ENC-03 | Explicit UNK + mask indicators improve robustness on novel conditions vs zero-fill. | T1-C | Zero-fill vs explicit UNK. |
 | H-ENC-04 | Adding selected experiment metadata (oxygen, growth phase, temperature) improves conditional prediction over chemistry-only features. | T1-D | Chemistry-only vs chemistry+metadata. |
@@ -432,7 +432,7 @@ plus metadata unknowns, analogous to existing unknown-category logging.
 **Experiments**
 | ID | Hypothesis | Comparison |
 |---|---|---|
-| T1-A | H-ENC-01 | media-id only vs canonical-ID multihot **derived from `experiment_chemistry.parquet`** |
+| T1-A | H-ENC-01 | `media`-name embedding only vs canonical-ID multihot (medium + stressor) from `experiment_chemistry.parquet`. Strawman-vs-useful-encoder framing; conflates representation effect with chemistry-scope effect. A strict stressor ablation (concatenated stressor strings as the media-id baseline, isolating the representation effect) is in §12 Deferred Experiments. |
 | T1-B | H-ENC-02 | raw vs log1p vs bounded numeric transform |
 | T1-C | H-ENC-03 | zero-fill UNK vs explicit-UNK + mask indicators |
 | T1-D | H-ENC-04 | chemistry-only vs chemistry + experiment metadata |
@@ -717,6 +717,7 @@ Each has a one-line trigger that would justify scheduling it.
 | **Chemical-fingerprint encoders** | Replace multihot Canonical_ID with structural fingerprints (Morgan / RDKit / RDF). Lets the model represent unseen chemicals via shared substructure with seen chemicals — i.e., enables "generalize to novel chemistry" claims that L7 currently locks out. | A reviewer asks for novel-chemistry generalization, OR T1+ results plateau and we suspect multihot is the bottleneck. |
 | **Canonical_ID-level holdouts** | Hold out specific Canonical_IDs in addition to organisms. Forces the model to predict for chemistry it has never seen. Requires careful construction because holding out water/glucose breaks every medium. | Same triggers as above, especially if fingerprint encoders are added (the two pair naturally). |
 | **External validation set** | Evaluate on a Tn-seq dataset from a separate publication that uses media not in v4. Ground-truth test of L7's "known media" boundary. | Once locked architecture is published-ready and we want to bound external validity. |
+| **T1-A.1: strict stressor ablation** | Disentangles T1-A's two confounded effects. A1' = single token = concatenation of `(media, condition_1, condition_2, condition_3, condition_4)` as a string id (so the baseline has *access* to the same stressor scope as A2, but still no decomposition). A2 = the locked multihot. Difference isolates the **representation effect** (decomposed vs coarse) from the **scope effect** (with vs without stressors). | T1-A measured gap is large AND we want to publish a causal "decomposed chemistry helps" claim. Skip if T1-A gap is small (effect size doesn't justify decomposition). |
 
 ### Training-paradigm extensions
 
