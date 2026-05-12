@@ -731,14 +731,61 @@ publish a causal decomposed-vs-coarse claim."
 
 ### Open risks / follow-ups
 
-- **§12 T1-A.2** filed: stress-test H-ENC-01 on `largest_by_rows`. Mandatory
-  before H-ENC-01 can be declared falsified.
+- ~~**§12 T1-A.2** filed: stress-test H-ENC-01 on `largest_by_rows`. Mandatory
+  before H-ENC-01 can be declared falsified.~~ **Completed (T1-DEC-002)** —
+  see T1-A.2 section below. H-ENC-01 confirmed.
 - Media_id's MAE advantage (0.006) is small but consistent. Hypothesis:
   per-medium learnable embedding has more capacity than the implicit
   projection out of the multihot. If T1-B / T2 widen the chemistry
   projection, the gap may close or flip.
 - Homology-bin crossover suggests a T2 fusion candidate: gate chemistry vs.
   medium identity by per-gene homology to training.
+
+### T1-A.2 — H-ENC-01 Stress Test on largest_by_rows
+
+**Sources.**
+
+- `research_log/decisions/tier1/T1-DEC-002.md`
+- `research_log/tier_reports/tier1_a2_stress_test.md`
+- `artifacts/runs/t1a2/t1a_summary.json`
+- `research_log/figures/tier1_a2/01_*.csv` … `04_*.csv`
+
+### Headline conclusions
+
+1. **H-ENC-01 unambiguously supported** when the protocol actually tests
+   the property (val media unseen in train). Multihot RMSE 0.5897 vs
+   media_id RMSE 3.8451 — gap of 3.26 RMSE, **650× the locked threshold**.
+   Decision: `promote_multihot_canonical_id` (no ambiguity).
+2. **Mechanism confirmed.** Media_id's cross-seed std is 1.30 RMSE vs
+   0.01 for multihot. The UNK embedding receives no training gradient
+   (no train row has UNK media), so it stays at random initialization;
+   every val row hits this random vector. The seed-to-seed variance is
+   evidence of UNK drift.
+3. **Multihot is stable across homology bins** (RMSE 0.53–0.62 across
+   all 4 bins). The T1-A crossover at cosine ≈ 0.70 was an artifact of
+   the easy protocol's full media coverage and is absent here.
+4. **Neither encoder beats global mean on this protocol.** Multihot RMSE
+   0.59 is 0.023 *worse* than global (0.567). The shallow concat-linear
+   MLP cannot extract real signal from Btheta even with good chemistry
+   features. This is a **protocol-difficulty finding, not an encoder
+   finding** — orthogonal to T1-A.2's question. Filed as open issue
+   for T2 (fusion) / T3 (capacity) to surface.
+
+### New policy locked
+
+- **`multi_org_balanced` remains primary promotion protocol.**
+- **`largest_by_rows` is now a mandatory diagnostic** for every future
+  T1+ promotion report. The encoder choice gets re-validated on a
+  protocol with unseen val media every time, not just at T1-A.
+
+### Cumulative T1 picture
+
+| Question | Status |
+|---|---|
+| Is decomposed chemistry better than medium-name? | **Yes** (T1-A.2 decisive) |
+| Does the locked encoder generalize across protocols? | Yes structurally, but absolute performance varies a lot (0.51 RMSE on multi_org_balanced; 0.59 on largest_by_rows; latter doesn't beat global mean). |
+| Are there regimes where media_id is competitive? | Only when val media are 100% in train (multi_org_balanced); otherwise media_id catastrophically fails. |
+| Does the homology-bin crossover from T1-A generalize? | **No.** It was an artifact of full media coverage on T1-A's protocol. Multihot is stable across bins on largest_by_rows. |
 
 ---
 

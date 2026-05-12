@@ -1,0 +1,36 @@
+# Diagnostic protocol for T1-A.2 — stress-test H-ENC-01 on a protocol with
+# unseen val media. val_seen_rate = 0% at the media-name level (Btheta uses
+# media names not shared with any other organism), which is exactly the
+# regime where the chemistry-decomposition vs media-id distinction should
+# matter.
+#
+# NOT the locked primary protocol — for the T1-A.2 follow-up only.
+# See REFACTORPLAN §12 (Deferred: "T1-A.2") and research_log/decisions/tier1/T1-DEC-001.md.
+
+status: diagnostic
+emitted_by: tier1_a2_followup
+selection_rule_id: stress_test_hencs_h_enc_01
+protocol_id: largest_by_rows
+val_org_ids:
+- Btheta
+test_org_ids:
+- DvH
+seed: 0
+seed_set:
+- 0
+- 1
+- 2
+
+# From S1 candidate_protocols.yaml and S2 baselines_per_protocol.json
+val_seen_rate_media_level: 0.0
+val_canonical_id_seen_rate: 0.9861
+nn_baseline_fallback_rate: 1.0
+embedding_nn_rmse_locked_s2: 0.6060
+global_train_mean_rmse_locked_s2: 0.5668
+additive_rmse_locked_s2: 0.5675
+
+notes: |
+  This protocol's NN baseline is WORSE than global mean (0.606 vs 0.567)
+  because val media are entirely unseen in train (100% NN fallback rate).
+  The best non-global baseline is global mean itself, so the S2-locked
+  gain_threshold defaults to the 0.005 floor (not 0.0212 like multi_org_balanced).

@@ -317,24 +317,41 @@ def _to_jsonable(obj):
     return obj
 
 
-def run_t1a(cfg) -> dict:
-    """Run T1-A end-to-end. Returns the comparison payload."""
+def run_t1a(cfg, *,
+            protocol_path: Path | None = None,
+            output_root: str = "t1a",
+            figures_dirname: str = "tier1_a",
+            experiment_id_label: str = "T1-A_granularity",
+            title: str = "T1-A Granularity Test (H-ENC-01)") -> dict:
+    """Run T1-A end-to-end. Returns the comparison payload.
+
+    Args:
+        cfg: Hydra config (unused at present; reserved for future overrides).
+        protocol_path: Override the locked split protocol. T1-A uses the locked
+            `multi_org_balanced`; T1-A.2 passes the largest_by_rows diagnostic
+            protocol to stress-test H-ENC-01 on unseen val media.
+        output_root: Folder name under artifacts/runs/ and artifacts/cache/.
+        figures_dirname: Folder name under research_log/figures/.
+        experiment_id_label: Label used in the summary JSON.
+        title: Banner string in logs.
+    """
     fitness_path = Path("data/derived/canonical/v0/fitness_experiment_long.parquet")
     feature_contract_path = Path("data_contract/feature_contract.yaml")
-    locked_protocol_path = Path("data_contract/splits/locked_protocol.yaml")
+    if protocol_path is None:
+        protocol_path = Path("data_contract/splits/locked_protocol.yaml")
     eval_policy_path = Path("data_contract/policy/eval_policy.yaml")
     embedding_dir = Path("data/processed/ProtLM_embeddings_layer8")
-    cache_dir = Path("artifacts/cache/t1a")
-    figures_dir = Path("research_log/figures/tier1_a")
-    output_dir = Path("artifacts/runs/t1a")
+    cache_dir = Path(f"artifacts/cache/{output_root}")
+    figures_dir = Path(f"research_log/figures/{figures_dirname}")
+    output_dir = Path(f"artifacts/runs/{output_root}")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    log.info("=" * 60); log.info("T1-A Granularity Test (H-ENC-01)"); log.info("=" * 60)
+    log.info("=" * 60); log.info(title); log.info("=" * 60)
     log.info("[1/6] loading shared T1 inputs")
     inputs = load_t1_inputs(
         fitness_path=fitness_path,
         feature_contract_path=feature_contract_path,
-        locked_protocol_path=locked_protocol_path,
+        locked_protocol_path=protocol_path,
         eval_policy_path=eval_policy_path,
         embedding_dir=embedding_dir,
         cache_dir=cache_dir,
@@ -479,7 +496,7 @@ def run_t1a(cfg) -> dict:
     metrics_df.to_parquet(output_dir / "t1a_metrics.parquet", index=False)
     summaries_df.to_parquet(output_dir / "t1a_summaries.parquet", index=False)
     payload = {
-        "experiment_id": "T1-A_granularity",
+        "experiment_id": experiment_id_label,
         "stage_or_tier": "T1",
         "hypothesis": "H-ENC-01",
         "locked_protocol_id": inputs.locked_protocol_id,

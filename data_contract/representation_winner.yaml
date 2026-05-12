@@ -40,11 +40,22 @@ winning_metrics:
   beats_best_non_global_baseline_s2: true       # NN baseline 0.5884 RMSE
   beats_additive_baseline_s2: true              # additive 0.6320 RMSE
 
-unresolved_followup:
-  description: |
-    H-ENC-01 is not adequately stress-tested by multi_org_balanced because
-    val_seen_rate = 1.0 at the media-name level. A protocol with unseen val
-    media (e.g. largest_by_rows, val_seen_rate = 0%) would be the proper
-    stress test.
-  refactorplan_section: §12 Deferred Experiments
-  follow_up_id: T1-A.2_stress_test_on_largest_by_rows
+stress_test_resolution:
+  status: resolved
+  resolved_by: research_log/decisions/tier1/T1-DEC-002.md
+  resolved_on: 2026-05-12
+  protocol: largest_by_rows (val=Btheta, val_seen_rate=0% at media level)
+  result_summary: |
+    Multihot RMSE 0.5897 ± 0.0109 vs media_id RMSE 3.8451 ± 1.2961.
+    Gap = 3.26 RMSE (650× the locked threshold). H-ENC-01 unambiguously
+    supported on the proper stress test. Promotion of multihot upgraded
+    from "tiebreaker basis" to "primary basis."
+
+# Mandatory diagnostic policy for all future T1+ experiments
+mandatory_diagnostic_reporting:
+  - protocol: largest_by_rows
+    rationale: |
+      H-ENC-01 was only adequately tested on this protocol (T1-A.2). Future
+      T1+ promotion reports must include results on largest_by_rows so the
+      encoder choice continues to be validated on a protocol with unseen
+      val media.

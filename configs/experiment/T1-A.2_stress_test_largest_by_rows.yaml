@@ -1,0 +1,31 @@
+# @package _global_
+# T1-A.2 — Stress-test of H-ENC-01 on `largest_by_rows`.
+#
+# Follow-up to T1-A (which produced no_winner on `multi_org_balanced` because
+# val_seen_rate at the media-name level was 1.0 — every val medium was in
+# train, so the media_id encoder never fell back to UNK).
+#
+# This protocol holds out Btheta (val) + DvH (test). val_seen_rate at the
+# media-name level is 0% — none of Btheta's medium names appear in train.
+# The media_id encoder will encode 100% of val rows as <UNK>, which is the
+# proper stress test of H-ENC-01.
+#
+# Filed in REFACTORPLAN §12 (Deferred: T1-A.2) per T1-DEC-001.
+
+experiment_id: T1-A.2_stress_test_largest_by_rows
+stage_or_tier: T1
+
+experiment:
+  hypothesis: H-ENC-01
+  parent_experiment: T1-A_granularity
+  protocol_path: data_contract/splits/largest_by_rows_diagnostic_protocol.yaml
+  arms:
+    - condition_encoder: media_id
+    - condition_encoder: multihot_canonical_id
+  seeds: [0, 1, 2]
+  promotion_rule:
+    # Uses largest_by_rows-specific S2 thresholds (0.005 RMSE floor, since
+    # NN doesn't beat global mean on this protocol).
+    additive_baseline_gate: required
+    primary: [rmse_decrease, mae_decrease]
+    secondary: spearman_non_degradation
