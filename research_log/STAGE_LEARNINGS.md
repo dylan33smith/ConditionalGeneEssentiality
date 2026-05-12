@@ -786,6 +786,55 @@ publish a causal decomposed-vs-coarse claim."
 | Does the locked encoder generalize across protocols? | Yes structurally, but absolute performance varies a lot (0.51 RMSE on multi_org_balanced; 0.59 on largest_by_rows; latter doesn't beat global mean). |
 | Are there regimes where media_id is competitive? | Only when val media are 100% in train (multi_org_balanced); otherwise media_id catastrophically fails. |
 | Does the homology-bin crossover from T1-A generalize? | **No.** It was an artifact of full media coverage on T1-A's protocol. Multihot is stable across bins on largest_by_rows. |
+| Does the numeric transform of `amount` matter? | **Yes, but the effect is small** (T1-B). Raw amounts (max=2000) cause ~0.015 RMSE worse than log1p or bounded. log1p ≈ bounded (statistically tied; log1p kept by tiebreaker). Most chemistry cells are presence-only so transform only matters on the ~2% of cells with stressor amounts. |
+
+### T1-B — Numeric Transform Test (H-ENC-02)
+
+**Sources.**
+
+- `research_log/decisions/tier1/T1-DEC-003.md`
+- `research_log/tier_reports/tier1_b_numeric_transform.md`
+- `artifacts/runs/t1b/t1b_summary.json`
+- `research_log/figures/tier1_b/01_*.csv`, `02_*.csv`
+- `artifacts/cache/t1b/bounded_reference_stats.json` (T1-local refit; S4
+  artifact's bounded_reference_stats had n_train=0 and was never fitted)
+
+### Headline conclusions
+
+1. **H-ENC-02 supported.** Both compressing transforms (log1p, bounded)
+   statistically beat raw amounts. Bootstrap CIs for raw and the
+   compressed arms are disjoint. Raw underperforms on all 3 seeds.
+2. **log1p and bounded are statistically tied.** RMSE gap 0.0014
+   (7% of threshold), MAE gap essentially zero. Bootstrap CIs overlap.
+3. **Tiebreaker keeps log1p** — locked S5 default, no artifact bump
+   needed. bounded would require re-fitting `bounded_reference_stats.json`
+   (S4 left it with n_train=0) and bumping artifact_id; not justified.
+4. **Effect size is small (~0.015 RMSE).** Because most chemistry cells
+   are presence-only across all arms — the transform difference only
+   bites on the ~2% of cells with stressor amounts. Adding numeric
+   values to more cells (workbook extension) would amplify the effect.
+5. **No new largest_by_rows run.** T1-B's winning config (log1p +
+   multihot) is bit-identical to T1-A.2's multihot arm; that
+   stress-test result carries over.
+
+### Locked T1 substrate after T1-B
+
+- condition encoder: `multihot_canonical_id` (T1-DEC-002)
+- numeric transform: `log1p` (T1-DEC-003, tiebreaker over bounded)
+- substrate: S4 artifact `de21504134c84a6c`, no change
+
+### Open risks / follow-ups
+
+- T1-B effect size below the locked threshold but statistically real.
+  A reviewer might argue raw "passes" the threshold rule literally. Our
+  rejection relies on bootstrap-CI non-overlap + cross-seed consistency,
+  not point-estimate magnitude alone. Documented in T1-DEC-003.
+- bounded has slightly lower seed variance (0.0013 vs 0.0021). If later
+  tiers find cross-seed stability is the bottleneck, revisit bounded as
+  a candidate.
+- If the workbook is later expanded to record concentrations for more
+  chemistry cells, the transform choice may matter more. Filed as a
+  deferred experiment.
 
 ---
 
