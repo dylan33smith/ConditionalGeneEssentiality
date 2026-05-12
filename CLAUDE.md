@@ -25,9 +25,9 @@ S0 → S1 → S2 → S3 → S4 → S5 → T1 → T2 → T3 → T4
 | S0 | Reproducibility & Governance (smoke pipeline, run manifest, v4 verification) | **approved** (S0-DEC-001) |
 | S1 | Data Characterization → emits candidate protocols | **approved** (S1-DEC-001); H-HOMO-01 triggered at 1.6σ |
 | S2 | Evaluation Trustworthiness (null baselines + power report per candidate) | **approved** (S2-DEC-001); 4/4 protocols → primary; H-BASE-01 reinterpreted (beat best-non-global, not additive) |
-| S3 | Split Protocol Lock | next |
-| S4 | Feature Contract (train-only vocab/scalers) | not started |
-| S5 | Training-Recipe Lock (row-quality + organism pool) | not started |
+| S3 | Split Protocol Lock | **approved** (S3-DEC-001); primary=`multi_org_balanced`, diagnostics=`low_overlap_stress` + homology (0.85 cutoff) |
+| S4 | Feature Contract (Option D: chem long + metadata wide) | **approved** (S4-DEC-002 supersedes S4-DEC-001); artifact_id=`de21504134c84a6c` |
+| S5 | Training-Recipe Lock (row-quality + organism pool) | **approved** (S5-DEC-001); policy=`weighted_full`, organism_pool=`full` |
 | T1 | Representation winner | not started |
 | T2 | Fusion winner (all topology decisions live here, not T3) | not started |
 | T3 | Capacity (depth/residuals/efficiency frontier; conditional embedding fine-tune) | not started |
@@ -71,13 +71,15 @@ python -m src.cli.run_experiment +experiment=T1-A_granularity train.seed=0,1,2 -
 
 ## Scope of generalization claim (locked, REFACTORPLAN L7)
 
-> "Given a gene and a growth medium drawn from a known chemistry vocabulary, our
-> model predicts conditional gene essentiality — including for organisms not seen
-> during training, and conditions structured differently from those the gene
-> appeared in during training."
+> "Given a gene and a growth medium **and applied stressor chemistry** drawn from a
+> known chemistry vocabulary (including explicit `<UNK>` / `<UNK_STRESSOR>`
+> fallbacks), our model predicts conditional gene essentiality — including for
+> organisms not seen during training, and conditions structured differently from
+> those the gene appeared in during training."
 
-S1 confirmed v4 chemistry overlap is ≥95% in every candidate protocol. We do
-NOT claim "generalizes to any chemistry." Going beyond requires fingerprint
+S1 confirmed v4 **medium** chemistry overlap is ≥95% in every candidate protocol at
+the Canonical_ID level; S4-DEC-002 adds stressor-derived canonical slots and logs
+stressor unknown rates. We do NOT claim "generalizes to any chemistry." Going beyond requires fingerprint
 encoders or Canonical_ID-level holdouts (REFACTORPLAN §12, Deferred Experiments).
 
 ## Hard rules (clean-room charter)

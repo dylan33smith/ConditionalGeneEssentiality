@@ -1,5 +1,7 @@
 # @package _global_
 # S5 — Training-Recipe Lock. Locks row-quality and organism-pool policies.
+# Feature contract: `data_contract/feature_contract.yaml` must match the active S4
+# bundle (S4-DEC-002 Option D; artifact_id `de21504134c84a6c` as of last S4 run).
 
 experiment_id: S5_quality_policy
 stage_or_tier: S5
@@ -7,10 +9,38 @@ stage_or_tier: S5
 stage:
   s5:
     feature_contract_path: data_contract/feature_contract.yaml
+    fitness_path: data/derived/canonical/v0/fitness_experiment_long.parquet
+    locked_protocol_path: data_contract/splits/locked_protocol.yaml
+    eval_policy_path: data_contract/policy/eval_policy.yaml
+    embedding_dir: data/processed/ProtLM_embeddings_layer8
+    cache_dir: artifacts/cache/s5
+    figures_dir: research_log/figures/stage5
+    metrics_filename: s5_metrics.parquet
+    report_path: research_log/tier_reports/s5_quality_policy.md
+    decision_path: research_log/decisions/stage5/S5-DEC-001.md
+    output_quality_policy: data_contract/policy/quality_policy.yaml
+    model:
+      hidden_dim: 256
+      dropout: 0.1
+      lr: 0.001
+      weight_decay: 0.0001
+      batch_size: 8192
+      epochs: 8
+      device: auto
+    chemistry_multihot:
+      role_distinguished: false
+      length: 425
+      sparse_cache_filename: multihot.npz
+    thresholds:
+      cor12_quantile: 0.25
+      abs_t_quantile: 0.25
+    threshold_sensitivity:
+      enabled: true
+      quantiles: [0.20, 0.30]
+      seed: 0
     arms:
       - row_quality_policy: weighted_full
         organism_pool: full
       - row_quality_policy: strict_slice
         organism_pool: full
     seeds: [0, 1, 2]
-    output_quality_policy: data_contract/policy/quality_policy.yaml

@@ -1,0 +1,377 @@
+stressor,train_freq,match_type,top1_canonical_id,top1_score,top2_canonical_id,top2_score,top3_canonical_id,top3_score,auto_apply
+Dimethyl Sulfoxide,435,fuzzy,h2s,0.588235,ni2,0.486486,oh,0.484848,False
+Sodium acetate,205,exact_after_norm,ac,1.0,,0.0,,0.0,True
+casamino acids,145,exact_after_norm,ala-L,1.0,,0.0,,0.0,True
+D-Glucose,110,exact_after_norm,glc-D,1.0,,0.0,,0.0,True
+Sodium pyruvate,110,exact_after_norm,pyr,1.0,,0.0,,0.0,True
+Sodium nitrite,105,fuzzy,no3,0.928571,sel,0.758621,si,0.758621,False
+Sodium nitrate,89,exact_after_norm,no3,1.0,,0.0,,0.0,True
+"Sodium D,L-Lactate",88,exact_after_norm,lac-D,1.0,,0.0,,0.0,True
+Cobalt chloride hexahydrate,85,exact_after_norm,cobalt2,1.0,,0.0,,0.0,True
+Nickel (II) chloride hexahydrate,79,fuzzy,cu2,0.8,fe2,0.789474,mn2,0.744186,False
+Sodium sulfate,79,fuzzy,nh4,0.8,mg2,0.774194,tungs,0.733333,False
+L-Glutamine,75,exact_after_norm,gln-L,1.0,,0.0,,0.0,True
+Sodium perchlorate monohydrate,73,fuzzy,na1,0.787879,for,0.75,pyr,0.727273,False
+Thallium(I) acetate,69,fuzzy,ac,0.666667,lac-L,0.571429,lac-D,0.540541,False
+Cisplatin,67,fuzzy,asp-L,0.583333,cys-L,0.526316,ala-L,0.521739,False
+L-Glutamic acid monopotassium salt monohydrate,67,exact_after_norm,glu-L,1.0,,0.0,,0.0,True
+Sodium Formate,67,exact_after_norm,for,1.0,,0.0,,0.0,True
+Fusidic acid sodium salt,65,fuzzy,succ,0.72,bo3,0.636364,asp-L,0.592593,False
+L-Leucine,65,exact_after_norm,leu-L,1.0,,0.0,,0.0,True
+Sodium Chloride,65,exact_after_norm,na1,1.0,,0.0,,0.0,True
+Mc_vitamins,64,fuzzy,phyllo,0.666667,4abz,0.6,thm,0.521739,False
+Sodium Chlorite,64,fuzzy,na1,0.933333,f,0.8,sr2,0.787879,False
+Ammonium chloride,62,exact_after_norm,nh4,1.0,,0.0,,0.0,True
+L-Proline,62,exact_after_norm,pro-L,1.0,,0.0,,0.0,True
+L-Serine,61,exact_after_norm,ser-L,1.0,,0.0,,0.0,True
+Paraquat dichloride,60,fuzzy,cobalt2,0.647059,cu2,0.615385,fe2,0.594595,False
+sodium sulfite,58,fuzzy,nh4,0.733333,mg2,0.709677,tungs,0.666667,False
+Ethanol,57,fuzzy,etha,0.736842,chol,0.545455,edta,0.545455,False
+L-Alanine,55,exact_after_norm,ala-L,1.0,,0.0,,0.0,True
+L-Asparagine,55,exact_after_norm,asn-L,1.0,,0.0,,0.0,True
+L-Isoleucine,55,exact_after_norm,ile-L,1.0,,0.0,,0.0,True
+MreB Perturbing Compound A22,55,fuzzy,cu2,0.4,asp-L,0.372093,tartr-L,0.372093,False
+Aluminum chloride hydrate,53,fuzzy,ca2,0.848485,nh4,0.823529,cl,0.774194,False
+L-Histidine,51,exact_after_norm,his-L,1.0,,0.0,,0.0,True
+copper (II) chloride dihydrate,51,exact_after_norm,cu2,1.0,,0.0,,0.0,True
+kanamycin,51,fuzzy,etha,0.571429,phyllo,0.526316,cbl1,0.521739,False
+Agar,49,fuzzy,akg,0.571429,ala-L,0.444444,arg-L,0.444444,False
+Chloramphenicol,49,fuzzy,cobalt2,0.6,zn2,0.571429,cu2,0.457143,False
+Glycerol,49,exact_after_norm,glyc,1.0,,0.0,,0.0,True
+Nalidixic acid sodium salt,48,fuzzy,succ,0.592593,bo3,0.583333,asp-L,0.551724,False
+Polymyxin B sulfate,48,fuzzy,so4,0.625,nh4,0.571429,mg2,0.555556,False
+Tetracycline hydrochloride,48,fuzzy,tricine,0.631579,etha,0.583333,4abz,0.56,False
+L-Arginine,46,exact_after_norm,arg-L,1.0,,0.0,,0.0,True
+L-Lysine,46,exact_after_norm,lys-L,1.0,,0.0,,0.0,True
+Sodium L-Lactate,46,exact_after_norm,lac-L,1.0,,0.0,,0.0,True
+L-Phenylalanine,45,exact_after_norm,phe-L,1.0,,0.0,,0.0,True
+Spectinomycin dihydrochloride pentahydrate,45,fuzzy,ins,0.5,tricine,0.5,zn2,0.5,False
+sodium fluoride,44,exact_after_norm,f,1.0,,0.0,,0.0,True
+D-Cycloserine,43,fuzzy,cys-L,0.695652,csn,0.666667,ser-L,0.666667,False
+L-Methionine,43,exact_after_norm,met-L,1.0,,0.0,,0.0,True
+Doxycycline hyclate,42,fuzzy,succ,0.5,4hbz,0.444444,si,0.444444,False
+benzoic acid,42,fuzzy,bo3,0.818182,succ,0.64,4abz,0.580645,False
+D-Alanine,41,fuzzy,ala-L,0.888889,val-L,0.705882,phe-L,0.666667,False
+N-Acetyl-D-Glucosamine,40,fuzzy,gln-L,0.606061,glc-D,0.580645,leu-L,0.516129,False
+Putrescine Dihydrochloride,40,exact_after_norm,ptrc,1.0,,0.0,,0.0,True
+Vancomycin Hydrochloride Hydrate,40,fuzzy,cbl1,0.583333,etha,0.545455,adn,0.526316,False
+Zinc sulfate heptahydrate,39,exact_after_norm,zn2,1.0,,0.0,,0.0,True
+a-Ketoglutaric acid disodium salt hydrate,39,exact_after_norm,akg,1.0,,0.0,,0.0,True
+Glycine,37,exact_after_norm,gly,1.0,,0.0,,0.0,True
+L-Citrulline,37,fuzzy,pro-L,0.666667,cys-L,0.636364,tyr-L,0.636364,False
+Sodium D-Lactate,37,fuzzy,lac-D,0.941176,lac-L,0.9375,ac,0.866667,False
+Carbenicillin disodium salt,36,fuzzy,ade,0.5,tricine,0.5,fe3,0.482759,False
+Iron (II) chloride tetrahydrate,36,exact_after_norm,fe2,1.0,,0.0,,0.0,True
+L-Threonine,36,exact_after_norm,thr-L,1.0,,0.0,,0.0,True
+Bacitracin,35,fuzzy,tricine,0.588235,tartr-L,0.56,cit,0.521739,False
+Benzethonium chloride,35,fuzzy,nh4,0.736842,cl,0.685714,ca2,0.648649,False
+Cephalothin sodium salt,35,fuzzy,chol,0.555556,xan,0.526316,etha,0.521739,False
+D-Glucosamine Hydrochloride,35,fuzzy,glc-D,0.818182,gln-L,0.75,gsn,0.636364,False
+Sodium succinate dibasic hexahydrate,35,fuzzy,na1,0.619048,k,0.577778,h2s,0.56,False
+D-Fructose,34,fuzzy,glc-D,0.736842,sucr,0.588235,csn,0.555556,False
+Iron,34,fuzzy,h,0.6,ins,0.571429,quin,0.5,False
+L-Malic acid disodium salt monohydrate,34,fuzzy,asp-L,0.740741,tartr-L,0.740741,bo3,0.636364,False
+Sisomicin sulfate salt,33,fuzzy,ile-L,0.571429,spmd,0.526316,his-L,0.5,False
+Lomefloxacin hydrochloride,32,fuzzy,ile-L,0.5,met-L,0.5,ala-L,0.47619,False
+D-Trehalose dihydrate,31,fuzzy,glc-D,0.6,tyr-L,0.571429,thr-L,0.545455,False
+L-Valine,30,exact_after_norm,val-L,1.0,,0.0,,0.0,True
+Adenosine,29,exact_after_norm,adn,1.0,,0.0,,0.0,True
+Cytidine,29,exact_after_norm,cytd,1.0,,0.0,,0.0,True
+Phosphomycin disodium salt,29,fuzzy,pheme,0.470588,ptrc,0.454545,spmd,0.454545,False
+Sodium Chlorate,29,fuzzy,na1,0.866667,for,0.827586,co3,0.774194,False
+D-Mannose,28,fuzzy,adn,0.555556,ala-L,0.555556,glc-D,0.555556,False
+D-Galactose,26,fuzzy,glc-D,0.8,polygalact,0.571429,glu-L,0.545455,False
+D-Maltose monohydrate,26,fuzzy,glc-D,0.666667,br,0.555556,tyr-L,0.526316,False
+Mixed culture; Syntrophotalea carbinolica 1:1 starting OD to methanogen,26,fuzzy,na1,0.427586,cl,0.410256,so4,0.396694,False
+Potassium acetate,26,fuzzy,k,0.787879,ac,0.774194,lac-L,0.666667,False
+cv.Norland,26,fuzzy,cbl1,0.5,etha,0.454545,chol,0.428571,False
+Benzalkonium Chloride,25,fuzzy,nh4,0.789474,ca2,0.756757,cl,0.685714,False
+Cholin acetate,25,fuzzy,ac,0.740741,lac-L,0.6,chol,0.571429,False
+D-Cellobiose,25,fuzzy,glc-D,0.571429,adn,0.47619,cys-L,0.454545,False
+Sucrose,25,exact_after_norm,sucr,1.0,,0.0,,0.0,True
+cv.Atlantic,25,fuzzy,zn2,0.545455,ac,0.5,ala-L,0.5,False
+D-Xylose,24,fuzzy,glc-D,0.705882,tyr-L,0.555556,csn,0.5,False
+cv.Upstate,24,fuzzy,tungs,0.48,asp-L,0.47619,glu-L,0.47619,False
+Ceftazidime hydrate,23,fuzzy,cytd,0.631579,ac,0.56,ncam,0.521739,False
+D-Gluconic Acid sodium salt,23,fuzzy,succ,0.714286,polygalact,0.666667,bo3,0.64,False
+Glucuronamide,23,fuzzy,ncam,0.64,polygalact,0.6,gln-L,0.583333,False
+L-Arabinose,23,fuzzy,ala-L,0.7,asn-L,0.695652,arg-L,0.666667,False
+L-Aspartic Acid,23,exact_after_norm,asp-L,1.0,,0.0,,0.0,True
+L-Tryptophan,23,exact_after_norm,trp-L,1.0,,0.0,,0.0,True
+Urea,23,fuzzy,ura,0.857143,gua,0.571429,uri,0.571429,False
+Uridine,23,exact_after_norm,uri,1.0,,0.0,,0.0,True
+1-ethyl-3-methylimidazolium acetate,22,fuzzy,nta,0.423077,fe3,0.413793,no3,0.405797,False
+Fusaric acid,22,fuzzy,asp-L,0.740741,bo3,0.727273,tartr-L,0.666667,False
+Vanillin,22,fuzzy,val-L,0.625,ade,0.533333,gua,0.533333,False
+5-Hydroxymethylfurfural,21,fuzzy,4hbz,0.5,34dhbz,0.454545,h2s,0.410256,False
+Cytosine,21,exact_after_norm,csn,1.0,,0.0,,0.0,True
+Sodium Fumarate dibasic,21,fuzzy,hco3,0.731707,si,0.684211,co3,0.666667,False
+Sodium sulfide nonahydrate,20,exact_after_norm,h2s,1.0,,0.0,,0.0,True
+Tween 20,20,fuzzy,btn,0.363636,sel,0.363636,cys-L,0.333333,False
+syringaldehyde,20,fuzzy,ser-L,0.454545,pydx,0.434783,succ,0.434783,False
+Choline chloride,19,fuzzy,cobalt2,0.774194,zn2,0.758621,na1,0.709677,False
+Dimetridazole,19,fuzzy,thgl,0.484848,etha,0.48,met-L,0.48,False
+Gentamicin sulfate salt,19,fuzzy,tricine,0.588235,gln-L,0.571429,etha,0.545455,False
+Sodium tungstate dihydrate,19,exact_after_norm,tungs,1.0,,0.0,,0.0,True
+Trisodium citrate dihydrate,19,fuzzy,no3,0.83871,ac,0.774194,co3,0.727273,False
+m-Inositol,19,fuzzy,inost,0.909091,ins,0.588235,ile-L,0.454545,False
+methylglyoxal,19,fuzzy,thgl,0.538462,phyllo,0.526316,glyc,0.47619,False
+Casamino acids (vitamin assay),18,fuzzy,ala-L,0.636364,phyllo,0.5,al3,0.4,False
+D-Mannitol,18,fuzzy,inost,0.545455,cit,0.434783,no3,0.434783,False
+L-Cysteine,18,exact_after_norm,cys-L,1.0,,0.0,,0.0,True
+Rifampicin,18,fuzzy,tricine,0.588235,phyllo,0.5,ura,0.5,False
+Sodium thiosulfate,18,fuzzy,thgl,0.789474,na1,0.722222,nh4,0.705882,False
+"Vogels_fungal_media, filtered",18,fuzzy,si,0.363636,polygalact,0.36,succ,0.333333,False
+2-Furfuraldehyde,17,fuzzy,akg,0.4,f,0.387097,tartr-L,0.384615,False
+D-Galacturonic Acid monohydrate,17,fuzzy,polygalact,0.85,asp-L,0.647059,tartr-L,0.647059,False
+Sodium propionate,17,fuzzy,co3,0.787879,pyr,0.75,hco3,0.742857,False
+D-Ribose,16,fuzzy,glc-D,0.588235,tyr-L,0.555556,ins,0.533333,False
+Gly-Glu,16,fuzzy,gln-L,0.666667,lys-L,0.666667,gly,0.6,False
+Inosine,16,exact_after_norm,ins,1.0,,0.0,,0.0,True
+L-Ornithine,16,fuzzy,arg-L,0.666667,his-L,0.636364,thr-L,0.636364,False
+1-ethyl-3-methylimidazolium chloride,15,fuzzy,nh4,0.566038,ca2,0.5,cl,0.44,False
+D-Sorbitol,15,fuzzy,inost,0.545455,ser-L,0.444444,pro-L,0.421053,False
+Gly-DL-Asp,15,fuzzy,glc-D,0.533333,gln-L,0.533333,glu-L,0.533333,False
+L-Valine (HPLC purified),15,fuzzy,val-L,0.5,ala-L,0.424242,thm,0.407407,False
+Sodium butyrate,15,fuzzy,no3,0.827586,pyr,0.8,ac,0.758621,False
+"Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered",15,fuzzy,cl,0.379888,k,0.34188,ca2,0.338462,False
+2-Deoxy-D-Ribose,14,fuzzy,34dhbz,0.486486,4hbz,0.484848,tyr-L,0.461538,False
+Bile salts,14,fuzzy,ile-L,0.533333,br,0.526316,starch,0.5,False
+Choline Lysine,14,fuzzy,chol,0.666667,lys-L,0.636364,ins,0.571429,False
+Sodium molybdate,14,exact_after_norm,mobd,1.0,,0.0,,0.0,True
+Zinc Pyrithione,14,fuzzy,zn2,0.692308,met-L,0.518519,spmd,0.48,False
+a-Cyclodextrin,14,fuzzy,zn2,0.518519,cys-L,0.5,sr2,0.5,False
+Antimycin A,13,fuzzy,tricine,0.555556,xan,0.526316,ac,0.5,False
+D-Raffinose pentahydrate,13,fuzzy,ins,0.555556,ser-L,0.526316,val-L,0.526316,False
+D-Serine,13,fuzzy,ser-L,0.875,ade,0.666667,cys-L,0.666667,False
+Chlorhexidine diacetate salt hydrate,12,fuzzy,cobalt2,0.578947,na1,0.578947,zn2,0.555556,False
+Chlorpromazine hydrochloride,12,fuzzy,pro-L,0.608696,zn2,0.592593,chol,0.571429,False
+Furfuryl Alcohol,12,fuzzy,chol,0.4,f,0.4,for,0.344828,False
+L-Rhamnose monohydrate,12,fuzzy,tyr-L,0.6,gln-L,0.571429,val-L,0.555556,False
+L-tyrosine disodium salt,12,exact_after_norm,tyr-L,1.0,,0.0,,0.0,True
+D-Salicin,11,fuzzy,val-L,0.588235,ile-L,0.571429,ala-L,0.555556,False
+Irgasan,11,fuzzy,gsn,0.6,asn-L,0.5,rsz,0.5,False
+Parabanic Acid,11,fuzzy,asp-L,0.689655,tartr-L,0.689655,bo3,0.666667,False
+"Supernatant; Trichoderma atroviride IMI tmk3mutant grown in Vogels_fungal_media, filtered",11,fuzzy,cl,0.369668,cu2,0.335484,k,0.3125,False
+2'-Deoxyinosine,10,fuzzy,adn,0.666667,ins,0.636364,tyr-L,0.56,False
+Adenine hydrochloride hydrate,10,exact_after_norm,ade,1.0,,0.0,,0.0,True
+Beta-Lactose,10,fuzzy,glc-D,0.571429,lac-D,0.518519,lac-L,0.518519,False
+Ethanolamine,10,exact_after_norm,etha,1.0,,0.0,,0.0,True
+Neomycin trisulfate salt hydrate,10,fuzzy,so4,0.6875,mg2,0.611111,nh4,0.571429,False
+Oxytetracycline hydrochloride,10,fuzzy,tricine,0.545455,etha,0.518519,4abz,0.5,False
+Sulfaquinoxaline sodium salt,10,fuzzy,gsn,0.56,mqn8,0.551724,arg-L,0.538462,False
+"1,3-Propanediol",9,fuzzy,pro-L,0.5,trp-L,0.444444,pydx,0.416667,False
+1-ethyl-3-methylimidazolium lysine,9,fuzzy,met-L,0.478261,etha,0.434783,thymd,0.418605,False
+2-Deoxy-D-ribonic acid lithium salt,9,fuzzy,4hbz,0.651163,34dhbz,0.638298,akg,0.536585,False
+2-n-Heptyl-4-hydroxyquinoline N-oxide,9,fuzzy,4hbz,0.448276,34dhbz,0.419355,oh,0.384615,False
+Cefoxitin sodium salt,9,fuzzy,chol,0.5,cit,0.5,hxan,0.47619,False
+Copper (II) sulfate pentahydrate,9,exact_after_norm,cu2,1.0,,0.0,,0.0,True
+Econazole nitrate salt,9,fuzzy,no3,0.666667,cit,0.6,sel,0.516129,False
+H2,9,fuzzy,h2s,0.8,h,0.666667,oh,0.5,False
+L-Fucose,9,fuzzy,glc-D,0.705882,sucr,0.666667,leu-L,0.588235,False
+L-tyrosine,9,exact_after_norm,tyr-L,1.0,,0.0,,0.0,True
+N2,9,fuzzy,mn2,0.8,ni2,0.8,zn2,0.8,False
+S-adenosyl Homocysteine,9,fuzzy,cys-L,0.484848,h2s,0.410256,mobd,0.410256,False
+Sodium Fluorophosphate,9,fuzzy,pi,0.75,for,0.722222,f,0.702703,False
+Sodium selenate,9,fuzzy,sel,0.933333,si,0.8,ac,0.758621,False
+Thioridazine hydrochloride,9,fuzzy,thymd,0.666667,zn2,0.64,tricine,0.631579,False
+Uranyl acetate,9,fuzzy,ac,0.740741,lac-L,0.533333,cit,0.5,False
+ammonium sulfide solution,9,fuzzy,nh4,0.682927,so4,0.578947,mobd,0.541667,False
+2-Mercaptopyridine N-oxide sodium salt,8,fuzzy,na1,0.439024,cl,0.42623,met-L,0.421053,False
+Anhydrotetracycline hydrochloride,8,fuzzy,h2s,0.514286,oh,0.470588,chol,0.461538,False
+Carnitine Hydrochloride,8,fuzzy,xan,0.705882,arg-L,0.631579,ade,0.625,False
+D-Glucose-6-Phosphate sodium salt,8,fuzzy,glc-D,0.6,na1,0.564103,pi,0.55,False
+Phenylacetic acid,8,fuzzy,polygalact,0.684211,asp-L,0.625,tartr-L,0.625,False
+Sodium Chromate,8,fuzzy,co3,0.83871,for,0.827586,hco3,0.787879,False
+Thymine,8,fuzzy,thymd,0.875,pheme,0.666667,xan,0.666667,False
+Chenodeoxycholic acid,7,fuzzy,succ,0.529412,bo3,0.516129,ca2,0.486486,False
+Deoxycholic acid,7,fuzzy,bo3,0.615385,succ,0.551724,asp-L,0.516129,False
+Trimethoprim,7,fuzzy,met-L,0.5,mg2,0.428571,tricine,0.421053,False
+spermidine,7,exact_after_norm,spmd,1.0,,0.0,,0.0,True
+2-Deoxyadenosine 5-monophosphate,6,fuzzy,k,0.566038,na1,0.56,pi,0.509804,False
+4-Hydroxybenzoic Acid,6,exact_after_norm,4hbz,1.0,,0.0,,0.0,True
+Ceftriaxone disodium salt hemi(heptahydrate),6,fuzzy,fe2,0.555556,edta,0.53125,mobd,0.507463,False
+DETA/NO,6,fuzzy,edta,0.545455,etha,0.545455,ac,0.5,False
+Deoxyribonucleic acid from herring sperm,6,fuzzy,cit,0.473684,nac,0.416667,fol,0.411765,False
+FCCP,6,fuzzy,caps,0.5,succ,0.5,f,0.4,False
+Formamide,6,fuzzy,ncam,0.571429,br,0.545455,for,0.545455,False
+Lactulose,6,fuzzy,csn,0.588235,lac-L,0.571429,glc-D,0.555556,False
+Maltitol,6,fuzzy,inost,0.5,ala-L,0.461538,val-L,0.461538,False
+Manganese (II) chloride tetrahydrate,6,exact_after_norm,mn2,1.0,,0.0,,0.0,True
+Methanol,6,fuzzy,etha,0.7,met-L,0.615385,chol,0.5,False
+"N,N,N′,N′-Tetramethylethylenediamine",6,fuzzy,4abz,0.41791,etha,0.375,met-L,0.375,False
+Nitrofurantoin,6,fuzzy,gsn,0.521739,nta,0.516129,h,0.5,False
+Polyethylene glycol,6,fuzzy,pnto-R,0.512821,gly,0.461538,hxan,0.451613,False
+Sodium octanoate,6,fuzzy,ac,0.8,co3,0.75,lac-L,0.75,False
+Sulfamethizole,6,fuzzy,met-L,0.615385,thgl,0.529412,etha,0.461538,False
+Sulfamonomethoxine,6,fuzzy,met-L,0.6,xan,0.538462,gsn,0.518519,False
+Vogels_fungal_media,6,fuzzy,polygalact,0.413793,br,0.357143,tungs,0.352941,False
+Xylitol,6,fuzzy,inost,0.526316,phyllo,0.461538,lipoate,0.428571,False
+calcium pantothenate,6,exact_after_norm,pnto-R,1.0,,0.0,,0.0,True
+potassium (poly)sulfide,6,fuzzy,br,0.7,oh,0.666667,k,0.564103,False
+rubidium chloride,6,fuzzy,na1,0.8125,sr2,0.742857,f,0.6875,False
+sucrose treatment,6,fuzzy,sucr,0.583333,glc-D,0.536585,4abz,0.484848,False
+"2,2'-Dipyridyl",5,fuzzy,pydx,0.521739,34dhbz,0.461538,pyr,0.352941,False
+8-hydroxy-nitroquinoline,5,fuzzy,4hbz,0.536585,hxan,0.5,34dhbz,0.488889,False
+Gelatin,5,fuzzy,gly,0.571429,gua,0.571429,gln-L,0.555556,False
+Levofloxacin,5,fuzzy,val-L,0.5,ala-L,0.47619,leu-L,0.47619,False
+Plant=Tomato_cv_Moneymaker; PlantTreatment=None; Sample=Xylem_sap; GrowthSubstrate=calcine_clay; Collection=direct,5,none,,0.0,,0.0,,0.0,False
+Ramoplanin,5,fuzzy,ala-L,0.631579,pro-L,0.526316,nh4,0.48,False
+Thymidine,5,exact_after_norm,thymd,1.0,,0.0,,0.0,True
+Vancomycin Hydrochloride from Streptomyces orientalis,5,fuzzy,cys-L,0.473118,cl,0.444444,zn2,0.419753,False
+mercury (II) chloride,5,fuzzy,cu2,0.780488,fe2,0.769231,mn2,0.727273,False
+2'-Deoxycytidine,4,fuzzy,cytd,0.666667,cys-L,0.538462,his-L,0.518519,False
+2-Piperidinone,4,fuzzy,spmd,0.666667,uri,0.571429,his-L,0.56,False
+5-Aminovaleric acid,4,fuzzy,4abz,0.736842,akg,0.526316,mops,0.509091,False
+D-Lysine,4,fuzzy,lys-L,0.875,cys-L,0.666667,gly,0.666667,False
+Dibucaine,4,fuzzy,gua,0.625,tricine,0.625,ile-L,0.571429,False
+Furaltadone hydrochloride,4,fuzzy,uri,0.555556,adn,0.5,ala-L,0.5,False
+G418 disulfate salt solution,4,fuzzy,al3,0.52,ribflv,0.428571,pnto-R,0.424242,False
+Glycolic Acid,4,fuzzy,bo3,0.695652,polygalact,0.647059,succ,0.615385,False
+Hyaluronic acid sodium salt from Streptococcus equi,4,fuzzy,no3,0.470588,na1,0.458716,so4,0.44898,False
+Lactitol,4,fuzzy,lac-L,0.615385,ura,0.571429,cit,0.545455,False
+Levulinic Acid,4,fuzzy,succ,0.740741,bo3,0.583333,polygalact,0.571429,False
+Lithocholic acid,4,fuzzy,bo3,0.615385,asp-L,0.580645,tartr-L,0.580645,False
+Methyl-B-D-galactopyranoside,4,fuzzy,tyr-L,0.473684,polygalact,0.444444,ala-L,0.432432,False
+Piperacillin sodium salt,4,fuzzy,ura,0.555556,spmd,0.545455,pro-L,0.47619,False
+Rotenone,4,fuzzy,h,0.714286,adn,0.588235,ade,0.533333,False
+amylopectin from maize,4,fuzzy,br,0.514286,for,0.514286,al3,0.454545,False
+p-Coumaric acid,4,fuzzy,bo3,0.72,asp-L,0.666667,tartr-L,0.666667,False
+2-oxobutyric acid sodium salt,3,fuzzy,akg,0.666667,4hbz,0.578947,34dhbz,0.571429,False
+20AA_mix,3,fuzzy,cbl1,0.434783,etha,0.4,bo3,0.384615,False
+3-Methyl-2-oxobutanoic acid sodium salt,3,fuzzy,4hbz,0.625,34dhbz,0.615385,akg,0.608696,False
+4-Aminobutyric acid,3,fuzzy,4abz,0.789474,akg,0.631579,4hbz,0.55,False
+5-fluorouracil,3,fuzzy,ura,0.6,f,0.482759,leu-L,0.434783,False
+Agro_defined_trehalose,3,fuzzy,ade,0.413793,ca2,0.40678,k,0.393443,False
+Avidin,3,fuzzy,adn,0.666667,ade,0.615385,uri,0.615385,False
+CHIR-090,3,fuzzy,his-L,0.461538,thr-L,0.461538,chol,0.4,False
+Cadmium chloride hemipentahydrate,3,fuzzy,nh4,0.666667,ca2,0.65625,cl,0.582278,False
+Ciprofloxacin Hydrochloride,3,fuzzy,pro-L,0.545455,h,0.526316,chol,0.5,False
+Citric Acid,3,fuzzy,bo3,0.761905,succ,0.75,tartr-L,0.692308,False
+D-Arabinose,3,fuzzy,asn-L,0.608696,ala-L,0.6,arg-L,0.571429,False
+D-Glucuronic Acid,3,fuzzy,polygalact,0.736842,succ,0.666667,bo3,0.592593,False
+D-glucosamine,3,fuzzy,glc-D,0.818182,gln-L,0.75,gsn,0.636364,False
+DL-Isocitric acid trisodium salt hydrate,3,fuzzy,asp-L,0.6875,tartr-L,0.6875,bo3,0.666667,False
+Ferulic Acid,3,fuzzy,bo3,0.727273,succ,0.64,cit,0.615385,False
+Geneticin G418,3,fuzzy,tricine,0.47619,phyllo,0.416667,ade,0.380952,False
+L-Carnitine hydrochloride,3,fuzzy,arg-L,0.761905,ala-L,0.7,cys-L,0.666667,False
+L-Homoserine,3,fuzzy,ser-L,0.8,cys-L,0.636364,tyr-L,0.636364,False
+Levan - from Erwinia herbicola,3,fuzzy,na1,0.436782,thgl,0.4,ni2,0.394737,False
+Lincomycin hydrochloride,3,fuzzy,gly,0.588235,ins,0.588235,ile-L,0.545455,False
+Oxaloacetic acid,3,fuzzy,polygalact,0.702703,asp-L,0.645161,bo3,0.615385,False
+Pectin,3,fuzzy,ptrc,0.625,nac,0.615385,csn,0.571429,False
+Phenazine ethosulfate,3,fuzzy,zn2,0.608696,etha,0.545455,ac,0.529412,False
+Plant=Tomato_MoneyMaker; PlantTreatment=exvivo_xylem_sap_from_healthy_plant; Sample=xylem_sap; Collection=25hr_after_growth_in_xylem_sap,3,none,,0.0,,0.0,,0.0,False
+Potassium dichromate,3,fuzzy,k,0.765957,br,0.756757,oh,0.717949,False
+Red Arabinan from sugar-beet,3,fuzzy,edta,0.416667,co3,0.409091,rsz,0.4,False
+Sodium Persulfate,3,fuzzy,pyr,0.8125,si,0.75,ac,0.709677,False
+Spiramycin,3,fuzzy,asn-L,0.545455,phyllo,0.5,spmd,0.5,False
+Starch,3,exact_after_norm,starch,1.0,,0.0,,0.0,True
+ammonium persulfate,3,fuzzy,nh4,0.914286,mg2,0.722222,so4,0.6875,False
+peroxynitrite,3,fuzzy,cit,0.538462,no3,0.538462,nac,0.5,False
+shock,3,fuzzy,so4,0.5,chol,0.444444,hco3,0.444444,False
+(+)-Arabinogalactan,2,fuzzy,polygalact,0.5,4abz,0.439024,cbl1,0.424242,False
+"1,2-Propanediol",2,fuzzy,pro-L,0.5,trp-L,0.444444,pydx,0.416667,False
+"1,3-Butandiol",2,fuzzy,ura,0.421053,gln-L,0.416667,etha,0.4,False
+"1,4-B-D-Galactobiose",2,fuzzy,glc-D,0.551724,polygalact,0.439024,lac-D,0.421053,False
+"1,4-Butanediol",2,fuzzy,gln-L,0.48,lac-D,0.4375,glu-L,0.4,False
+"1,5-Pentanediol",2,fuzzy,phe-L,0.466667,nac,0.454545,etha,0.444444,False
+"1,6-Hexanediamine",2,fuzzy,etha,0.551724,thm,0.533333,phe-L,0.5,False
+1-Pentanol,2,fuzzy,etha,0.545455,pnto-R,0.5,phe-L,0.48,False
+"2,2-dibromo-2-cyanoacetamide",2,fuzzy,34dhbz,0.490566,cbl1,0.428571,4hbz,0.408163,False
+2-Deoxyadenosine monohydrate,2,fuzzy,adn,0.72,ade,0.608696,gsn,0.56,False
+2-methyl-1-butanol,2,fuzzy,etha,0.466667,gln-L,0.413793,met-L,0.4,False
+3-aminobutyric acid,2,fuzzy,4abz,0.736842,akg,0.631579,34dhbz,0.545455,False
+3-methyl-1-butanol,2,fuzzy,etha,0.466667,gln-L,0.413793,met-L,0.4,False
+3-methyl-3-butenol,2,fuzzy,etha,0.4,met-L,0.4,ac,0.387097,False
+4-Guanidinobutyric acid,2,fuzzy,4abz,0.666667,akg,0.571429,34dhbz,0.5,False
+4-Hydroxyvalerate,2,fuzzy,4hbz,0.764706,34dhbz,0.631579,akg,0.516129,False
+6-O-Acetyl-D-glucose,2,fuzzy,glc-D,0.62069,leu-L,0.413793,glu-L,0.408163,False
+Amylose from potato,2,fuzzy,for,0.5,nh4,0.470588,pnto-R,0.461538,False
+Bathophenanthrolinedisulfonic acid disodium salt hydrate,2,fuzzy,pnto-R,0.481481,polygalact,0.472727,mops,0.457143,False
+Beta-alanine,2,fuzzy,ala-L,0.761905,etha,0.666667,val-L,0.6,False
+Betaine,2,fuzzy,etha,0.631579,btn,0.6,thm,0.6,False
+Butanol,2,fuzzy,btn,0.6,etha,0.526316,asn-L,0.5,False
+Butyl stearate,2,fuzzy,asp-L,0.56,akg,0.5,starch,0.5,False
+Butyrolactam,2,fuzzy,nta,0.482759,4abz,0.48,thgl,0.48,False
+Cadaverine,2,fuzzy,ade,0.705882,adn,0.631579,cytd,0.555556,False
+Caprolactam,2,fuzzy,lac-D,0.538462,lac-L,0.538462,co3,0.518519,False
+Chondroitin sulfate A sodium salt from bovine trachea,2,fuzzy,so4,0.522727,no3,0.505747,na1,0.481203,False
+"D,L-Malic Acid",2,fuzzy,asp-L,0.689655,tartr-L,0.689655,bo3,0.583333,False
+"D,L-cysteine",2,fuzzy,cys-L,0.909091,lys-L,0.7,ser-L,0.7,False
+D-Leucrose,2,fuzzy,glc-D,0.842105,sucr,0.705882,leu-L,0.631579,False
+DL-2-Aminobutyric acid,2,fuzzy,tartr-L,0.648649,asp-L,0.594595,bo3,0.5625,False
+DL-3-Aminoisobutyric acid,2,fuzzy,asp-L,0.6,tartr-L,0.6,glu-L,0.518519,False
+Decanoic acid,2,fuzzy,bo3,0.695652,succ,0.692308,ala-L,0.666667,False
+Fructooligosaccharides (FOS),2,fuzzy,starch,0.54902,f,0.428571,fol,0.410256,False
+Green bean,2,fuzzy,sel,0.5,bo3,0.454545,hepes,0.454545,False
+Heparin sodium salt from porcine intestinal mucosa,2,fuzzy,na1,0.481481,cl,0.433735,k,0.432432,False
+Heptanoic acid,2,fuzzy,bo3,0.666667,asp-L,0.62069,tartr-L,0.62069,False
+Hexanoic acid,2,fuzzy,bo3,0.695652,succ,0.615385,ala-L,0.592593,False
+Hydantoin,2,fuzzy,hxan,0.666667,csn,0.588235,xan,0.588235,False
+Indolicidin,2,fuzzy,ins,0.555556,cytd,0.526316,4abz,0.466667,False
+L-Aspartate,2,exact_after_norm,asp-L,1.0,,0.0,,0.0,True
+L-Cysteine hydrochloride monohydrate,2,exact_after_norm,cys-L,1.0,,0.0,,0.0,True
+L-Pipecolic Acid,2,fuzzy,asp-L,0.645161,bo3,0.615385,tartr-L,0.580645,False
+L-Sorbose,2,fuzzy,tyr-L,0.631579,sucr,0.625,ser-L,0.588235,False
+L-pyroglutamic acid,2,fuzzy,asp-L,0.705882,tartr-L,0.647059,glu-L,0.625,False
+Laminaribiose,2,fuzzy,arg-L,0.521739,al3,0.5,gln-L,0.5,False
+Lauric acid,2,fuzzy,asp-L,0.769231,tartr-L,0.769231,bo3,0.761905,False
+Maltohexaose,2,fuzzy,pnto-R,0.5,adn,0.47619,br,0.47619,False
+Maltotetraose,2,fuzzy,tyr-L,0.521739,al3,0.514286,pnto-R,0.484848,False
+Mannan from Saccharomyces cerevisiae,2,fuzzy,mn2,0.392857,bo3,0.363636,fe2,0.363636,False
+Melibiose,2,fuzzy,ins,0.5,lipoate,0.5,mes,0.5,False
+Metronidazole,2,fuzzy,met-L,0.56,nac,0.5,etha,0.48,False
+Myristic acid,2,fuzzy,bo3,0.695652,asp-L,0.642857,succ,0.615385,False
+Nicotinic Acid,2,fuzzy,succ,0.740741,ncam,0.615385,nac,0.608696,False
+Nonanoic acid,2,fuzzy,bo3,0.695652,succ,0.615385,asp-L,0.571429,False
+Octanoic acid,2,fuzzy,bo3,0.695652,succ,0.692308,ala-L,0.666667,False
+Oleic acid,2,fuzzy,bo3,0.8,asp-L,0.64,tartr-L,0.64,False
+Propandiamine,2,fuzzy,etha,0.56,hxan,0.56,pro-L,0.545455,False
+Protocatechuic Acid,2,fuzzy,asp-L,0.588235,tartr-L,0.588235,succ,0.5625,False
+Rhamnogalacturonan - from potato,2,fuzzy,polygalact,0.530612,phe-L,0.382979,br,0.367347,False
+Stachyose - 70%,2,fuzzy,tyr-L,0.48,starch,0.47619,sucr,0.454545,False
+Supernatant; Agrobacterium rhizogenes K599 grown in Agro_defined_trehalose (~7.5 mM 3-keto-trehalose),2,fuzzy,na1,0.364641,k,0.337349,so4,0.331126,False
+Tetrazolium violet,2,fuzzy,ca2,0.5,4abz,0.489796,mobd,0.489796,False
+Uracil,2,exact_after_norm,ura,1.0,,0.0,,0.0,True
+Valeric acid,2,fuzzy,bo3,0.727273,asp-L,0.666667,tartr-L,0.666667,False
+Vanillic Acid,2,fuzzy,succ,0.615385,bo3,0.608696,asp-L,0.571429,False
+capsaicin,2,fuzzy,caps,0.615385,ptrc,0.526316,ala-L,0.521739,False
+"dextran, Mw ~200,000",2,fuzzy,4abz,0.363636,cl,0.36,ala-L,0.333333,False
+e-Amino-N-Caproic Acid,2,fuzzy,asp-L,0.594595,tartr-L,0.594595,bo3,0.5625,False
+epiphytic,2,fuzzy,ptrc,0.461538,pipes,0.428571,zn2,0.411765,False
+palatinose hydrate,2,fuzzy,ala-L,0.631579,ins,0.588235,phe-L,0.56,False
+polygalacturonic acid,2,exact_after_norm,polygalact,1.0,,0.0,,0.0,True
+20AA_mix_minus_Ala,1,fuzzy,4abz,0.378378,al3,0.363636,cbl1,0.363636,False
+20AA_mix_minus_Arg,1,fuzzy,4abz,0.378378,al3,0.363636,cbl1,0.363636,False
+20AA_mix_minus_Asn,1,fuzzy,al3,0.424242,4abz,0.384615,cbl1,0.363636,False
+20AA_mix_minus_Asp,1,fuzzy,4abz,0.384615,al3,0.363636,cbl1,0.363636,False
+20AA_mix_minus_Cys,1,fuzzy,4abz,0.384615,al3,0.363636,cbl1,0.363636,False
+20AA_mix_minus_Gln,1,fuzzy,4abz,0.378378,al3,0.363636,cbl1,0.363636,False
+20AA_mix_minus_Glu,1,fuzzy,4abz,0.378378,cbl1,0.363636,etha,0.333333,False
+20AA_mix_minus_Gly,1,fuzzy,4abz,0.378378,cbl1,0.363636,etha,0.333333,False
+20AA_mix_minus_His,1,fuzzy,4abz,0.378378,al3,0.363636,cbl1,0.363636,False
+20AA_mix_minus_Ile,1,fuzzy,etha,0.4,inost,0.4,ins,0.4,False
+20AA_mix_minus_Leu,1,fuzzy,etha,0.4,4abz,0.378378,sel,0.375,False
+20AA_mix_minus_Lys,1,fuzzy,4abz,0.384615,cbl1,0.363636,ca2,0.344828,False
+20AA_mix_minus_Met,1,fuzzy,al3,0.424242,etha,0.4,4abz,0.384615,False
+20AA_mix_minus_Pro,1,fuzzy,4abz,0.378378,ala-L,0.375,al3,0.363636,False
+20AA_mix_minus_Ser,1,fuzzy,etha,0.4,4abz,0.378378,ala-L,0.37037,False
+20AA_mix_minus_Thr,1,fuzzy,bo3,0.388889,4abz,0.378378,al3,0.363636,False
+20AA_mix_minus_Trp,1,fuzzy,bo3,0.388889,4abz,0.378378,al3,0.363636,False
+20AA_mix_minus_Tyr,1,fuzzy,bo3,0.388889,4abz,0.378378,al3,0.363636,False
+20AA_mix_minus_Val,1,fuzzy,4abz,0.378378,pyr,0.375,al3,0.363636,False
+Acridine orange,1,fuzzy,bo3,0.592593,for,0.571429,uri,0.545455,False
+Acriflavine,1,fuzzy,ribflv,0.615385,ala-L,0.6,arg-L,0.571429,False
+Ampicillin sodium salt,1,fuzzy,ura,0.5,nh4,0.48,chol,0.470588,False
+Berberine,1,fuzzy,tricine,0.608696,ser-L,0.588235,spmd,0.526316,False
+"D,L-histidine",1,fuzzy,his-L,0.916667,cys-L,0.608696,cytd,0.571429,False
+D-Tagatose,1,fuzzy,glc-D,0.631579,tartr-L,0.6,glu-L,0.571429,False
+Erythromycin,1,fuzzy,etha,0.583333,tricine,0.538462,thr-L,0.521739,False
+Flavone,1,fuzzy,val-L,0.533333,adn,0.5,ala-L,0.5,False
+Hydrogen peroxide,1,fuzzy,h2s,0.727273,oh,0.5625,4hbz,0.526316,False
+Isomaltose,1,fuzzy,br,0.631579,lipoate,0.588235,for,0.521739,False
+Mitomycin C,1,fuzzy,csn,0.526316,btn,0.454545,chol,0.444444,False
+Phloretin,1,fuzzy,zn2,0.636364,pheme,0.571429,h,0.533333,False
+Succinic Acid,1,exact_after_norm,succ,1.0,,0.0,,0.0,True
+Yeast Extract,1,exact_after_norm,4abz,1.0,,0.0,,0.0,True

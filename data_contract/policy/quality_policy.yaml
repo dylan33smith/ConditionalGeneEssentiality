@@ -1,6 +1,43 @@
-# S5 emits this.
-status: pending
+status: locked
 emitted_by: stage5
-row_quality_policy: null   # "weighted_full" | "strict_slice"
-organism_pool: null        # "full" | "curated"
-weighting_thresholds: {}
+row_quality_policy: weighted_full
+organism_pool: full
+weighting_thresholds:
+  cor12_median_train: 0.21396512444077
+  abs_t_median_train: 0.701673023654227
+  cor12_q_train: 0.162083259120376
+  abs_t_q_train: 0.31917084415825203
+  cor12_quantile: 0.25
+  abs_t_quantile: 0.25
+effective_sample_size_train:
+  weighted_full: 15800521.0
+  strict_slice: 13878149.0
+chemistry_multihot_length: 425
+chemistry_multihot_role_distinguished: false
+additive_gate:
+- arm: weighted_full
+  additive_rmse: 0.6319791150927225
+  additive_mae: 0.31591983504903476
+  model_best_rmse_mean: 0.5151467374031115
+  passes_h_base_01_rmse: true
+- arm: strict_slice
+  additive_rmse: 0.6368873174423915
+  additive_mae: 0.3385475510008765
+  model_best_rmse_mean: 0.5193101865014452
+  passes_h_base_01_rmse: true
+drop_cause_attribution_strict_slice:
+  dropped_only_cor12: 4524885
+  dropped_only_abs_t: 4506870
+  dropped_both: 1622835
+threshold_sensitivity:
+- setting: weight_floor_p5
+  val_rmse: 0.5123881094656333
+  val_mae: 0.29389693278590234
+- setting: weight_floor_p15
+  val_rmse: 0.5161997103751775
+  val_mae: 0.29621452152729316
+- setting: base
+  val_rmse: 0.5151467374031115
+  val_mae: 0.2957290080466724
+split_protocol_id: multi_org_balanced
+feature_contract_artifact_id: de21504134c84a6c

@@ -1,5 +1,7 @@
 # @package _global_
 # T1-C — Unknown Handling Test. Hypothesis H-ENC-03.
+# Data: S4 Option D — chemistry unknowns = canonical strings absent from train vocab;
+#   metadata unknowns = `*_idx` from `experiment_metadata.parquet`.
 
 experiment_id: T1-C_unknown_handling
 stage_or_tier: T1

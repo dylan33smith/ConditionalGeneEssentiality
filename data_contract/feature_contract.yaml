@@ -1,13 +1,105 @@
-# S4 emits this. Concrete artifact ids point at fitted vocab/scalers under
-# data_contract/preprocessing/<artifact_id>/.
-status: pending
+status: locked
 emitted_by: stage4
-canonical_id_vocab_artifact: null
-canonical_id_to_index_artifact: null
-media_to_multihot_contract: null
-representation_mode_tag: null
-numeric_field_registry: {}
-metadata_field_registry: {}
-trimming_policy:
-  prevalence_threshold: null
-  fit_on_train_only: true
+schema_version: s4_option_d_v1
+artifact_id: de21504134c84a6c
+locked_protocol_id: multi_org_balanced
+locked_split_manifest_sha256: 74095fbfec6b34897fe02a146a46b290bdcd4c23661315bf6a2ef82abb57e74f
+unk_policy:
+  unk_token: <UNK>
+  unk_index: 0
+  missing_token: <MISSING>
+  missing_index: 1
+  unk_stressor_token: <UNK_STRESSOR>
+stressor_resolution:
+  source_path: data_contract/preprocessing/_review/stressor_to_canonical_id.yaml
+  artifact_copy: stressor_to_canonical_id.yaml
+canonical_id_vocab:
+  n_pretrim: 423
+  n_posttrim: 423
+  vocab_size_with_specials: 425
+  chemistry_prevalence_threshold: 0.0
+  prevalence_unit: distinct_train_experiments_per_canonical_id
+  chemistry_parquet_policy: "raw_canonical_id_strings; no S4 prevalence replacement\
+    \ \u2014 OOV/rare bucketing deferred to T1"
+experiment_chemistry_table:
+  path: experiment_chemistry.parquet
+  columns:
+  - experiment_id
+  - canonical_id
+  - role
+  - amount
+  - log1p_amount
+experiment_metadata_table:
+  path: experiment_metadata.parquet
+  categorical_columns:
+  - oxygen_idx
+  - experiment_group_idx
+  - liquid_state_idx
+  numeric_columns:
+  - temperature_c_z
+  - pH_z
+  - shaking_rpm_z
+  - temperature_c_is_finite
+  - pH_is_finite
+  - shaking_rpm_is_finite
+representation_mode:
+  modes:
+  - physical
+  - mix
+  - extract
+  - in_silico
+  - stressor
+  source_mapping_path: data_contract/representation_mode_mapping.yaml
+  per_media_table: representation_mode_per_media.parquet
+  per_canonical_table: representation_mode_per_canonical.parquet
+concentration_policy:
+  note: "units_1..units_4 are NOT consumed in S4. concentration_* values are pooled\
+    \ without unit conversion \u2014 do NOT use raw concentrations for cross-experiment\
+    \ comparisons or magnitude claims until T1 normalizes units."
+numeric_registry:
+  Amount:
+    default_transform: log1p
+    fitted_scaler_file: amount_scaler.json
+    available_alternatives:
+    - raw
+    - bounded
+    bounded_reference_file: bounded_reference_stats.json
+  metadata_numeric:
+    temperature_c:
+      fitted_scaler: numeric_metadata_scalers.json
+      field_key: temperature_c
+    pH:
+      fitted_scaler: numeric_metadata_scalers.json
+      field_key: pH
+    shaking_rpm:
+      fitted_scaler: numeric_metadata_scalers.json
+      field_key: shaking_rpm
+metadata_registry:
+  oxygen:
+    source_column: aerobic
+    encoding: categorical_index
+    vocab_file: metadata_vocabs/oxygen.json
+    unknown_rate_eval: 0.0
+    prevalence_threshold: 0.001
+  experiment_group:
+    source_column: expGroup
+    encoding: categorical_index
+    vocab_file: metadata_vocabs/experiment_group.json
+    unknown_rate_eval: 0.003257328990228013
+    prevalence_threshold: 0.001
+  liquid_state:
+    source_column: liquid
+    encoding: categorical_index
+    vocab_file: metadata_vocabs/liquid_state.json
+    unknown_rate_eval: 0.0
+    prevalence_threshold: 0.001
+unknown_category_rates:
+  chemistry_eval_rows:
+    fraction_canonical_id_not_in_train_vocab: 0.0
+  metadata_eval:
+    oxygen: 0.0
+    experiment_group: 0.003257328990228013
+    liquid_state: 0.0
+artifact_manifest:
+  path: data_contract/preprocessing/de21504134c84a6c/artifact_manifest.json
+  sha256: 7eee76873d8720e6d08942b306adf7067fb7b4644ccc9a2d4b231ffdd5ceba1b

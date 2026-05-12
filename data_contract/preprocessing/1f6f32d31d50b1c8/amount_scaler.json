@@ -1,0 +1,7 @@
+{
+  "mean": 0.0,
+  "n_finite": 0,
+  "n_train": 0,
+  "std": 1.0,
+  "transform": "log1p"
+}

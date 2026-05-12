@@ -23,7 +23,10 @@
 # overlap with defined media). Collapsing extract into mix would erase the
 # ability to flag this with a feature.
 
-modes: [physical, mix, extract, in_silico]
+# `stressor` is assigned in S4 to canonical IDs that appear only as applied
+# stressors (never as a workbook medium component). All workbook-derived rows
+# keep prop_stressor=0 in `representation_mode_per_media.parquet`.
+modes: [physical, mix, extract, in_silico, stressor]
 
 mapping:
   direct:

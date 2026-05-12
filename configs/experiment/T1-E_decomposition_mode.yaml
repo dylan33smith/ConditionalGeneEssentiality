@@ -2,6 +2,8 @@
 # T1-E — Decomposition-Mode Indicator Test. Hypothesis H-ENC-05.
 # Tests whether explicit physical/in-silico/mix flags mitigate over-coupling
 # from decomposed extracts (e.g., LB).
+# Data: join `representation_mode_per_media.parquet` and
+#   `representation_mode_per_canonical.parquet` (includes `stressor` dominant mode).
 
 experiment_id: T1-E_decomposition_mode
 stage_or_tier: T1

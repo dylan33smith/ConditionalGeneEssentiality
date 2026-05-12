@@ -39,7 +39,7 @@ ledger) are referenced but not read end-to-end.
 | L4 | Co-primary metrics: RMSE + MAE. Within-gene Spearman is conditional on Stage-2 power evidence. | Tn-seq fit residuals are heavy-tailed; either-or reporting hides regimes. |
 | L5 | Hydra is the config framework. | Composable YAML is required; ad-hoc loaders fragment quickly across stages and tiers. |
 | L6 | Project structure follows §9. Logic lives only in `src/`. | Prevents code drift across tiers. |
-| L7 | **Scope of generalization claim:** "*Given a gene and a growth medium drawn from a known chemistry vocabulary, our model predicts conditional gene essentiality — including for organisms not seen during training, and conditions structured differently from those the gene appeared in during training.*" Locked 2026-04-27. | S1 figure 17 confirmed all 4 candidate protocols are ≥95% chemistry-seen at the Canonical_ID level. v4 has only ~112 Canonical_IDs (mostly widely shared) so the data cannot honestly support a "generalizes to any chemistry" claim. The narrower scope is testable, useful, and publishable. Going beyond requires fingerprint encoders or Canonical_ID-level holdouts (see §12 Deferred Experiments). |
+| L7 | **Scope of generalization claim:** "*Given a gene and a growth medium **and applied stressor chemistry** drawn from a known chemistry vocabulary (with explicit `<UNK>` / `<UNK_STRESSOR>` handling), our model predicts conditional gene essentiality — including for organisms not seen during training, and conditions structured differently from those the gene appeared in during training.*" Locked 2026-04-27; stressor clause ratified 2026-04-29 (S4-DEC-002). | S1 figure 17 confirmed all 4 candidate protocols are ≥95% **medium** chemistry-seen at the Canonical_ID level. S4 Option D extends the locked contract to stressors (`condition_1..4`) as chemistry rows, with train-only prevalence and resolution YAML. v4 still cannot support a "generalizes to any chemistry" claim. Going beyond requires fingerprint encoders or Canonical_ID-level holdouts (see §12 Deferred Experiments). |
 
 ## 3. Authoritative Data Scope
 
@@ -317,7 +317,7 @@ Pick by transparent rule, not preference.
 - Primary: protocol with non-degenerate chemistry overlap (val/test chemistry seen-rate
   in 30–80% range) AND val support sufficient for stable metrics (per S2 power report).
 - Secondary: lower-overlap stress-test protocol; reported but not gating.
-- Conditional: if `H-HOMO-01` triggered in S1, add a homology-masked diagnostic protocol.
+- Conditional: if `H-HOMO-01` triggered in S1, add homology-aware diagnostics. **Locked policy** (bin stratification as the primary diagnostic; masking for a secondary homology-clean RMSE/MAE; cosine cutoff 0.85; evidence tied to S1 fig 18) is pre-registered in `research_log/decisions/stage3/S3-DEC-001.md`.
 
 **Stratified vs random selection** (`H-SPLIT-02`): when multiple candidates qualify,
 prefer overlap/support-stratified over random; record cross-seed stability as evidence.
@@ -327,34 +327,52 @@ manifest hash) + `data_contract/splits/diagnostic_protocols.yaml`.
 
 ### S4 — Feature Contract
 
-**Goal:** define the chemistry feature schema as an immutable contract. The split
-is locked, so train-only preprocessing has a well-defined target row set.
+**Goal:** define the chemistry + condition metadata schema as an immutable contract
+(Option D, S4-DEC-002). The split is locked, so train-only preprocessing has a
+well-defined target experiment set.
 
 **Required outputs**
-- `canonical_id_vocab` — ordered list of Canonical_IDs present in train rows with
-  `Include_in_ml = True`.
-- `canonical_id_to_index` — dict; index 0 reserved for `<UNK>`.
-- `media_to_multihot` — `(n_media, len(vocab))` binary contract; idempotent on
-  duplicate `(Media, Canonical_ID)` rows.
-- `representation_mode` per medium (`physical` | `in_silico` | `mix`).
-- Numeric-field registry — `Amount`, optional `temperature`, optional `concentration`,
-  with declared transforms (raw / log1p / bounded).
-- Metadata-field registry — `oxygen`, `growth_phase`, `genotype`, with encoding
-  method and missingness policy each.
+- `canonical_id_vocab` — unified vocabulary of workbook `Canonical_ID` values **plus**
+  stressor-derived canonical slots (normalized names for compounds absent from the
+  workbook). **Chemistry strings in `experiment_chemistry.parquet` are not rewritten**
+  for prevalence; train-only **distinct-experiment** counts drive the vocab registry
+  only (threshold 0 ⇒ every train-seen `canonical_id` is listed). Index 0 = `<UNK>`,
+  index 1 = `<UNK_STRESSOR>` (reserved for **T1** OOV mapping).
+- `canonical_id_to_index` — dict aligned to the ordered vocab.
+- `experiment_chemistry.parquet` — long table per experiment:
+  `(experiment_id, canonical_id, role ∈ {medium, stressor}, amount, log1p_amount)`.
+- `stressor_to_canonical_id.yaml` — ratified string map from Phase 0 matcher
+  (`scripts/build_stressor_match_report.py`); copied into the artifact bundle.
+- `representation_mode` per medium (`physical` | `mix` | `extract` | `in_silico`)
+  unchanged from S1 mapping.
+- Numeric registry — `Amount` / stressor concentrations via shared `log1p_amount`
+  scaler; `bounded_reference_stats` from workbook `Amount`; optional numeric
+  metadata scalers in `numeric_metadata_scalers.json`.
+- `experiment_metadata.parquet` — wide encoded table: `oxygen`, `experiment_group`,
+  `liquid_state` + parsed `temperature_c`, `pH`, `shaking_rpm` (no genotype /
+  `mutantLibrary` in the locked contract).
 
 **Hard-gate decisions**
-- Mapped/unmapped policy from S1 instantiated as concrete `<UNK>` vs explicit drop
-  per family.
-- Train-only feature trimming policy: prevalence threshold, fit on train only.
+- `<UNK>` / `<MISSING>` index policy on categoricals; `<UNK>` / `<UNK_STRESSOR>` on
+  unified chemistry.
+- Train-only **metadata** prevalence + stressor resolution hygiene (no duplicate
+  surface strings where the matcher maps to an existing canonical). Chemistry
+  prevalence is a vocab-listing gate only (see `chemistry_prevalence_threshold` in
+  `configs/stage/s4_feature_contract.yaml`).
 
-**Emits:** `data_contract/feature_contract.yaml`,
-`data_contract/preprocessing/<artifact_id>/` containing fitted vocab/scalers and
-their checksums.
+**Emits:** `data_contract/feature_contract.yaml` (`schema_version: s4_option_d_v1`),
+`data_contract/preprocessing/<artifact_id>/` (checksum-pinned tree including
+`artifact_manifest.json`).
 
 ### S5 — Training-Recipe Lock
 
 **Goal:** lock the optimization-irrelevant training-data choices that, if left as
 sweep dimensions in T1, would confound all tier comparisons.
+
+**Feature contract pointer:** `configs/stage/s5_quality_policy.yaml` references
+`data_contract/feature_contract.yaml` — that file must stay aligned with the active
+S4 artifact id (**post–S4-DEC-002, Option D**). No code change required unless the
+path is duplicated elsewhere with a stale id.
 
 **Required controlled comparisons** (run with the locked feature contract, no model
 architecture changes; use `concat_linear` shallow MLP fixed):
@@ -388,10 +406,33 @@ without an explicit ledger entry justifying the re-open.
 training recipe (S5), shallow MLP fusion + concat head (T2/T3 architectures NOT yet
 chosen — use the simplest viable head). Same seeds across arms.
 
+**S4 Option D data handoff (do not resurrect pre–S4-DEC-002 paths)**  
+Implementers **must** load condition features from the checksum-pinned tree under
+`data_contract/preprocessing/<artifact_id>/` as declared in
+`data_contract/feature_contract.yaml` (`schema_version: s4_option_d_v1`):
+`experiment_chemistry.parquet` (long: `experiment_id`, `canonical_id`, `role`,
+`amount`, `log1p_amount`), `experiment_metadata.parquet` (wide encoded metadata),
+`representation_mode_per_media.parquet`, **`representation_mode_per_canonical.parquet`**
+(one row per `canonical_id` in the chemistry union; stressor-only slots use
+`dominant_mode=stressor`), `canonical_id_vocab.json`, `amount_scaler.json`,
+`numeric_metadata_scalers.json`, `stressor_to_canonical_id.yaml`. Join experiments
+to chemistry/metadata on **`experiment_id`** = SHA256-64 of `(orgId, setName,
+seqindex, media)` with **missing `media` hashed as empty string**. There is **no**
+`media_to_multihot.parquet` in the locked contract anymore; any multihot baseline
+must be **derived in T1** from `experiment_chemistry.parquet`. **Concentration policy:**
+`units_1..units_4` are not applied in S4 — do not treat pooled `concentration_*` as
+cross-comparable molarities until T1 normalizes units (see
+`research_log/notes/T1_option_d_encoding_handoff.md`). **`mutantLibrary` / genotype is
+not part of the locked S4 metadata table** (organism-holdout made it non-informative);
+do not wire a genotype channel from S4 artifacts.
+
+**Run manifests (when wired):** log `unknown_category_rates.chemistry_eval_rows.fraction_canonical_id_not_in_train_vocab`
+plus metadata unknowns, analogous to existing unknown-category logging.
+
 **Experiments**
 | ID | Hypothesis | Comparison |
 |---|---|---|
-| T1-A | H-ENC-01 | media-id only vs canonical-ID multihot |
+| T1-A | H-ENC-01 | media-id only vs canonical-ID multihot **derived from `experiment_chemistry.parquet`** |
 | T1-B | H-ENC-02 | raw vs log1p vs bounded numeric transform |
 | T1-C | H-ENC-03 | zero-fill UNK vs explicit-UNK + mask indicators |
 | T1-D | H-ENC-04 | chemistry-only vs chemistry + experiment metadata |
@@ -409,6 +450,10 @@ gains are explained by representation-mode confound (LB risk policy).
 decisions live here.** No new fusion topologies introduced in T3.
 
 **Fixed controls:** T1 winner. Same shallow head capacity as T1.
+
+**Condition side input:** fusion consumes **encoder outputs** on
+`experiment_chemistry.parquet` / `experiment_metadata.parquet` (and optional mode
+tables), **not** a frozen multihot matrix from S4.
 
 **Experiments**
 | ID | Hypothesis | Comparison |

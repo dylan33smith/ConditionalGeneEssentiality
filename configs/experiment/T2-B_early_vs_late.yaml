@@ -1,5 +1,6 @@
 # @package _global_
 # T2-B — Early vs Late Fusion. Hypothesis H-FUSE-02.
+# Condition tensors = T1 outputs on S4 Option D tables (not legacy multihot).
 
 experiment_id: T2-B_early_vs_late
 stage_or_tier: T2

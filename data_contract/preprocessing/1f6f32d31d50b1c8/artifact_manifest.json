@@ -1,0 +1,13 @@
+{
+  "artifact_id": "1f6f32d31d50b1c8",
+  "per_file_sha256": {
+    "amount_scaler.json": "feb87ed82d4806c6ad021a9a02ffa0caac0c3097e5b358d5ee18cbe6f527916c",
+    "bounded_reference_stats.json": "7e9ae9139303ee50bbd0962a148fa77ec4096ea5950267bec18ad936a1b0ffab",
+    "canonical_id_vocab.json": "7146ed9c7db5d56eb8694c6e542d6c6e67827894020456452611260516cf6eaf",
+    "media_to_multihot.parquet": "0485058e1b31cbc9386e0cabc6aca55559539809aec745f9de1b0eced6e897aa",
+    "metadata_vocabs/genotype.json": "7f41f03a1f1782a67f241ef62e746423ab893d81db71b5cbf09ec6d51f1c8f39",
+    "metadata_vocabs/growth_phase.json": "2b199130551835279f36e53d5c0ab9993ca0b8f3f5d59d3bfcdfdbd9af9e46da",
+    "metadata_vocabs/oxygen.json": "409502ef9bd63c276038df24ab76d8119740b253d8ce8fb596958f148fd9ff57",
+    "representation_mode_per_media.parquet": "c9afdb85556745785f5171d2b8fae97b9bb11e0d80eb5a44b3712ed46df756fa"
+  }
+}

@@ -2,6 +2,7 @@
 # T2-C — Condition-Gated Fusion. Hypothesis H-FUSE-03.
 # All gating/FiLM/interaction-block decisions live in T2; T3 may not introduce
 # new fusion topologies.
+# Condition tensors = T1 outputs on S4 Option D tables (not legacy multihot).
 
 experiment_id: T2-C_gating
 stage_or_tier: T2

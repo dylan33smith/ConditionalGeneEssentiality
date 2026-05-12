@@ -1,0 +1,17 @@
+{
+  "artifact_id": "de21504134c84a6c",
+  "per_file_sha256": {
+    "amount_scaler.json": "63ca25d2f4b1eab0497af22ded31cc5853558b5344c7102be876856972a1bf48",
+    "bounded_reference_stats.json": "7e9ae9139303ee50bbd0962a148fa77ec4096ea5950267bec18ad936a1b0ffab",
+    "canonical_id_vocab.json": "619368ef3c8891c0ba655d71f72c31a0984a40343524b8b49f6b69acc5829b62",
+    "experiment_chemistry.parquet": "871852a1b83ab13b4f3819d33d3722a3df960c7785fd631c945811c5263272eb",
+    "experiment_metadata.parquet": "aa315f97e1b80ff1cfadd6db8dd4e36fae9af040e9d26ad16936cb93b04c0f98",
+    "metadata_vocabs/experiment_group.json": "7d4bc3fb0272c411516276352a7fd9f20fc8ce574ab7ae29749dc4be631ab1c5",
+    "metadata_vocabs/liquid_state.json": "5a8d0a184ef7b887c112755e1041eb3ff6c52c2934db418bfdd7f6b26d6700c7",
+    "metadata_vocabs/oxygen.json": "409502ef9bd63c276038df24ab76d8119740b253d8ce8fb596958f148fd9ff57",
+    "numeric_metadata_scalers.json": "7bc262f68f5e866d4a4b4f381d89eb9d8ae0f711903cde535f8f2a719d2c35c0",
+    "representation_mode_per_canonical.parquet": "f4e88bf8e05158b0187321fc0d24c975dca2611e6fcdbcf01647f815d7d1f71d",
+    "representation_mode_per_media.parquet": "40592745f63819de519d6c83babc4bffd08153c0657d94a32f72529e077e673c",
+    "stressor_to_canonical_id.yaml": "cfab06de44a9dd293beb567413ca3638bb53358af274cfefd531875f6f6864c8"
+  }
+}

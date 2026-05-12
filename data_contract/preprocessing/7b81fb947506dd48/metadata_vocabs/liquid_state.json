@@ -1,0 +1,23 @@
+{
+  "field_name": "liquid_state",
+  "min_count_required": 6,
+  "missing_token": "<MISSING>",
+  "n_non_missing": 6727,
+  "n_train": 6938,
+  "n_unique_posttrim": 2,
+  "n_unique_pretrim": 2,
+  "prevalence_threshold": 0.001,
+  "unk_token": "<UNK>",
+  "vocab": [
+    "<UNK>",
+    "<MISSING>",
+    "Liquid",
+    "Solid"
+  ],
+  "vocab_to_index": {
+    "<MISSING>": 1,
+    "<UNK>": 0,
+    "Liquid": 2,
+    "Solid": 3
+  }
+}

@@ -1,0 +1,67 @@
+version: 1
+description: 'Auto ratified: exact_after_norm + fuzzy top1 >= 0.95. Omitted stressors
+  fall back to normalize_chemical_name() as new canonical slots.'
+map:
+  4-Hydroxybenzoic Acid: 4hbz
+  Adenine hydrochloride hydrate: ade
+  Adenosine: adn
+  Ammonium chloride: nh4
+  Cobalt chloride hexahydrate: cobalt2
+  Copper (II) sulfate pentahydrate: cu2
+  Cytidine: cytd
+  Cytosine: csn
+  D-Glucose: glc-D
+  Ethanolamine: etha
+  Glycerol: glyc
+  Glycine: gly
+  Inosine: ins
+  Iron (II) chloride tetrahydrate: fe2
+  L-Alanine: ala-L
+  L-Arginine: arg-L
+  L-Asparagine: asn-L
+  L-Aspartate: asp-L
+  L-Aspartic Acid: asp-L
+  L-Cysteine: cys-L
+  L-Cysteine hydrochloride monohydrate: cys-L
+  L-Glutamic acid monopotassium salt monohydrate: glu-L
+  L-Glutamine: gln-L
+  L-Histidine: his-L
+  L-Isoleucine: ile-L
+  L-Leucine: leu-L
+  L-Lysine: lys-L
+  L-Methionine: met-L
+  L-Phenylalanine: phe-L
+  L-Proline: pro-L
+  L-Serine: ser-L
+  L-Threonine: thr-L
+  L-Tryptophan: trp-L
+  L-Valine: val-L
+  L-tyrosine: tyr-L
+  L-tyrosine disodium salt: tyr-L
+  Manganese (II) chloride tetrahydrate: mn2
+  Putrescine Dihydrochloride: ptrc
+  Sodium Chloride: na1
+  Sodium D,L-Lactate: lac-D
+  Sodium Formate: for
+  Sodium L-Lactate: lac-L
+  Sodium acetate: ac
+  Sodium molybdate: mobd
+  Sodium nitrate: no3
+  Sodium pyruvate: pyr
+  Sodium sulfide nonahydrate: h2s
+  Sodium tungstate dihydrate: tungs
+  Starch: starch
+  Succinic Acid: succ
+  Sucrose: sucr
+  Thymidine: thymd
+  Uracil: ura
+  Uridine: uri
+  Yeast Extract: 4abz
+  Zinc sulfate heptahydrate: zn2
+  a-Ketoglutaric acid disodium salt hydrate: akg
+  calcium pantothenate: pnto-R
+  casamino acids: ala-L
+  copper (II) chloride dihydrate: cu2
+  polygalacturonic acid: polygalact
+  sodium fluoride: f
+  spermidine: spmd

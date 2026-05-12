@@ -1,6 +1,10 @@
 # @package _global_
 # T1-A — Granularity Test. Hypothesis H-ENC-01.
 # Comparison: media-id-only vs canonical-ID multihot.
+#
+# Data: S4 Option D — derive multihot (if used) from
+#   data_contract/preprocessing/<artifact_id>/experiment_chemistry.parquet
+#   per feature_contract.yaml (NOT legacy media_to_multihot).
 
 experiment_id: T1-A_granularity
 stage_or_tier: T1

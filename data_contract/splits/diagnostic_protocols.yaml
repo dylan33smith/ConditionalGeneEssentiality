@@ -1,4 +1,18 @@
-# S3 emits this. Secondary protocols for stress tests and homology diagnostic.
-status: pending
+status: populated
 emitted_by: stage3
-protocols: []
+protocols:
+- id: secondary_stress
+  protocol_id: low_overlap_stress
+  role: reported_not_gating
+  reason: Lowest media-level val seen-rate among non-primary candidates.
+- id: homology_diagnostic
+  mode: primary_bin_stratified_plus_secondary_masked_subset
+  cosine_threshold: 0.85
+  bin_edges:
+  - 0.0
+  - 0.5
+  - 0.85
+  - 1.0
+  applies_to_protocol: multi_org_balanced
+  evidence: research_log/figures/stage1/18_embedding_cosine_to_nearest_train_per_protocol.csv
+  decision_ref: research_log/decisions/stage3/S3-DEC-001.md

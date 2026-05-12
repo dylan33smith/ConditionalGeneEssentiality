@@ -120,3 +120,16 @@ required for any tier-level claim.
   non-trivial NN baseline (RMSE 0.588 < global 0.631). It's structurally the
   most informative protocol for tier comparisons. Strong S3 candidate for
   primary-promotion role.
+
+---
+
+## Addendum (2026-04-29) — S4 Option D vs S2 additive baseline
+
+S2 numbers and `H-BASE-01` discussion used **`condition = media`** (media name /
+media-level grouping). **S4-DEC-002** expands the locked feature contract to
+**medium + stressor chemistry** plus corrected experiment metadata. Re-running null
+baselines under the expanded condition definition is **optional** before T1; if
+re-run, expect the additive baseline bar to move slightly because stressors carry
+signal the old `β[condition]` term could not see. Interpretation of locked S2
+metrics is unchanged for historical comparison; new runs should cite the
+condition definition they use.

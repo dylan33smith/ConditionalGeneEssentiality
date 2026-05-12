@@ -1,0 +1,25 @@
+{
+  "field_name": "oxygen",
+  "min_count_required": 6,
+  "missing_token": "<MISSING>",
+  "n_non_missing": 6727,
+  "n_train": 6938,
+  "n_unique_posttrim": 3,
+  "n_unique_pretrim": 3,
+  "prevalence_threshold": 0.001,
+  "unk_token": "<UNK>",
+  "vocab": [
+    "<UNK>",
+    "<MISSING>",
+    "Aerobic",
+    "Anaerobic",
+    "Microaerobic"
+  ],
+  "vocab_to_index": {
+    "<MISSING>": 1,
+    "<UNK>": 0,
+    "Aerobic": 2,
+    "Anaerobic": 3,
+    "Microaerobic": 4
+  }
+}

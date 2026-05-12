@@ -1,5 +1,7 @@
 # @package _global_
 # T1-B — Numeric Transform Test. Hypothesis H-ENC-02.
+# Data: S4 Option D — `experiment_chemistry.parquet` + `amount_scaler.json`
+#   (paths from data_contract/feature_contract.yaml).
 
 experiment_id: T1-B_numeric_transform
 stage_or_tier: T1

@@ -1,0 +1,382 @@
+version: 1
+description: Maps condition_* stressor display strings to workbook Canonical_ID. Omit
+  keys to fall back to normalize_chemical_name(stressor) as a new slot.
+map:
+  4-Hydroxybenzoic Acid: 4hbz
+  Adenine hydrochloride hydrate: ade
+  Adenosine: adn
+  Ammonium chloride: nh4
+  Cobalt chloride hexahydrate: cobalt2
+  Copper (II) sulfate pentahydrate: cu2
+  Cytidine: cytd
+  Cytosine: csn
+  D-Glucose: glc-D
+  Ethanolamine: etha
+  Glycerol: glyc
+  Glycine: gly
+  Inosine: ins
+  Iron (II) chloride tetrahydrate: fe2
+  L-Alanine: ala-L
+  L-Arginine: arg-L
+  L-Asparagine: asn-L
+  L-Aspartate: asp-L
+  L-Aspartic Acid: asp-L
+  L-Cysteine: cys-L
+  L-Cysteine hydrochloride monohydrate: cys-L
+  L-Glutamic acid monopotassium salt monohydrate: glu-L
+  L-Glutamine: gln-L
+  L-Histidine: his-L
+  L-Isoleucine: ile-L
+  L-Leucine: leu-L
+  L-Lysine: lys-L
+  L-Methionine: met-L
+  L-Phenylalanine: phe-L
+  L-Proline: pro-L
+  L-Serine: ser-L
+  L-Threonine: thr-L
+  L-Tryptophan: trp-L
+  L-Valine: val-L
+  L-tyrosine: tyr-L
+  L-tyrosine disodium salt: tyr-L
+  Manganese (II) chloride tetrahydrate: mn2
+  Putrescine Dihydrochloride: ptrc
+  Sodium Chloride: na1
+  Sodium D,L-Lactate: lac-D
+  Sodium Formate: for
+  Sodium L-Lactate: lac-L
+  Sodium acetate: ac
+  Sodium molybdate: mobd
+  Sodium nitrate: no3
+  Sodium pyruvate: pyr
+  Sodium sulfide nonahydrate: h2s
+  Sodium tungstate dihydrate: tungs
+  Starch: starch
+  Succinic Acid: succ
+  Sucrose: sucr
+  Thymidine: thymd
+  Uracil: ura
+  Uridine: uri
+  Yeast Extract: 4abz
+  Zinc sulfate heptahydrate: zn2
+  a-Ketoglutaric acid disodium salt hydrate: akg
+  calcium pantothenate: pnto-R
+  casamino acids: ala-L
+  copper (II) chloride dihydrate: cu2
+  polygalacturonic acid: polygalact
+  sodium fluoride: f
+  spermidine: spmd
+  Dimethyl Sulfoxide: <NEW>
+  Sodium nitrite: <NEW>
+  Nickel (II) chloride hexahydrate: <NEW>
+  Sodium sulfate: <NEW>
+  Sodium perchlorate monohydrate: <NEW>
+  Thallium(I) acetate: <NEW>
+  Cisplatin: <NEW>
+  Fusidic acid sodium salt: <NEW>
+  Mc_vitamins: <NEW>
+  Sodium Chlorite: <NEW>
+  Paraquat dichloride: <NEW>
+  sodium sulfite: <NEW>
+  Ethanol: <NEW>
+  MreB Perturbing Compound A22: <NEW>
+  Aluminum chloride hydrate: <NEW>
+  kanamycin: <NEW>
+  Agar: <NEW>
+  Chloramphenicol: <NEW>
+  Nalidixic acid sodium salt: <NEW>
+  Polymyxin B sulfate: <NEW>
+  Tetracycline hydrochloride: <NEW>
+  Spectinomycin dihydrochloride pentahydrate: <NEW>
+  D-Cycloserine: <NEW>
+  Doxycycline hyclate: <NEW>
+  benzoic acid: <NEW>
+  D-Alanine: <NEW>
+  N-Acetyl-D-Glucosamine: <NEW>
+  Vancomycin Hydrochloride Hydrate: <NEW>
+  L-Citrulline: <NEW>
+  Sodium D-Lactate: <NEW>
+  Carbenicillin disodium salt: <NEW>
+  Bacitracin: <NEW>
+  Benzethonium chloride: <NEW>
+  Cephalothin sodium salt: <NEW>
+  D-Glucosamine Hydrochloride: <NEW>
+  Sodium succinate dibasic hexahydrate: <NEW>
+  D-Fructose: <NEW>
+  Iron: <NEW>
+  L-Malic acid disodium salt monohydrate: <NEW>
+  Sisomicin sulfate salt: <NEW>
+  Lomefloxacin hydrochloride: <NEW>
+  D-Trehalose dihydrate: <NEW>
+  Phosphomycin disodium salt: <NEW>
+  Sodium Chlorate: <NEW>
+  D-Mannose: <NEW>
+  D-Galactose: <NEW>
+  D-Maltose monohydrate: <NEW>
+  Mixed culture; Syntrophotalea carbinolica 1:1 starting OD to methanogen: <NEW>
+  Potassium acetate: <NEW>
+  cv.Norland: <NEW>
+  Benzalkonium Chloride: <NEW>
+  Cholin acetate: <NEW>
+  D-Cellobiose: <NEW>
+  cv.Atlantic: <NEW>
+  D-Xylose: <NEW>
+  cv.Upstate: <NEW>
+  Ceftazidime hydrate: <NEW>
+  D-Gluconic Acid sodium salt: <NEW>
+  Glucuronamide: <NEW>
+  L-Arabinose: <NEW>
+  Urea: <NEW>
+  1-ethyl-3-methylimidazolium acetate: <NEW>
+  Fusaric acid: <NEW>
+  Vanillin: <NEW>
+  5-Hydroxymethylfurfural: <NEW>
+  Sodium Fumarate dibasic: <NEW>
+  Tween 20: <NEW>
+  syringaldehyde: <NEW>
+  Choline chloride: <NEW>
+  Dimetridazole: <NEW>
+  Gentamicin sulfate salt: <NEW>
+  Trisodium citrate dihydrate: <NEW>
+  m-Inositol: <NEW>
+  methylglyoxal: <NEW>
+  Casamino acids (vitamin assay): <NEW>
+  D-Mannitol: <NEW>
+  Rifampicin: <NEW>
+  Sodium thiosulfate: <NEW>
+  Vogels_fungal_media, filtered: <NEW>
+  2-Furfuraldehyde: <NEW>
+  D-Galacturonic Acid monohydrate: <NEW>
+  Sodium propionate: <NEW>
+  D-Ribose: <NEW>
+  Gly-Glu: <NEW>
+  L-Ornithine: <NEW>
+  1-ethyl-3-methylimidazolium chloride: <NEW>
+  D-Sorbitol: <NEW>
+  Gly-DL-Asp: <NEW>
+  L-Valine (HPLC purified): <NEW>
+  Sodium butyrate: <NEW>
+  Supernatant; Trichoderma atroviride IMI grown in Vogels_fungal_media, filtered: <NEW>
+  2-Deoxy-D-Ribose: <NEW>
+  Bile salts: <NEW>
+  Choline Lysine: <NEW>
+  Zinc Pyrithione: <NEW>
+  a-Cyclodextrin: <NEW>
+  Antimycin A: <NEW>
+  D-Raffinose pentahydrate: <NEW>
+  D-Serine: <NEW>
+  Chlorhexidine diacetate salt hydrate: <NEW>
+  Chlorpromazine hydrochloride: <NEW>
+  Furfuryl Alcohol: <NEW>
+  L-Rhamnose monohydrate: <NEW>
+  D-Salicin: <NEW>
+  Irgasan: <NEW>
+  Parabanic Acid: <NEW>
+  Supernatant; Trichoderma atroviride IMI tmk3mutant grown in Vogels_fungal_media, filtered: <NEW>
+  2'-Deoxyinosine: <NEW>
+  Beta-Lactose: <NEW>
+  Neomycin trisulfate salt hydrate: <NEW>
+  Oxytetracycline hydrochloride: <NEW>
+  Sulfaquinoxaline sodium salt: <NEW>
+  1,3-Propanediol: <NEW>
+  1-ethyl-3-methylimidazolium lysine: <NEW>
+  2-Deoxy-D-ribonic acid lithium salt: <NEW>
+  2-n-Heptyl-4-hydroxyquinoline N-oxide: <NEW>
+  Cefoxitin sodium salt: <NEW>
+  Econazole nitrate salt: <NEW>
+  H2: <NEW>
+  L-Fucose: <NEW>
+  N2: <NEW>
+  S-adenosyl Homocysteine: <NEW>
+  Sodium Fluorophosphate: <NEW>
+  Sodium selenate: <NEW>
+  Thioridazine hydrochloride: <NEW>
+  Uranyl acetate: <NEW>
+  ammonium sulfide solution: <NEW>
+  2-Mercaptopyridine N-oxide sodium salt: <NEW>
+  Anhydrotetracycline hydrochloride: <NEW>
+  Carnitine Hydrochloride: <NEW>
+  D-Glucose-6-Phosphate sodium salt: <NEW>
+  Phenylacetic acid: <NEW>
+  Sodium Chromate: <NEW>
+  Thymine: <NEW>
+  Chenodeoxycholic acid: <NEW>
+  Deoxycholic acid: <NEW>
+  Trimethoprim: <NEW>
+  2-Deoxyadenosine 5-monophosphate: <NEW>
+  Ceftriaxone disodium salt hemi(heptahydrate): <NEW>
+  DETA/NO: <NEW>
+  Deoxyribonucleic acid from herring sperm: <NEW>
+  FCCP: <NEW>
+  Formamide: <NEW>
+  Lactulose: <NEW>
+  Maltitol: <NEW>
+  Methanol: <NEW>
+  "N,N,N\u2032,N\u2032-Tetramethylethylenediamine": <NEW>
+  Nitrofurantoin: <NEW>
+  Polyethylene glycol: <NEW>
+  Sodium octanoate: <NEW>
+  Sulfamethizole: <NEW>
+  Sulfamonomethoxine: <NEW>
+  Vogels_fungal_media: <NEW>
+  Xylitol: <NEW>
+  potassium (poly)sulfide: <NEW>
+  rubidium chloride: <NEW>
+  sucrose treatment: <NEW>
+  2,2'-Dipyridyl: <NEW>
+  8-hydroxy-nitroquinoline: <NEW>
+  Gelatin: <NEW>
+  Levofloxacin: <NEW>
+  Plant=Tomato_cv_Moneymaker; PlantTreatment=None; Sample=Xylem_sap; GrowthSubstrate=calcine_clay; Collection=direct: <NEW>
+  Ramoplanin: <NEW>
+  Vancomycin Hydrochloride from Streptomyces orientalis: <NEW>
+  mercury (II) chloride: <NEW>
+  2'-Deoxycytidine: <NEW>
+  2-Piperidinone: <NEW>
+  5-Aminovaleric acid: <NEW>
+  D-Lysine: <NEW>
+  Dibucaine: <NEW>
+  Furaltadone hydrochloride: <NEW>
+  G418 disulfate salt solution: <NEW>
+  Glycolic Acid: <NEW>
+  Hyaluronic acid sodium salt from Streptococcus equi: <NEW>
+  Lactitol: <NEW>
+  Levulinic Acid: <NEW>
+  Lithocholic acid: <NEW>
+  Methyl-B-D-galactopyranoside: <NEW>
+  Piperacillin sodium salt: <NEW>
+  Rotenone: <NEW>
+  amylopectin from maize: <NEW>
+  p-Coumaric acid: <NEW>
+  2-oxobutyric acid sodium salt: <NEW>
+  20AA_mix: <NEW>
+  3-Methyl-2-oxobutanoic acid sodium salt: <NEW>
+  4-Aminobutyric acid: <NEW>
+  5-fluorouracil: <NEW>
+  Agro_defined_trehalose: <NEW>
+  Avidin: <NEW>
+  CHIR-090: <NEW>
+  Cadmium chloride hemipentahydrate: <NEW>
+  Ciprofloxacin Hydrochloride: <NEW>
+  Citric Acid: <NEW>
+  D-Arabinose: <NEW>
+  D-Glucuronic Acid: <NEW>
+  D-glucosamine: <NEW>
+  DL-Isocitric acid trisodium salt hydrate: <NEW>
+  Ferulic Acid: <NEW>
+  Geneticin G418: <NEW>
+  L-Carnitine hydrochloride: <NEW>
+  L-Homoserine: <NEW>
+  Levan - from Erwinia herbicola: <NEW>
+  Lincomycin hydrochloride: <NEW>
+  Oxaloacetic acid: <NEW>
+  Pectin: <NEW>
+  Phenazine ethosulfate: <NEW>
+  ? Plant=Tomato_MoneyMaker; PlantTreatment=exvivo_xylem_sap_from_healthy_plant; Sample=xylem_sap;
+    Collection=25hr_after_growth_in_xylem_sap
+  : <NEW>
+  Potassium dichromate: <NEW>
+  Red Arabinan from sugar-beet: <NEW>
+  Sodium Persulfate: <NEW>
+  Spiramycin: <NEW>
+  ammonium persulfate: <NEW>
+  peroxynitrite: <NEW>
+  shock: <NEW>
+  (+)-Arabinogalactan: <NEW>
+  1,2-Propanediol: <NEW>
+  1,3-Butandiol: <NEW>
+  1,4-B-D-Galactobiose: <NEW>
+  1,4-Butanediol: <NEW>
+  1,5-Pentanediol: <NEW>
+  1,6-Hexanediamine: <NEW>
+  1-Pentanol: <NEW>
+  2,2-dibromo-2-cyanoacetamide: <NEW>
+  2-Deoxyadenosine monohydrate: <NEW>
+  2-methyl-1-butanol: <NEW>
+  3-aminobutyric acid: <NEW>
+  3-methyl-1-butanol: <NEW>
+  3-methyl-3-butenol: <NEW>
+  4-Guanidinobutyric acid: <NEW>
+  4-Hydroxyvalerate: <NEW>
+  6-O-Acetyl-D-glucose: <NEW>
+  Amylose from potato: <NEW>
+  Bathophenanthrolinedisulfonic acid disodium salt hydrate: <NEW>
+  Beta-alanine: <NEW>
+  Betaine: <NEW>
+  Butanol: <NEW>
+  Butyl stearate: <NEW>
+  Butyrolactam: <NEW>
+  Cadaverine: <NEW>
+  Caprolactam: <NEW>
+  Chondroitin sulfate A sodium salt from bovine trachea: <NEW>
+  D,L-Malic Acid: <NEW>
+  D,L-cysteine: <NEW>
+  D-Leucrose: <NEW>
+  DL-2-Aminobutyric acid: <NEW>
+  DL-3-Aminoisobutyric acid: <NEW>
+  Decanoic acid: <NEW>
+  Fructooligosaccharides (FOS): <NEW>
+  Green bean: <NEW>
+  Heparin sodium salt from porcine intestinal mucosa: <NEW>
+  Heptanoic acid: <NEW>
+  Hexanoic acid: <NEW>
+  Hydantoin: <NEW>
+  Indolicidin: <NEW>
+  L-Pipecolic Acid: <NEW>
+  L-Sorbose: <NEW>
+  L-pyroglutamic acid: <NEW>
+  Laminaribiose: <NEW>
+  Lauric acid: <NEW>
+  Maltohexaose: <NEW>
+  Maltotetraose: <NEW>
+  Mannan from Saccharomyces cerevisiae: <NEW>
+  Melibiose: <NEW>
+  Metronidazole: <NEW>
+  Myristic acid: <NEW>
+  Nicotinic Acid: <NEW>
+  Nonanoic acid: <NEW>
+  Octanoic acid: <NEW>
+  Oleic acid: <NEW>
+  Propandiamine: <NEW>
+  Protocatechuic Acid: <NEW>
+  Rhamnogalacturonan - from potato: <NEW>
+  Stachyose - 70%: <NEW>
+  Supernatant; Agrobacterium rhizogenes K599 grown in Agro_defined_trehalose (~7.5 mM 3-keto-trehalose): <NEW>
+  Tetrazolium violet: <NEW>
+  Valeric acid: <NEW>
+  Vanillic Acid: <NEW>
+  capsaicin: <NEW>
+  dextran, Mw ~200,000: <NEW>
+  e-Amino-N-Caproic Acid: <NEW>
+  epiphytic: <NEW>
+  palatinose hydrate: <NEW>
+  20AA_mix_minus_Ala: <NEW>
+  20AA_mix_minus_Arg: <NEW>
+  20AA_mix_minus_Asn: <NEW>
+  20AA_mix_minus_Asp: <NEW>
+  20AA_mix_minus_Cys: <NEW>
+  20AA_mix_minus_Gln: <NEW>
+  20AA_mix_minus_Glu: <NEW>
+  20AA_mix_minus_Gly: <NEW>
+  20AA_mix_minus_His: <NEW>
+  20AA_mix_minus_Ile: <NEW>
+  20AA_mix_minus_Leu: <NEW>
+  20AA_mix_minus_Lys: <NEW>
+  20AA_mix_minus_Met: <NEW>
+  20AA_mix_minus_Pro: <NEW>
+  20AA_mix_minus_Ser: <NEW>
+  20AA_mix_minus_Thr: <NEW>
+  20AA_mix_minus_Trp: <NEW>
+  20AA_mix_minus_Tyr: <NEW>
+  20AA_mix_minus_Val: <NEW>
+  Acridine orange: <NEW>
+  Acriflavine: <NEW>
+  Ampicillin sodium salt: <NEW>
+  Berberine: <NEW>
+  D,L-histidine: <NEW>
+  D-Tagatose: <NEW>
+  Erythromycin: <NEW>
+  Flavone: <NEW>
+  Hydrogen peroxide: <NEW>
+  Isomaltose: <NEW>
+  Mitomycin C: <NEW>
+  Phloretin: <NEW>

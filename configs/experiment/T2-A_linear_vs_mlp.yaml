@@ -1,5 +1,8 @@
 # @package _global_
 # T2-A — Linear vs Shallow MLP Fusion. Hypothesis H-FUSE-01.
+#
+# Condition path: consumes T1 encoder outputs on S4 Option D tables
+#   (experiment_chemistry + experiment_metadata + mode parquets), not frozen multihot.
 
 experiment_id: T2-A_linear_vs_mlp
 stage_or_tier: T2

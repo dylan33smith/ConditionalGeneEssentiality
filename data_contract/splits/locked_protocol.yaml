@@ -1,9 +1,76 @@
-# S3 emits this. The single primary protocol used for all tier promotion decisions.
-status: pending
+status: locked
 emitted_by: stage3
-protocol_id: null
-val_org_ids: []
-test_org_ids: []
-seed: null
-split_manifest_sha256: null
-selection_rationale: null
+selection_rule_id: s3_v1_power_driven
+protocol_id: multi_org_balanced
+val_org_ids:
+- pseudo3_N2E3
+- BFirm
+- ANA3
+- SyringaeB728a_mexBdelta
+test_org_ids:
+- PV4
+seed: 0
+seed_set:
+- 0
+- 1
+- 2
+candidate_protocols_sha256: 88b8dbdbb720d09415b1b2b7218dd0b3c58bc6964604fd600ec9e3e13e581f4d
+baselines_sha256: 17fefedc7957752882340d12694c5809c486fd46cd673293d3a059684340358f
+eval_policy_sha256: 5b101e856174558a5ef5c87cbd8139490b15a85c8cd9c3ca55790329e29210f7
+split_manifest_sha256: 74095fbfec6b34897fe02a146a46b290bdcd4c23661315bf6a2ef82abb57e74f
+selection_rationale:
+  summary: 'Primary selected using s3_v1_power_driven: eligible protocols are ranked
+    by (NN beats global on RMSE, n_genes_used, val_rows).'
+  table:
+  - protocol_id: high_overlap_easy
+    eligible: true
+    checks:
+      spearman_primary: true
+      n_genes_eligible_ge_200: true
+      val_rows_floor_pass: true
+      canonical_seen_rate_ge_0_90: true
+    n_genes_used: 6095
+    val_rows: 2605550
+    val_canonical_seen_rate: 1.0
+    nn_beats_global_rmse: false
+    nn_rmse: 0.6250828588750862
+    global_rmse: 0.5865700160852934
+  - protocol_id: largest_by_rows
+    eligible: true
+    checks:
+      spearman_primary: true
+      n_genes_eligible_ge_200: true
+      val_rows_floor_pass: true
+      canonical_seen_rate_ge_0_90: true
+    n_genes_used: 3041
+    val_rows: 2104545
+    val_canonical_seen_rate: 0.9861111111111112
+    nn_beats_global_rmse: false
+    nn_rmse: 0.6059831477646005
+    global_rmse: 0.5668274976346473
+  - protocol_id: low_overlap_stress
+    eligible: true
+    checks:
+      spearman_primary: true
+      n_genes_eligible_ge_200: true
+      val_rows_floor_pass: true
+      canonical_seen_rate_ge_0_90: true
+    n_genes_used: 1424
+    val_rows: 244971
+    val_canonical_seen_rate: 0.9473684210526315
+    nn_beats_global_rmse: false
+    nn_rmse: 0.9793434555022886
+    global_rmse: 0.9370312362177168
+  - protocol_id: multi_org_balanced
+    eligible: true
+    checks:
+      spearman_primary: true
+      n_genes_eligible_ge_200: true
+      val_rows_floor_pass: true
+      canonical_seen_rate_ge_0_90: true
+    n_genes_used: 13804
+    val_rows: 2165234
+    val_canonical_seen_rate: 1.0
+    nn_beats_global_rmse: true
+    nn_rmse: 0.5883749173708371
+    global_rmse: 0.630685168009717
