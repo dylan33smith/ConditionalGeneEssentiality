@@ -39,3 +39,9 @@ venv/
 .DS_Store
 Thumbs.db
 .claude/
+
+## Large violin/QQ sidecar CSVs from S1 (per-row distributions exceed GitHub's 100MB limit)
+## The PNG plots are kept; regenerate by re-running S1 if the rows are needed.
+research_log/figures/stage1/10_fit_distribution_per_org_violin.csv
+research_log/figures/stage1/11_t_stat_distribution_per_org.csv
+research_log/figures/stage1/13_fit_qq_plot_global.csv
