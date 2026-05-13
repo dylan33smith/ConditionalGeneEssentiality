@@ -48,6 +48,7 @@ from src.experiments.tier1._t1_common import (
 log = logging.getLogger(__name__)
 
 ARM_NAMES = ("raw", "log1p", "bounded")
+ALL_TRANSFORMS = ("raw", "log1p", "bounded", "binary")
 DEFAULT_BOUNDED_STATS_PATH = Path("artifacts/cache/t1b/bounded_reference_stats.json")
 
 
@@ -78,8 +79,8 @@ def build_chemistry_matrix(
         - log1p:   log1p(amount)  (precomputed in `log1p_amount` column)
         - bounded: clip(amount, p1, p99), then (val - p1) / (p99 - p1)
     """
-    if transform not in ARM_NAMES:
-        raise ValueError(f"Unknown transform {transform!r}; must be one of {ARM_NAMES}")
+    if transform not in ALL_TRANSFORMS:
+        raise ValueError(f"Unknown transform {transform!r}; must be one of {ALL_TRANSFORMS}")
     if transform == "bounded" and bounded_stats is None:
         raise ValueError("bounded transform requires bounded_stats")
 
@@ -104,6 +105,10 @@ def build_chemistry_matrix(
         clipped = np.clip(amt[has_amt], p1, p99)
         scale = max(p99 - p1, 1e-12)
         values[has_amt] = ((clipped - p1) / scale).astype(np.float32)
+    elif transform == "binary":
+        # Keep 1.0 everywhere chemistry is present, regardless of recorded amount.
+        # This is the T1-A multihot encoding — no concentration information.
+        pass
     # else: keep 1.0 (presence only)
 
     # Drop rows that didn't map to a valid experiment or canonical_id
@@ -428,4 +433,176 @@ def run_t1b(cfg, *,
     }
     (output_dir / "t1b_summary.json").write_text(json.dumps(payload, indent=2))
     log.info("T1-B complete. outputs at %s", output_dir)
+    return payload
+
+
+# ---------------------------------------------------------------------------
+# T1-B.3 — Binary vs log1p (controlled head-to-head)
+# ---------------------------------------------------------------------------
+
+def run_t1b3(cfg, *,
+             output_root: str = "t1b3",
+             figures_dirname: str = "tier1_b3",
+             experiment_id_label: str = "T1-B.3_binary_vs_log1p",
+             title: str = "T1-B.3 Concentration-Inclusion Test (binary vs log1p)") -> dict:
+    """Controlled 2-arm comparison: pure binary presence vs log1p concentration.
+
+    This is the side-by-side test that T1-B did not include. T1-B compared
+    *transforms of* concentration (raw vs log1p vs bounded) but never tested
+    "with vs without concentration info at all." T1-B.3 closes that gap.
+
+    Arm A1 (binary): same encoding as T1-A's multihot — every present chemistry
+        cell is exactly 1.0, regardless of whether `amount` is recorded.
+    Arm A2 (log1p):  the currently locked default — presence (1.0) for cells
+        with NaN amount, log1p(amount) for cells with recorded concentrations.
+    """
+    fitness_path = Path("data/derived/canonical/v0/fitness_experiment_long.parquet")
+    feature_contract_path = Path("data_contract/feature_contract.yaml")
+    protocol_path = Path("data_contract/splits/locked_protocol.yaml")
+    eval_policy_path = Path("data_contract/policy/eval_policy.yaml")
+    embedding_dir = Path("data/processed/ProtLM_embeddings_layer8")
+    cache_dir = Path(f"artifacts/cache/{output_root}")
+    figures_dir = Path(f"research_log/figures/{figures_dirname}")
+    output_dir = Path(f"artifacts/runs/{output_root}")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    log.info("=" * 60); log.info(title); log.info("=" * 60)
+
+    log.info("[1/4] loading shared T1 inputs")
+    inputs = load_t1_inputs(
+        fitness_path=fitness_path,
+        feature_contract_path=feature_contract_path,
+        locked_protocol_path=protocol_path,
+        eval_policy_path=eval_policy_path,
+        embedding_dir=embedding_dir,
+        cache_dir=cache_dir,
+    )
+    log.info("    train rows=%d val rows=%d artifact_id=%s",
+             len(inputs.train_df), len(inputs.val_df), inputs.artifact_id)
+
+    feature_contract = yaml.safe_load(feature_contract_path.read_text())
+    artifact_root = Path("data_contract/preprocessing") / inputs.artifact_id
+    chem_df = pd.read_parquet(
+        artifact_root / feature_contract["experiment_chemistry_table"]["path"]
+    )
+    vocab = _load_vocab_map(artifact_root / "canonical_id_vocab.json")
+    log.info("    chem rows=%d vocab=%d", len(chem_df), len(vocab))
+
+    log.info("[2/4] building chemistry matrices (binary, log1p)")
+    arms_to_run = ["binary", "log1p"]
+    chem_matrices = {}
+    for arm in arms_to_run:
+        m = build_chemistry_matrix(
+            experiment_chemistry_df=chem_df,
+            vocab=vocab,
+            exp_to_row=inputs.exp_to_row,
+            transform=arm,
+            bounded_stats=None,
+            vocab_size=int(inputs.chemistry_dense.shape[1]),
+        )
+        log.info("    arm=%s shape=%s nnz=%d mean(nonzero)=%.4f max=%.4f",
+                 arm, m.shape, int(np.count_nonzero(m)),
+                 float(m[m != 0].mean()) if (m != 0).any() else 0.0,
+                 float(m.max()))
+        chem_matrices[arm] = m
+
+    model_cfg = {
+        "hidden_dim": 256, "dropout": 0.1, "lr": 1e-3, "weight_decay": 1e-4,
+        "batch_size": 8192, "epochs": 8, "device": "auto",
+    }
+    seeds = [0, 1, 2]
+
+    all_metrics: list[pd.DataFrame] = []
+    all_summaries: list[dict] = []
+    per_arm_predictions: dict[str, dict[int, np.ndarray]] = {a: {} for a in arms_to_run}
+    per_arm_true: dict[str, dict[int, np.ndarray]] = {a: {} for a in arms_to_run}
+
+    log.info("[3/4] training %d arms × %d seeds", len(arms_to_run), len(seeds))
+    for arm in arms_to_run:
+        log.info("──── arm = %s ────", arm)
+        for seed in seeds:
+            metrics_df, summary = _run_one(
+                arm_name=arm, seed=seed, inputs=inputs,
+                chemistry_matrix=chem_matrices[arm],
+                weights=inputs.weighted_weights, cfg_model=model_cfg,
+            )
+            all_metrics.append(metrics_df)
+            all_summaries.append({k: v for k, v in summary.items() if not k.startswith("_")} | {"arm": arm})
+            per_arm_predictions[arm][seed] = summary["_best_val_pred"]
+            per_arm_true[arm][seed] = summary["_best_val_true"]
+            log.info("    arm=%s seed=%d best_val_rmse=%.4f mae=%.4f",
+                     arm, seed, summary["best_val_rmse"], summary["best_val_mae"])
+
+    metrics_df = pd.concat(all_metrics, ignore_index=True)
+    summaries_df = pd.DataFrame(all_summaries)
+
+    log.info("[4/4] aggregating + bootstrap")
+    agg = summaries_df.groupby("arm")[["best_val_rmse", "best_val_mae"]].agg(["mean", "std"])
+    agg.columns = ["rmse_mean", "rmse_std", "mae_mean", "mae_std"]
+    arm_metrics = agg.reset_index()
+    log.info("per-arm summary:\n%s", arm_metrics.to_string(index=False))
+
+    bootstrap_per_arm = {}
+    for arm in arms_to_run:
+        bootstrap_per_arm[arm] = _bootstrap_rmse_ci(
+            per_arm_true[arm][0], per_arm_predictions[arm][0], n_boot=1000, seed=0
+        )
+        b = bootstrap_per_arm[arm]
+        log.info("    arm=%s bootstrap (seed 0): RMSE [%.4f, %.4f] MAE [%.4f, %.4f]",
+                 arm, b["rmse_ci_low"], b["rmse_ci_high"], b["mae_ci_low"], b["mae_ci_high"])
+
+    # Decision logic: binary is the "simpler / no-concentration" arm; log1p is "includes
+    # unit-mixed concentrations". Tie → prefer binary on epistemic grounds (no
+    # unit-mixing concern). Log1p must beat binary by threshold to justify
+    # including concentrations.
+    rmse_log1p = float(arm_metrics.set_index("arm").loc["log1p", "rmse_mean"])
+    rmse_binary = float(arm_metrics.set_index("arm").loc["binary", "rmse_mean"])
+    mae_log1p = float(arm_metrics.set_index("arm").loc["log1p", "mae_mean"])
+    mae_binary = float(arm_metrics.set_index("arm").loc["binary", "mae_mean"])
+    eval_policy = yaml.safe_load(eval_policy_path.read_text())
+    th = eval_policy["gain_thresholds_per_protocol"][inputs.locked_protocol_id]
+    threshold_rmse = float(th["rmse"]); threshold_mae = float(th["mae"])
+
+    rmse_gap_binary_minus_log1p = rmse_binary - rmse_log1p
+    mae_gap_binary_minus_log1p = mae_binary - mae_log1p
+    log1p_clearly_better = (
+        rmse_gap_binary_minus_log1p > threshold_rmse
+        and mae_gap_binary_minus_log1p > threshold_mae
+    )
+    decision = "promote_log1p_keep_concentrations" if log1p_clearly_better else "promote_binary_drop_concentrations"
+
+    # CI overlap check (binary "ties" if log1p doesn't statistically beat it)
+    binary_ci_hi = bootstrap_per_arm["binary"]["rmse_ci_high"]
+    log1p_ci_lo = bootstrap_per_arm["log1p"]["rmse_ci_low"]
+    ci_overlap_rmse = log1p_ci_lo < binary_ci_hi  # overlap if log1p lower bound below binary upper bound
+    log.info("Decision: %s | RMSE gap (binary - log1p) = %.4f (thr=%.4f) | "
+             "CI overlap on RMSE: %s",
+             decision, rmse_gap_binary_minus_log1p, threshold_rmse, ci_overlap_rmse)
+
+    _plot_figures(figures_dir, metrics_df, summaries_df)
+    metrics_df.to_parquet(output_dir / "t1b3_metrics.parquet", index=False)
+    summaries_df.to_parquet(output_dir / "t1b3_summaries.parquet", index=False)
+    payload = {
+        "experiment_id": experiment_id_label,
+        "stage_or_tier": "T1",
+        "hypothesis": "H-ENC-02 (concentration-inclusion controlled test)",
+        "locked_protocol_id": inputs.locked_protocol_id,
+        "feature_contract_artifact_id": inputs.artifact_id,
+        "seeds": seeds,
+        "arm_metrics": _to_jsonable(arm_metrics.to_dict(orient="records")),
+        "bootstrap_ci_per_arm": _to_jsonable(bootstrap_per_arm),
+        "comparison": {
+            "rmse_gap_binary_minus_log1p": rmse_gap_binary_minus_log1p,
+            "mae_gap_binary_minus_log1p": mae_gap_binary_minus_log1p,
+            "rmse_threshold_locked_s2": threshold_rmse,
+            "mae_threshold_locked_s2": threshold_mae,
+            "log1p_clearly_better": bool(log1p_clearly_better),
+            "ci_overlap_rmse": bool(ci_overlap_rmse),
+            "decision": decision,
+        },
+        "n_train_rows": int(len(inputs.train_df)),
+        "n_val_rows": int(len(inputs.val_df)),
+    }
+    (output_dir / "t1b3_summary.json").write_text(json.dumps(payload, indent=2))
+    log.info("T1-B.3 complete. outputs at %s", output_dir)
     return payload

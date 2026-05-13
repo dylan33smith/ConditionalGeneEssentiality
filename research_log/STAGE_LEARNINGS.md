@@ -786,7 +786,8 @@ publish a causal decomposed-vs-coarse claim."
 | Does the locked encoder generalize across protocols? | Yes structurally, but absolute performance varies a lot (0.51 RMSE on multi_org_balanced; 0.59 on largest_by_rows; latter doesn't beat global mean). |
 | Are there regimes where media_id is competitive? | Only when val media are 100% in train (multi_org_balanced); otherwise media_id catastrophically fails. |
 | Does the homology-bin crossover from T1-A generalize? | **No.** It was an artifact of full media coverage on T1-A's protocol. Multihot is stable across bins on largest_by_rows. |
-| Does the numeric transform of `amount` matter? | **Yes, but the effect is small** (T1-B). Raw amounts (max=2000) cause ~0.015 RMSE worse than log1p or bounded. log1p ≈ bounded (statistically tied; log1p kept by tiebreaker). Most chemistry cells are presence-only so transform only matters on the ~2% of cells with stressor amounts. |
+| Does the numeric transform of `amount` matter? | **Yes, but the effect is small** (T1-B). Raw amounts (max=2000) cause ~0.015 RMSE worse than log1p or bounded. log1p ≈ bounded (statistically tied). |
+| Should we include concentration information at all? | **No, per T1-B.3 (T1-DEC-004).** Controlled binary-vs-log1p comparison showed RMSE tied (CIs overlap), MAE log1p win is statistically real but sub-threshold (0.0017 vs 0.005), and the concentrations are in mixed units (S4 concentration_policy says don't trust them for magnitude). Lock reverts from T1-DEC-003's log1p to binary. |
 
 ### T1-B — Numeric Transform Test (H-ENC-02)
 
@@ -820,8 +821,74 @@ publish a causal decomposed-vs-coarse claim."
 ### Locked T1 substrate after T1-B
 
 - condition encoder: `multihot_canonical_id` (T1-DEC-002)
-- numeric transform: `log1p` (T1-DEC-003, tiebreaker over bounded)
+- numeric transform: `log1p` (T1-DEC-003, tiebreaker over bounded) — **superseded
+  by T1-DEC-004 → use binary; see T1-B.3 section below**
 - substrate: S4 artifact `de21504134c84a6c`, no change
+
+### T1-B.3 — Controlled binary vs log1p (concentration-inclusion test)
+
+**Sources.**
+
+- `research_log/decisions/tier1/T1-DEC-004.md`
+- `research_log/tier_reports/tier1_b3_binary_vs_log1p.md`
+- `artifacts/runs/t1b3/t1b3_summary.json`
+
+### Why T1-B.3 happened
+
+T1-B compared *transforms of* concentration but never tested
+**"include concentrations at all vs presence-only."** Per
+`feature_contract.yaml::concentration_policy`, the recorded `amount`
+values are in mixed units (units_1..units_4 not consumed in S4). Including
+them without unit normalization is at best representation-questionable.
+T1-B.3 closes the gap.
+
+### Headline conclusions
+
+| Metric | binary (mean ± std) | log1p (mean ± std) | Gap (binary − log1p) | Threshold |
+|---|---:|---:|---:|---:|
+| RMSE | 0.5150 ± 0.0020 | 0.5159 ± 0.0021 | −0.0009 (tied) | 0.0212 |
+| MAE | 0.2957 ± 0.0014 | 0.2940 ± 0.0014 | +0.0017 (log1p statistically better) | 0.005 |
+
+- **RMSE CIs overlap** (binary [0.5113, 0.5149] vs log1p [0.5118, 0.5155]).
+- **MAE CIs are disjoint** by ~0.0015 — log1p is statistically better on MAE
+  but the gap is below the 0.005 threshold (60% of it).
+- **H-METRIC-01 disagreement, third occurrence in T1.** Different metrics
+  favor different arms; per S2-DEC-001 rule, neither arm wins by the strict
+  promotion gate.
+
+### Decision (T1-DEC-004)
+
+**Lock `binary` chemistry encoding.** Supersedes T1-DEC-003's `log1p` lock.
+The MAE advantage of log1p (0.0017) is real but:
+
+1. Sub-threshold per the locked S2-DEC-001 rule.
+2. The unit-mixed concentrations cannot be honestly described as
+   "concentration information" without unit normalization.
+3. The empirical case isn't strong enough to justify the representation
+   complexity or the inevitable reviewer concern.
+
+T1-DEC-003's *other* finding — that raw amounts destabilize relative to
+log1p/bounded — remains valid for any future tier that revisits
+concentration inclusion (e.g., after units are normalized).
+
+### Final locked T1 substrate after T1-B.3
+
+- condition encoder: `multihot_canonical_id` (T1-DEC-002)
+- chemistry encoding: **binary presence/absence (T1-DEC-004)** — no
+  concentration values
+- substrate: S4 artifact `de21504134c84a6c`, unchanged
+- T1-A's multihot is now the canonical T1 chemistry encoding (T1-A, T1-A.2,
+  and T1-B.3 binary arm are all bit-equivalent in encoding choice)
+
+### Open risks / followups
+
+- **The MAE advantage of log1p is real, just below threshold.** If T2/T3/T4
+  find that central-mass error reduction matters disproportionately
+  (e.g., Huber tuning in T4 finds delta that prizes central mass),
+  T1-DEC-004 can be revisited.
+- **Unit normalization is in §12 Deferred.** Re-running T1-B / T1-B.3 with
+  unit-converted concentrations is the natural follow-up if that work is
+  ever done.
 
 ### Open risks / follow-ups
 

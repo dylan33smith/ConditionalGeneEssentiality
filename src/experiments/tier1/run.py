@@ -9,7 +9,7 @@ import logging
 from omegaconf import DictConfig
 
 from src.experiments.tier1._t1a import run_t1a
-from src.experiments.tier1._t1b import run_t1b
+from src.experiments.tier1._t1b import run_t1b, run_t1b3
 
 log = logging.getLogger(__name__)
 
@@ -46,8 +46,12 @@ def main(cfg: DictConfig) -> None:
             title="T1-B.2 Stress Test (H-ENC-02 winner on largest_by_rows)",
         )
         return
+    if exp_id == "T1-B.3_binary_vs_log1p":
+        run_t1b3(cfg)
+        return
     raise NotImplementedError(
         f"tier1 experiment_id={exp_id!r} not yet implemented. "
         f"Available: T1-A_granularity, T1-A.2_stress_test_largest_by_rows, "
-        f"T1-B_numeric_transform, T1-B.2_stress_test_largest_by_rows"
+        f"T1-B_numeric_transform, T1-B.2_stress_test_largest_by_rows, "
+        f"T1-B.3_binary_vs_log1p"
     )

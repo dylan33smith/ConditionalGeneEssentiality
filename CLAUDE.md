@@ -28,7 +28,7 @@ S0 → S1 → S2 → S3 → S4 → S5 → T1 → T2 → T3 → T4
 | S3 | Split Protocol Lock | **approved** (S3-DEC-001); primary=`multi_org_balanced`, diagnostics=`low_overlap_stress` + homology (0.85 cutoff) |
 | S4 | Feature Contract (Option D: chem long + metadata wide) | **approved** (S4-DEC-002 supersedes S4-DEC-001); artifact_id=`de21504134c84a6c` |
 | S5 | Training-Recipe Lock (row-quality + organism pool) | **approved** (S5-DEC-001); policy=`weighted_full`, organism_pool=`full` |
-| T1 | Representation winner | T1-A (T1-DEC-001) + T1-A.2 (T1-DEC-002) + T1-B (T1-DEC-003) complete. Locks: multihot encoder + log1p numeric transform. H-ENC-01 confirmed on `largest_by_rows`; H-ENC-02 supported (raw < log1p ≈ bounded; log1p kept by tiebreaker). T1-C, T1-D, T1-E pending. `largest_by_rows` mandatory diagnostic for all future T1+ promotions. |
+| T1 | Representation winner | T1-A (T1-DEC-001), T1-A.2 (T1-DEC-002), T1-B (T1-DEC-003), T1-B.3 (T1-DEC-004 supersedes T1-DEC-003 on encoding choice) complete. **Locked: multihot encoder + BINARY presence/absence** (concentrations dropped — mixed-unit concern + sub-threshold empirical case). T1-DEC-003's secondary finding "raw < log1p/bounded" remains valid if concentrations are ever reintroduced. T1-C, T1-D, T1-E pending. `largest_by_rows` mandatory diagnostic for all future T1+ promotions. |
 | T2 | Fusion winner (all topology decisions live here, not T3) | not started |
 | T3 | Capacity (depth/residuals/efficiency frontier; conditional embedding fine-tune) | not started |
 | T4 | Optimization + loss family + target normalization locks | not started |
