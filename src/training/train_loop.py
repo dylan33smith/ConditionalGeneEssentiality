@@ -20,6 +20,8 @@ class TrainLoopConfig:
     batch_size: int = 8192
     epochs: int = 8
     device: str = "cpu"
+    loss_fn_name: str = "mse"
+    huber_delta: float = 1.0
 
 
 def _resolve_device(device_cfg: str) -> torch.device:
@@ -112,7 +114,10 @@ def train_one_arm(
     device = _resolve_device(config.device)
     model = model.to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=config.lr, weight_decay=config.weight_decay)
-    loss_fn = torch.nn.MSELoss(reduction="none")
+    if config.loss_fn_name == "huber":
+        loss_fn = torch.nn.HuberLoss(reduction="none", delta=config.huber_delta)
+    else:
+        loss_fn = torch.nn.MSELoss(reduction="none")
 
     fast_path = all(
         hasattr(train_dataset, attr) for attr in ["row_batch", "embedding_matrix", "chemistry_matrix", "weights"]

@@ -1,0 +1,19 @@
+# @package _global_
+# T3-A — Depth Ablation. Hypothesis H-CAP-01.
+#
+# Tests 1-layer (T2 winner) vs 2-layer vs 4-layer residual MLP head.
+# Parsimony rule: smallest model within tolerance of the best.
+
+experiment_id: T3-A_depth
+stage_or_tier: T3
+
+experiment:
+  hypothesis: H-CAP-01
+  arms:
+    - depth: 1_layer
+    - depth: 2_layer
+    - depth: 4_layer
+  seeds: [0, 1, 2]
+  promotion_rule:
+    parsimony: smallest_within_tolerance
+    primary: [rmse_decrease, mae_decrease]

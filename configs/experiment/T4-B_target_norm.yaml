@@ -1,0 +1,19 @@
+# @package _global_
+# T4-B — Target Normalization. Hypothesis H-TARGET-01.
+#
+# Tests raw fitness targets vs per-experiment z-scored targets.
+# Promotion gated on raw-scale metric improvement.
+
+experiment_id: T4-B_target_norm
+stage_or_tier: T4
+
+experiment:
+  hypothesis: H-TARGET-01
+  arms:
+    - target: raw
+    - target: zscore
+  seeds: [0, 1, 2]
+  promotion_rule:
+    primary: [rmse_decrease, mae_decrease]
+    evaluation_scale: raw
+    no_regression_vs_t3: required
