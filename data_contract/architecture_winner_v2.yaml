@@ -1,0 +1,33 @@
+status: approved
+emitted_by: tier5
+supersedes: data_contract/architecture_winner.yaml (T3-DEC-001)
+winning_class: adapter_residual_mlp
+architecture:
+  input: "cat(gene_emb[1152], chem_multihot[425])"
+  gene_adapter:
+    - {type: linear, in_dim: 1152, out_dim: 1024}
+    - {type: relu}
+    - {type: dropout, p: 0.1}
+    - {type: linear, in_dim: 1024, out_dim: 512}
+  head:
+    - {type: concat, inputs: [adapted_gene[512], chem[425]]}
+    - {type: linear, in_dim: 937, out_dim: 512}
+    - {type: relu}
+    - {type: dropout, p: 0.1}
+    - {type: residual_block, dim: 512, inner: "linear(512,512) → relu → dropout(0.1)"}
+    - {type: linear, in_dim: 512, out_dim: 1}
+  total_params: 2_448_897
+rejected_alternatives:
+  - {class: no_adapter_t3_baseline, reason: "T5-A: RMSE +0.0043 — adapter helps"}
+  - {class: adapter_256_keep_dim, reason: "T5-A: same as no_adapter; same-dim adapter doesn't help"}
+  - {class: adapter_512_keep_dim, reason: "T5-A: RMSE +0.0024; same-dim adapter helps less than dim-reducing one"}
+  - {class: plm_layer_0_4_12_18, reason: "T5-B: layer 8 confirmed as best ProteomeLM layer (12, 18 are dramatically worse)"}
+  - {class: esmc_only_bypass, reason: "T5-C: bypassing ProteomeLM loses RMSE 0.006 — proteome-context helps"}
+ledger_entry: T5-DEC-001
+fusion_locked: T2-DEC-001
+representation_locked: T1-DEC-004
+embedding_source:
+  encoder: "Bitbol-Lab/ProteomeLM-L"
+  layer: 8
+  dim: 1152
+  embeddings_dir: "data/processed/ProtLM_embeddings_layer8"

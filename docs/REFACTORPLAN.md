@@ -106,6 +106,10 @@ Hypotheses without a clear owner are dropped.
 | H-CAP-03 | FiLM gating's near-threshold advantage (T2-C) amplifies at deeper capacity. | T3-D | Concat vs FiLM at T3-A winning depth. |
 | H-LOSS-01 | Huber objective improves robustness to extreme rows vs MSE without degrading central-mass metrics. | T4 | MSE vs Huber, all else fixed. |
 | H-TARGET-01 | Per-experiment z-score normalization of `fit` aids optimization but should not be promoted unless gains persist on raw-scale metrics. | T4 | Raw vs normalized target. Promotion gated on raw-scale RMSE+MAE. |
+| H-OPT-01 | Cosine LR schedule with longer training improves over the 8-epoch constant-LR baseline. | T4-C | Baseline (8ep, constant) vs cosine variants (16ep, 32ep with patience). |
+| H-EMB-02 | A learnable gene-side adapter MLP between the frozen embedding and the fusion concat point unlocks downstream signal that the architecture currently can't extract. | T5-A | No-adapter vs same-dim adapter vs dim-reducing adapter. |
+| H-EMB-03 | The current choice of ProteomeLM-L layer 8 may not be optimal for downstream conditional essentiality prediction. | T5-B | Re-encode at layers {0,4,8,12,18} and compare. |
+| H-EMB-04 | ProteomeLM's proteome-context layer adds value over raw ESM-C 600M embeddings. | T5-C | Frozen ProteomeLM-L layer 8 vs raw mean-pooled ESM-C 600M. |
 | H-HOMO-01 | Model performance is partially explained by train-val sequence similarity. | S1 (diagnostic) | Embedding cosine similarity bins; metric stratification. |
 | H-HOMO-02 | Homology-aware masking reduces optimistic bias vs pure organism holdout. | S3 (conditional, triggered if H-HOMO-01 effect size > 0.5σ on val Spearman). | Add homology-masked diagnostic protocol. |
 | H-METRIC-01 | RMSE and MAE may disagree under heavy-tailed noise. | Always-on policy (per L4). | Report both for every comparison. |
@@ -500,6 +504,29 @@ as a tiebreaker when arms are within threshold of each other.
 
 **Promotion rule:** Pareto-improving combinations only; no regression vs T3 winner
 on co-primary metrics.
+
+### Tier 5 — Embedding (added 2026-05-20)
+
+**Sole concern:** the assumption that the frozen ProteomeLM-L layer-8 gene
+embedding is the right representation. Triggered after T2-T4 plateau revealed
+the val curves stop improving early while train continues — diagnostic of
+representation-limited capacity rather than head/optimization limits.
+
+**Fixed controls:** T1, T2, T3 head architecture, T4 optimization locks.
+
+**Experiments**
+| ID | Hypothesis | Comparison |
+|---|---|---|
+| T5-A | H-EMB-02 | Learnable gene-side adapter MLP between frozen embedding and concat point. Tests both same-dim and dim-reducing adapters. |
+| T5-B | H-EMB-03 | ProteomeLM-L layer ablation. Re-encode all 48 organisms at layers {0, 4, 8, 12, 18} and compare. |
+| T5-C | H-EMB-04 | ProteomeLM bypass — use raw mean-pooled ESM-C 600M instead. Tests whether proteome-context helps at all. |
+| T5-D | H-EMB-01 | Fine-tune top N ProteomeLM layers with cached per-epoch activations. Most computationally expensive; conditional on T5-A/B/C results. |
+
+**Promotion rule:** best-performing arm on co-primary metrics; bootstrap CIs
+must be disjoint. Sub-threshold gains accepted given diminishing returns in
+this regime.
+
+**Emits:** `data_contract/architecture_winner_v2.yaml` (supersedes T3 lock when promoted).
 
 ---
 

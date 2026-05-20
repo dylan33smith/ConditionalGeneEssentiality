@@ -63,6 +63,7 @@ def load_t1_inputs(
     eval_policy_path: Path,
     embedding_dir: Path,
     cache_dir: Path,
+    embedding_filename_suffix: str = "_proteomelm.pt",
 ) -> T1Inputs:
     """Load canonical fitness, S4 artifact, locked split, S5 quality weights, embeddings."""
     feature_contract = yaml.safe_load(feature_contract_path.read_text())
@@ -89,7 +90,9 @@ def load_t1_inputs(
     val_df = fitness_df.loc[val_mask].copy()
 
     all_orgs = fitness_df["orgId"].astype(str).unique().tolist()
-    embedding_matrix, gene_key_to_idx = _load_concatenated_embeddings(all_orgs, embedding_dir)
+    embedding_matrix, gene_key_to_idx = _load_concatenated_embeddings(
+        all_orgs, embedding_dir, filename_suffix=embedding_filename_suffix,
+    )
 
     exp_ids = fitness_df["experiment_id"].astype(str).unique().tolist()
     chem_csr, exp_to_row, chem_len = build_or_load_experiment_multihot(

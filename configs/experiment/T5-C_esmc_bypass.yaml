@@ -1,0 +1,17 @@
+# @package _global_
+# T5-C — ProteomeLM Bypass with ESM-C. Hypothesis H-EMB-04.
+#
+# Tests whether ProteomeLM's proteome-context pass adds value over raw ESM-C.
+
+experiment_id: T5-C_esmc_bypass
+stage_or_tier: T5
+
+experiment:
+  hypothesis: H-EMB-04
+  arms:
+    - embedding: proteomelm_layer8
+    - embedding: esmc_600m_only
+  seeds: [0, 1, 2]
+  promotion_rule:
+    primary: [rmse_decrease, mae_decrease]
+    no_regression_vs_t3: required

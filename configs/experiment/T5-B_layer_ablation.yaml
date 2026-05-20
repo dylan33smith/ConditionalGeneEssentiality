@@ -1,0 +1,20 @@
+# @package _global_
+# T5-B — ProteomeLM-L Layer Ablation. Hypothesis H-EMB-03.
+#
+# Tests which ProteomeLM-L hidden layer gives the best downstream embedding.
+
+experiment_id: T5-B_layer_ablation
+stage_or_tier: T5
+
+experiment:
+  hypothesis: H-EMB-03
+  arms:
+    - layer: 0
+    - layer: 4
+    - layer: 8
+    - layer: 12
+    - layer: 18
+  seeds: [0, 1, 2]
+  promotion_rule:
+    primary: [rmse_decrease, mae_decrease]
+    no_regression_vs_t3: required
