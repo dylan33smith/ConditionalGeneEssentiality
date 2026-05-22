@@ -20,6 +20,10 @@ class TrainLoopConfig:
     batch_size: int = 8192
     epochs: int = 8
     device: str = "cpu"
+    loss_fn_name: str = "mse"
+    huber_delta: float = 1.0
+    lr_schedule: str = "constant"
+    early_stopping_patience: int = 0
 
 
 def _resolve_device(device_cfg: str) -> torch.device:
@@ -112,7 +116,16 @@ def train_one_arm(
     device = _resolve_device(config.device)
     model = model.to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=config.lr, weight_decay=config.weight_decay)
-    loss_fn = torch.nn.MSELoss(reduction="none")
+    if config.loss_fn_name == "huber":
+        loss_fn = torch.nn.HuberLoss(reduction="none", delta=config.huber_delta)
+    else:
+        loss_fn = torch.nn.MSELoss(reduction="none")
+
+    scheduler = None
+    if config.lr_schedule == "cosine":
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            opt, T_max=config.epochs, eta_min=0.0
+        )
 
     fast_path = all(
         hasattr(train_dataset, attr) for attr in ["row_batch", "embedding_matrix", "chemistry_matrix", "weights"]
@@ -125,6 +138,7 @@ def train_one_arm(
     best_val_rmse = float("inf")
     best_epoch = -1
     best_summary: dict = {}
+    epochs_without_improvement = 0
 
     for epoch in range(1, int(config.epochs) + 1):
         t0 = time.time()
@@ -244,6 +258,7 @@ def train_one_arm(
         if val_rmse < best_val_rmse:
             best_val_rmse = val_rmse
             best_epoch = epoch
+            epochs_without_improvement = 0
             best_summary = {
                 "best_epoch": int(epoch),
                 "best_val_rmse": float(val_rmse),
@@ -251,13 +266,17 @@ def train_one_arm(
                 "train_val_gap_rmse": float(train_rmse - val_rmse),
                 "train_val_gap_mae": float(train_mae - val_mae),
                 "val_residual_quantiles_json": pd.Series(_residual_quantiles(val_true, val_pred)).to_json(),
-                # T1+ uses these for bootstrap CIs and homology-bin breakdowns.
-                # Numpy arrays not JSON-serializable; downstream code must strip
-                # them before saving the summary to disk (S5's flow drops them
-                # implicitly via pd.DataFrame coercion).
                 "_best_val_pred": val_pred.copy(),
                 "_best_val_true": val_true.copy(),
             }
+        else:
+            epochs_without_improvement += 1
+
+        if scheduler is not None:
+            scheduler.step()
+
+        if config.early_stopping_patience > 0 and epochs_without_improvement >= config.early_stopping_patience:
+            break
 
     metrics_df = pd.DataFrame(rows)
     summary = {

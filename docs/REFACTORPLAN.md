@@ -95,16 +95,22 @@ Hypotheses without a clear owner are dropped.
 | H-POLICY-02 | Curated organism pools improve robustness only if primary metrics improve and generalization diagnostics do not degrade. | S5 (deferred if S1 finds support too uneven for curation to matter). | Full vs curated org pool, same protocol. |
 | H-ENC-01 | Decomposed chemistry encoding — a multihot over the locked 425-slot Canonical_ID vocab covering **both medium and stressor chemistry per experiment** (per S4-DEC-002 Option D) — beats coarse medium-name-only encoding. | T1-A | Media-name embedding (medium string only) vs canonical-ID multihot from `experiment_chemistry.parquet` (which already includes resolved stressors). T1-A's gap therefore conflates two effects: (a) decomposed vs coarse representation, and (b) chemistry scope (medium-only vs medium+stressor). The conflation is intentional — it measures the headline encoder vs the strawman baseline. A strict-stressor ablation that disentangles (a) from (b) is in §12 Deferred Experiments. |
 | H-ENC-02 | Numeric concentration transforms (log1p / bounded) outperform raw amounts. | T1-B | raw vs log1p vs bounded. |
-| H-ENC-03 | Explicit UNK + mask indicators improve robustness on novel conditions vs zero-fill. | T1-C | Zero-fill vs explicit UNK. |
+| H-ENC-03 | Explicit UNK + mask indicators improve robustness on novel conditions vs zero-fill. | T1-C | **Skipped** (T1-DEC-005): zero chemistry unknown rate on locked split + vocab makes both arms identical. Deferred, not rejected — reactivate if prevalence trimming or Canonical_ID holdout introduces nonzero unknowns. |
 | H-ENC-04 | Adding selected experiment metadata (oxygen, growth phase, temperature) improves conditional prediction over chemistry-only features. | T1-D | Chemistry-only vs chemistry+metadata. |
 | H-ENC-05 | Explicit decomposition-mode indicators (extract/in-silico flags) mitigate over-coupling vs untagged chemistry vectors. | T1-E | Chemistry vs chemistry+mode flags. |
 | H-FUSE-01 | Shallow nonlinear fusion beats linear fusion. | T2-A | Linear head vs 1-hidden MLP head, same encoder. |
 | H-FUSE-02 | Two-tower (separate encoders → late merge) beats early concat on novelty subsets. | T2-B | Early concat vs two-tower merge. |
 | H-FUSE-03 | Condition-gated gene features (FiLM-like) improve ranking on high-condition-variance genes vs un-gated fusion. | T2-C | Un-gated vs FiLM/gating. |
 | H-CAP-01 | Adding depth + residual links to the locked fusion improves RMSE without seed instability. | T3-A | 1-layer vs 2-layer vs 4-layer residual MLP. |
-| H-CAP-02 | A smaller model can match a larger model when input representation is well-designed. | T3-B | Param/runtime vs RMSE frontier. |
+| H-CAP-02 | Wider hidden layers improve performance by retaining more gene×condition interaction capacity through the projection bottleneck. | T3-B | Width sweep {128, 256, 512, 1024} at T3-A winning depth. |
+| H-CAP-03 | FiLM gating's near-threshold advantage (T2-C) amplifies at deeper capacity. | T3-D | Concat vs FiLM at T3-A winning depth. |
 | H-LOSS-01 | Huber objective improves robustness to extreme rows vs MSE without degrading central-mass metrics. | T4 | MSE vs Huber, all else fixed. |
 | H-TARGET-01 | Per-experiment z-score normalization of `fit` aids optimization but should not be promoted unless gains persist on raw-scale metrics. | T4 | Raw vs normalized target. Promotion gated on raw-scale RMSE+MAE. |
+| H-OPT-01 | Cosine LR schedule with longer training improves over the 8-epoch constant-LR baseline. | T4-C | Baseline (8ep, constant) vs cosine variants (16ep, 32ep with patience). |
+| H-EMB-02 | A learnable gene-side adapter MLP between the frozen embedding and the fusion concat point unlocks downstream signal that the architecture currently can't extract. | T5-A | No-adapter vs same-dim adapter vs dim-reducing adapter. |
+| H-EMB-03 | The current choice of ProteomeLM-L layer 8 may not be optimal for downstream conditional essentiality prediction. | T5-B | Re-encode at layers {0,4,8,12,18} and compare. |
+| H-EMB-04 | ProteomeLM's proteome-context layer adds value over raw ESM-C 600M embeddings. | T5-C | Frozen ProteomeLM-L layer 8 vs raw mean-pooled ESM-C 600M. |
+| H-EMB-05 | The T5-A adapter winner can be improved further via more aggressive dimension reduction, wider adapter, deeper adapter, or LayerNorm normalization. | T5-D | Adapter variants at fixed output dim and depth axes. |
 | H-HOMO-01 | Model performance is partially explained by train-val sequence similarity. | S1 (diagnostic) | Embedding cosine similarity bins; metric stratification. |
 | H-HOMO-02 | Homology-aware masking reduces optimistic bias vs pure organism holdout. | S3 (conditional, triggered if H-HOMO-01 effect size > 0.5σ on val Spearman). | Add homology-masked diagnostic protocol. |
 | H-METRIC-01 | RMSE and MAE may disagree under heavy-tailed noise. | Always-on policy (per L4). | Report both for every comparison. |
@@ -479,10 +485,12 @@ residuals, regularization only — no new fusion topologies.**
 | ID | Hypothesis | Comparison |
 |---|---|---|
 | T3-A | H-CAP-01 | 1-layer vs 2-layer vs 4-layer residual MLP head |
-| T3-B | H-CAP-02 | param/runtime vs RMSE+MAE frontier sweep; pick smallest within ε of best |
+| T3-B | H-CAP-02 | Width sweep {128, 256, 512, 1024} at T3-A winning depth; promote if wider hidden dim improves co-primary metrics |
 | T3-C (conditional) | H-EMB-01 | frozen ProteomeLM vs fine-tune top-N layers — only if T3-A/B plateau against null delta. |
+| T3-D | H-CAP-03 | FiLM gating at T3-A winning depth; re-tests T2-C's near-threshold signal with more capacity |
 
-**Promotion rule:** smallest model class within tolerance of the best.
+**Promotion rule:** best performing arm on co-primary metrics. Parsimony applies only
+as a tiebreaker when arms are within threshold of each other.
 
 **Emits:** `data_contract/architecture_winner.yaml`.
 
@@ -497,6 +505,35 @@ residuals, regularization only — no new fusion topologies.**
 
 **Promotion rule:** Pareto-improving combinations only; no regression vs T3 winner
 on co-primary metrics.
+
+### Tier 5 — Embedding (added 2026-05-20)
+
+**Sole concern:** the assumption that the frozen ProteomeLM-L layer-8 gene
+embedding is the right representation. Triggered after T2-T4 plateau revealed
+the val curves stop improving early while train continues — diagnostic of
+representation-limited capacity rather than head/optimization limits.
+
+**Fixed controls:** T1, T2, T3 head architecture, T4 optimization locks.
+
+**Experiments**
+| ID | Hypothesis | Comparison |
+|---|---|---|
+| T5-A | H-EMB-02 | Learnable gene-side adapter MLP between frozen embedding and concat point. Tests both same-dim and dim-reducing adapters. |
+| T5-B | H-EMB-03 | ProteomeLM-L layer ablation. Re-encode all 48 organisms at layers {0, 4, 8, 12, 18} and compare. |
+| T5-C | H-EMB-04 | ProteomeLM bypass — use raw mean-pooled ESM-C 600M instead. Tests whether proteome-context helps at all. |
+| T5-D | H-EMB-05 | Adapter variants — follow-up to T5-A. Tests output-dim {256 vs 512}, adapter width {1024 vs 2048}, adapter depth {1 vs 2 hidden layers}, and LayerNorm. |
+
+**Dropped from T5:** the original T5-D (ProteomeLM fine-tuning, H-EMB-01)
+was removed after T5-A established that a learnable adapter on top of the
+frozen embedding captures most of the available signal. Fine-tuning the
+ProteomeLM weights themselves was deemed not worth the additional
+infrastructure cost given the modest adapter gains.
+
+**Promotion rule:** best-performing arm on co-primary metrics; bootstrap CIs
+must be disjoint. Sub-threshold gains accepted given diminishing returns in
+this regime.
+
+**Emits:** `data_contract/architecture_winner_v2.yaml` (supersedes T3 lock when promoted).
 
 ---
 

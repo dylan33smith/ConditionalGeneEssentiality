@@ -1,0 +1,20 @@
+# @package _global_
+# T4-A — Loss Family. Hypothesis H-LOSS-01.
+#
+# Tests MSE vs Huber loss at several deltas.
+# Promotion: best performance on co-primary metrics (raw scale).
+
+experiment_id: T4-A_loss_family
+stage_or_tier: T4
+
+experiment:
+  hypothesis: H-LOSS-01
+  arms:
+    - loss: mse
+    - loss: huber_0.5
+    - loss: huber_1.0
+    - loss: huber_1.5
+  seeds: [0, 1, 2]
+  promotion_rule:
+    primary: [rmse_decrease, mae_decrease]
+    no_regression_vs_t3: required

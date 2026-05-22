@@ -27,7 +27,8 @@ log = logging.getLogger(__name__)
 
 
 def _load_concatenated_embeddings(
-    orgs: list[str], embedding_dir: Path
+    orgs: list[str], embedding_dir: Path,
+    filename_suffix: str = "_proteomelm.pt",
 ) -> tuple[np.ndarray, dict[str, int]]:
     """Concatenate and L2-normalize embedding bundles.
 
@@ -37,7 +38,7 @@ def _load_concatenated_embeddings(
     matrices: list[np.ndarray] = []
     idx_to_key: list[str] = []
     for org in sorted(set(orgs)):
-        pt = embedding_dir / f"{org}_proteomelm.pt"
+        pt = embedding_dir / f"{org}{filename_suffix}"
         if not pt.exists():
             log.warning("Missing embedding bundle for org=%s", org)
             continue

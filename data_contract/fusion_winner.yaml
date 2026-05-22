@@ -1,5 +1,16 @@
-status: pending
+status: approved
 emitted_by: tier2
-winning_topology: null
-rejected_alternatives: []
-ledger_entry: null
+winning_topology: early_concat_shallow_mlp
+architecture:
+  input: "cat(gene_emb[1152], chem_multihot[425])"
+  layers:
+    - {type: linear, in_dim: 1577, out_dim: 256}
+    - {type: relu}
+    - {type: dropout, p: 0.1}
+    - {type: linear, in_dim: 256, out_dim: 1}
+rejected_alternatives:
+  - {topology: linear_head, reason: "T2-A: RMSE gap 0.095 — nonlinearity essential"}
+  - {topology: two_tower, reason: "T2-B: RMSE gap 0.049 — early fusion essential"}
+  - {topology: film_gated, reason: "T2-C: sub-threshold (RMSE 0.003, MAE 0.004) — promising but does not clear co-primary bar"}
+ledger_entry: T2-DEC-001
+representation_locked: T1-DEC-004

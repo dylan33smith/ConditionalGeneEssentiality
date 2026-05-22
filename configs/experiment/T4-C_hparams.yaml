@@ -1,0 +1,20 @@
+# @package _global_
+# T4-C — Hyperparameter Sweep. Hypothesis H-OPT-01.
+#
+# Tests cosine LR annealing + longer training vs the 8-epoch constant-LR
+# baseline. Includes early stopping and weight decay variants.
+
+experiment_id: T4-C_hparams
+stage_or_tier: T4
+
+experiment:
+  hypothesis: H-OPT-01
+  arms:
+    - schedule: baseline (8ep, constant lr)
+    - schedule: cosine_16ep
+    - schedule: cosine_32ep (patience=5)
+    - schedule: cosine_32ep_wd1e-3 (patience=5)
+  seeds: [0, 1, 2]
+  promotion_rule:
+    primary: [rmse_decrease, mae_decrease]
+    no_regression_vs_t3: required

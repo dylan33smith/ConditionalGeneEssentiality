@@ -28,10 +28,11 @@ S0 → S1 → S2 → S3 → S4 → S5 → T1 → T2 → T3 → T4
 | S3 | Split Protocol Lock | **approved** (S3-DEC-001); primary=`multi_org_balanced`, diagnostics=`low_overlap_stress` + homology (0.85 cutoff) |
 | S4 | Feature Contract (Option D: chem long + metadata wide) | **approved** (S4-DEC-002 supersedes S4-DEC-001); artifact_id=`de21504134c84a6c` |
 | S5 | Training-Recipe Lock (row-quality + organism pool) | **approved** (S5-DEC-001); policy=`weighted_full`, organism_pool=`full` |
-| T1 | Representation winner | T1-A (T1-DEC-001), T1-A.2 (T1-DEC-002), T1-B (T1-DEC-003), T1-B.3 (T1-DEC-004 supersedes T1-DEC-003 on encoding choice) complete. **Locked: multihot encoder + BINARY presence/absence** (concentrations dropped — mixed-unit concern + sub-threshold empirical case). T1-DEC-003's secondary finding "raw < log1p/bounded" remains valid if concentrations are ever reintroduced. T1-C, T1-D, T1-E pending. `largest_by_rows` mandatory diagnostic for all future T1+ promotions. |
-| T2 | Fusion winner (all topology decisions live here, not T3) | not started |
-| T3 | Capacity (depth/residuals/efficiency frontier; conditional embedding fine-tune) | not started |
-| T4 | Optimization + loss family + target normalization locks | not started |
+| T1 | Representation winner | **COMPLETE.** T1-A (T1-DEC-001), T1-A.2 (T1-DEC-002), T1-B (T1-DEC-003), T1-B.3 (T1-DEC-004) complete. T1-C **skipped** (T1-DEC-005: zero chemistry unknown rate). T1-D no_winner (T1-DEC-006: metadata sub-threshold but stabilizes seed variance). T1-E no_winner (T1-DEC-007: mode flags negligible). **Locked representation: 425-dim binary multihot over Canonical_ID vocab, chemistry only.** No metadata, no concentrations, no mode flags. `largest_by_rows` mandatory diagnostic for all future T1+ promotions. |
+| T2 | Fusion winner (all topology decisions live here, not T3) | **COMPLETE** (T2-DEC-001). T2-A: MLP >> linear (gap 0.095). T2-B: early concat >> two-tower (gap 0.049). T2-C: FiLM sub-threshold (RMSE 0.003, MAE 0.004 — disjoint CIs but below bar). **Locked fusion: early-concat shallow MLP** (cat→256→ReLU→dropout→1). |
+| T3 | Capacity (depth, width, FiLM retest; conditional embedding fine-tune) | **COMPLETE** (T3-DEC-001). T3-A: 2-layer >> 1-layer (RMSE gap 0.009); 4-layer sub-threshold over 2-layer. T3-B: width 512 selected (monotonic improvement 128→1024, 512 chosen for seed stability over 1024). T3-D: FiLM worse at depth (reversed T2-C signal). T3-C not triggered (no plateau). **Locked architecture: 2-layer ResidualMLP, hidden_dim=512** (cat→512→ReLU→Dropout→ResBlock(512)→1). |
+| T4 | Optimization + loss family + target normalization locks | **COMPLETE** (T4-DEC-001, T4-DEC-002). T4-A: MSE retained (Huber 0.5 better on MAE but regresses RMSE). T4-B: raw targets retained (z-score substantially worse, RMSE +0.018). T4-C: 8-epoch constant-LR baseline retained (cosine+32ep is sub-threshold gain; val plateau diagnosed as representation-limited, not training-time-limited). T4-D (multi-seed CIs) deferred until post-T5. |
+| T5 | Embedding (questioning frozen ProteomeLM-L assumption) | **Phase 1 complete** (T5-DEC-001). T5-A: **adapter_1024_proj wins** (RMSE -0.0043, MAE -0.0025, disjoint CIs — first real gain since T3). T5-B: layer 8 confirmed optimal (layers 12/18 much worse). T5-C: ProteomeLM beats raw ESM-C by RMSE 0.006. T5-D (fine-tune top N ProteomeLM layers) pending. **New locked architecture: adapter_residual_mlp** (Linear(1152,1024)→ReLU→Dropout→Linear(1024,512), then T3 head). |
 
 ## Authoritative data inputs
 
@@ -102,7 +103,7 @@ encoders or Canonical_ID-level holdouts (REFACTORPLAN §12, Deferred Experiments
 
 - **Feature schema instance** (which encoder wins) → T1 only. NOT S5.
 - **All fusion topology decisions** (concat / two-tower / FiLM / gating) → T2 only. NOT T3.
-- **Capacity decisions** (depth / residuals / efficiency frontier) → T3 only. NOT T2.
+- **Capacity decisions** (depth / width / residuals) → T3 only. NOT T2.
 - **Loss family + target normalization** → T4 only. NOT S5.
 
 ## Test policy

@@ -10,6 +10,8 @@ from omegaconf import DictConfig
 
 from src.experiments.tier1._t1a import run_t1a
 from src.experiments.tier1._t1b import run_t1b, run_t1b3
+from src.experiments.tier1._t1d import run_t1d
+from src.experiments.tier1._t1e import run_t1e
 
 log = logging.getLogger(__name__)
 
@@ -49,9 +51,15 @@ def main(cfg: DictConfig) -> None:
     if exp_id == "T1-B.3_binary_vs_log1p":
         run_t1b3(cfg)
         return
+    if exp_id == "T1-D_metadata_bundle":
+        run_t1d(cfg)
+        return
+    if exp_id == "T1-E_decomposition_mode":
+        run_t1e(cfg)
+        return
     raise NotImplementedError(
         f"tier1 experiment_id={exp_id!r} not yet implemented. "
         f"Available: T1-A_granularity, T1-A.2_stress_test_largest_by_rows, "
         f"T1-B_numeric_transform, T1-B.2_stress_test_largest_by_rows, "
-        f"T1-B.3_binary_vs_log1p"
+        f"T1-B.3_binary_vs_log1p, T1-D_metadata_bundle, T1-E_decomposition_mode"
     )
