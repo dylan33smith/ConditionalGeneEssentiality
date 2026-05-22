@@ -1,0 +1,2552 @@
+{
+  "(+)-arabinogalactan": {
+    "lookup_name": "(+)-arabinogalactan",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "ambiguous_mixture"
+  },
+  "1,2-propanediol": {
+    "lookup_name": "1,2-propanediol",
+    "smiles": "CC(CO)O",
+    "pubchem_cid": 1030,
+    "status": "ok"
+  },
+  "1,3-butandiol": {
+    "lookup_name": "1,3-butandiol",
+    "smiles": "CC(CCO)O",
+    "pubchem_cid": 7896,
+    "status": "ok"
+  },
+  "1,3-propanediol": {
+    "lookup_name": "1,3-propanediol",
+    "smiles": "C(CO)CO",
+    "pubchem_cid": 10442,
+    "status": "ok"
+  },
+  "1,4-b-d-galactobiose": {
+    "lookup_name": "1,4-b-d-galactobiose",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "1,4-butanediol": {
+    "lookup_name": "1,4-butanediol",
+    "smiles": "C(CCO)CO",
+    "pubchem_cid": 8064,
+    "status": "ok"
+  },
+  "1,5-pentanediol": {
+    "lookup_name": "1,5-pentanediol",
+    "smiles": "C(CCO)CCO",
+    "pubchem_cid": 8105,
+    "status": "ok"
+  },
+  "1,6-hexanediamine": {
+    "lookup_name": "1,6-hexanediamine",
+    "smiles": "C(CCCN)CCN",
+    "pubchem_cid": 16402,
+    "status": "ok"
+  },
+  "1-ethyl-3-methylimidazolium acetate": {
+    "lookup_name": "1-ethyl-3-methylimidazolium acetate",
+    "smiles": "CCN1C=C[N+](=C1)C.CC(=O)[O-]",
+    "pubchem_cid": 11658353,
+    "status": "ok"
+  },
+  "1-ethyl-3-methylimidazolium chloride": {
+    "lookup_name": "1-ethyl-3-methylimidazolium chloride",
+    "smiles": "CCN1C=C[N+](=C1)C.[Cl-]",
+    "pubchem_cid": 2734160,
+    "status": "ok"
+  },
+  "1-ethyl-3-methylimidazolium lysine": {
+    "lookup_name": "1-ethyl-3-methylimidazolium lysine",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "1-pentanol": {
+    "lookup_name": "1-pentanol",
+    "smiles": "CCCCCO",
+    "pubchem_cid": 6276,
+    "status": "ok"
+  },
+  "2'-deoxycytidine": {
+    "lookup_name": "2'-deoxycytidine",
+    "smiles": "C1[C@@H]([C@H](O[C@H]1N2C=CC(=NC2=O)N)CO)O",
+    "pubchem_cid": 13711,
+    "status": "ok"
+  },
+  "2'-deoxyinosine": {
+    "lookup_name": "2'-deoxyinosine",
+    "smiles": "C1[C@@H]([C@H](O[C@H]1N2C=NC3=C2N=CNC3=O)CO)O",
+    "pubchem_cid": 135398593,
+    "status": "ok"
+  },
+  "2,2'-dipyridyl": {
+    "lookup_name": "2,2'-dipyridyl",
+    "smiles": "C1=CC=NC(=C1)C2=CC=CC=N2",
+    "pubchem_cid": 1474,
+    "status": "ok"
+  },
+  "2,2-dibromo-2-cyanoacetamide": {
+    "lookup_name": "2,2-dibromo-2-cyanoacetamide",
+    "smiles": "C(#N)C(C(=O)N)(Br)Br",
+    "pubchem_cid": 25059,
+    "status": "ok"
+  },
+  "2-deoxy-d-ribonic acid": {
+    "lookup_name": "2-deoxy-d-ribonic acid",
+    "smiles": "C([C@@H]([C@@H](CO)O)O)C(=O)O",
+    "pubchem_cid": 11528367,
+    "status": "ok"
+  },
+  "2-deoxy-d-ribose": {
+    "lookup_name": "2-deoxy-d-ribose",
+    "smiles": "C(C=O)[C@@H]([C@@H](CO)O)O",
+    "pubchem_cid": 5460005,
+    "status": "ok"
+  },
+  "2-deoxyadenosine": {
+    "lookup_name": "2-deoxyadenosine",
+    "smiles": "C1[C@@H]([C@H](O[C@H]1N2C=NC3=C(N=CN=C32)N)CO)O",
+    "pubchem_cid": 13730,
+    "status": "ok"
+  },
+  "2-deoxyadenosine 5-monophosphate": {
+    "lookup_name": "2-deoxyadenosine 5-monophosphate",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "2-furfuraldehyde": {
+    "lookup_name": "2-furfuraldehyde",
+    "smiles": "C1=COC(=C1)C=O",
+    "pubchem_cid": 7362,
+    "status": "ok"
+  },
+  "2-mercaptopyridine n-oxide": {
+    "lookup_name": "2-mercaptopyridine n-oxide",
+    "smiles": "C1=CC(=S)N(C=C1)O",
+    "pubchem_cid": 1570,
+    "status": "ok"
+  },
+  "2-methyl-1-butanol": {
+    "lookup_name": "2-methyl-1-butanol",
+    "smiles": "CCC(C)CO",
+    "pubchem_cid": 8723,
+    "status": "ok"
+  },
+  "2-n-heptyl-4-hydroxyquinoline n-oxide": {
+    "lookup_name": "2-n-heptyl-4-hydroxyquinoline n-oxide",
+    "smiles": "CCCCCCCC1=CC(=O)C2=CC=CC=C2N1O",
+    "pubchem_cid": 1561,
+    "status": "ok"
+  },
+  "2-oxobutyric acid": {
+    "lookup_name": "2-oxobutyric acid",
+    "smiles": "CCC(=O)C(=O)O",
+    "pubchem_cid": 58,
+    "status": "ok"
+  },
+  "2-piperidinone": {
+    "lookup_name": "2-piperidinone",
+    "smiles": "C1CCNC(=O)C1",
+    "pubchem_cid": 12665,
+    "status": "ok"
+  },
+  "20aa_mix": {
+    "lookup_name": "20aa_mix",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_ala": {
+    "lookup_name": "20aa_mix_minus_ala",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_arg": {
+    "lookup_name": "20aa_mix_minus_arg",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_asn": {
+    "lookup_name": "20aa_mix_minus_asn",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_asp": {
+    "lookup_name": "20aa_mix_minus_asp",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_cys": {
+    "lookup_name": "20aa_mix_minus_cys",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_gln": {
+    "lookup_name": "20aa_mix_minus_gln",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_glu": {
+    "lookup_name": "20aa_mix_minus_glu",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_gly": {
+    "lookup_name": "20aa_mix_minus_gly",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_his": {
+    "lookup_name": "20aa_mix_minus_his",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_ile": {
+    "lookup_name": "20aa_mix_minus_ile",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_leu": {
+    "lookup_name": "20aa_mix_minus_leu",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_lys": {
+    "lookup_name": "20aa_mix_minus_lys",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_met": {
+    "lookup_name": "20aa_mix_minus_met",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_pro": {
+    "lookup_name": "20aa_mix_minus_pro",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_ser": {
+    "lookup_name": "20aa_mix_minus_ser",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_thr": {
+    "lookup_name": "20aa_mix_minus_thr",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_trp": {
+    "lookup_name": "20aa_mix_minus_trp",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_tyr": {
+    "lookup_name": "20aa_mix_minus_tyr",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "20aa_mix_minus_val": {
+    "lookup_name": "20aa_mix_minus_val",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "3-aminobutyric acid": {
+    "lookup_name": "3-aminobutyric acid",
+    "smiles": "CC(CC(=O)O)N",
+    "pubchem_cid": 10932,
+    "status": "ok"
+  },
+  "3-methyl-1-butanol": {
+    "lookup_name": "3-methyl-1-butanol",
+    "smiles": "CC(C)CCO",
+    "pubchem_cid": 31260,
+    "status": "ok"
+  },
+  "3-methyl-2-oxobutanoic acid": {
+    "lookup_name": "3-methyl-2-oxobutanoic acid",
+    "smiles": "CC(C)C(=O)C(=O)O",
+    "pubchem_cid": 49,
+    "status": "ok"
+  },
+  "3-methyl-3-butenol": {
+    "lookup_name": "3-methyl-3-butenol",
+    "smiles": "CC(=C)CCO",
+    "pubchem_cid": 12988,
+    "status": "ok"
+  },
+  "34dhbz": {
+    "lookup_name": "2,3-Dihydroxybenzoate",
+    "smiles": "C1=CC(=C(C(=C1)O)[O-])C(=O)O",
+    "pubchem_cid": 54675818,
+    "status": "ok"
+  },
+  "4-aminobutyric acid": {
+    "lookup_name": "4-aminobutyric acid",
+    "smiles": "CC(CCC(=O)O)N",
+    "pubchem_cid": 223130,
+    "status": "ok"
+  },
+  "4-guanidinobutyric acid": {
+    "lookup_name": "4-guanidinobutyric acid",
+    "smiles": "C(CC(=O)O)CN=C(N)N",
+    "pubchem_cid": 500,
+    "status": "ok"
+  },
+  "4-hydroxyvalerate": {
+    "lookup_name": "4-hydroxyvalerate",
+    "smiles": "CC(CCC(=O)[O-])O",
+    "pubchem_cid": 21976320,
+    "status": "ok"
+  },
+  "4abz": {
+    "lookup_name": "4-Aminobenzoate (pABA)",
+    "smiles": "C1=CC(=CC=C1C(=O)[O-])N",
+    "pubchem_cid": 4876,
+    "status": "ok"
+  },
+  "4hbz": {
+    "lookup_name": "4-Hydroxybenzoate",
+    "smiles": "C1=CC(=CC=C1C(=O)O)O",
+    "pubchem_cid": 135,
+    "status": "ok"
+  },
+  "5-aminovaleric acid": {
+    "lookup_name": "5-aminovaleric acid",
+    "smiles": "C(CCN)CC(=O)O",
+    "pubchem_cid": 138,
+    "status": "ok"
+  },
+  "5-fluorouracil": {
+    "lookup_name": "5-fluorouracil",
+    "smiles": "C1=C(C(=O)NC(=O)N1)F",
+    "pubchem_cid": 3385,
+    "status": "ok"
+  },
+  "5-hydroxymethylfurfural": {
+    "lookup_name": "5-hydroxymethylfurfural",
+    "smiles": "C1=C(OC(=C1)C=O)CO",
+    "pubchem_cid": 237332,
+    "status": "ok"
+  },
+  "6-o-acetyl-d-glucose": {
+    "lookup_name": "6-o-acetyl-d-glucose",
+    "smiles": "CC(=O)OC[C@@H]1[C@H]([C@@H]([C@H](C(O1)O)O)O)O",
+    "pubchem_cid": 5459944,
+    "status": "ok"
+  },
+  "8-hydroxy-nitroquinoline": {
+    "lookup_name": "8-hydroxy-nitroquinoline",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "<UNK>": {
+    "lookup_name": "<UNK>",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "ambiguous_mixture"
+  },
+  "<UNK_STRESSOR>": {
+    "lookup_name": "<UNK_STRESSOR>",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "ambiguous_mixture"
+  },
+  "a-cyclodextrin": {
+    "lookup_name": "a-cyclodextrin",
+    "smiles": "C([C@@H]1[C@@H]2[C@@H]([C@H]([C@H](O1)O[C@@H]3[C@H](O[C@@H]([C@@H]([C@H]3O)O)O[C@@H]4[C@H](O[C@@H]([C@@H]([C@H]4O)O)O[C@@H]5[C@H](O[C@@H]([C@@H]([C@H]5O)O)O[C@@H]6[C@H](O[C@@H]([C@@H]([C@H]6O)O)O[C@@H]7[C@H](O[C@H](O2)[C@@H]([C@H]7O)O)CO)CO)CO)CO)CO)O)O)O",
+    "pubchem_cid": 444913,
+    "status": "ok"
+  },
+  "ac": {
+    "lookup_name": "Acetate anion",
+    "smiles": "CC(=O)[O-]",
+    "pubchem_cid": 175,
+    "status": "ok"
+  },
+  "acridine orange": {
+    "lookup_name": "acridine orange",
+    "smiles": "CN(C)C1=CC2=C(C=C1)C=C3C=CC(=CC3=N2)N(C)C",
+    "pubchem_cid": 62344,
+    "status": "ok"
+  },
+  "acriflavine": {
+    "lookup_name": "acriflavine",
+    "smiles": "C[N+]1=C2C=C(C=CC2=CC3=C1C=C(C=C3)N)N.C1=CC(=CC2=NC3=C(C=CC(=C3)N)C=C21)N.[Cl-]",
+    "pubchem_cid": 443101,
+    "status": "ok"
+  },
+  "ade": {
+    "lookup_name": "Adenine",
+    "smiles": "C1=NC2=NC=NC(=C2N1)N",
+    "pubchem_cid": 190,
+    "status": "ok"
+  },
+  "adn": {
+    "lookup_name": "Adenosine",
+    "smiles": "C1=NC(=C2C(=N1)N(C=N2)[C@H]3[C@@H]([C@@H]([C@H](O3)CO)O)O)N",
+    "pubchem_cid": 60961,
+    "status": "ok"
+  },
+  "agar": {
+    "lookup_name": "agar",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "ambiguous_mixture"
+  },
+  "agro_defined_trehalose": {
+    "lookup_name": "agro_defined_trehalose",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "akg": {
+    "lookup_name": "2-Oxoglutarate",
+    "smiles": "C(CC(=O)O)C(=O)C(=O)O",
+    "pubchem_cid": 51,
+    "status": "ok"
+  },
+  "al3": {
+    "lookup_name": "Aluminum cation",
+    "smiles": "[Al+3]",
+    "pubchem_cid": 104727,
+    "status": "ok"
+  },
+  "ala-L": {
+    "lookup_name": "L-Alanine",
+    "smiles": "C[C@@H](C(=O)O)N",
+    "pubchem_cid": 5950,
+    "status": "ok"
+  },
+  "aluminum chloride": {
+    "lookup_name": "aluminum chloride",
+    "smiles": "[Al](Cl)(Cl)Cl",
+    "pubchem_cid": 24012,
+    "status": "ok"
+  },
+  "ammonium persulfate": {
+    "lookup_name": "ammonium persulfate",
+    "smiles": "[NH4+].[NH4+].[O-]S(=O)(=O)OOS(=O)(=O)[O-]",
+    "pubchem_cid": 62648,
+    "status": "ok"
+  },
+  "ammonium sulfide solution": {
+    "lookup_name": "ammonium sulfide solution",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "ampicillin": {
+    "lookup_name": "ampicillin",
+    "smiles": "CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)[C@@H](C3=CC=CC=C3)N)C(=O)O)C",
+    "pubchem_cid": 6249,
+    "status": "ok"
+  },
+  "amylopectin from maize": {
+    "lookup_name": "amylopectin from maize",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "amylose from potato": {
+    "lookup_name": "amylose from potato",
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O[C@@H]2[C@H](O[C@@H]([C@@H]([C@H]2O)O)O[C@@H]3[C@H](O[C@@H]([C@@H]([C@H]3O)O)O)CO)CO)O)O)O)O",
+    "pubchem_cid": 192826,
+    "status": "ok"
+  },
+  "anhydrotetracycline": {
+    "lookup_name": "anhydrotetracycline",
+    "smiles": "CC1=C2C=CC=C(C2=C(C3=C1C[C@H]4[C@@H](C(=O)C(=C([C@]4(C3=O)O)O)C(=O)N)N(C)C)O)O",
+    "pubchem_cid": 54675758,
+    "status": "ok"
+  },
+  "antimycin a": {
+    "lookup_name": "antimycin a",
+    "smiles": "CCCCCC[C@@H]1[C@H]([C@@H](OC(=O)[C@H]([C@H](OC1=O)C)NC(=O)C2=C(C(=CC=C2)NC=O)O)C)OC(=O)CC(C)C",
+    "pubchem_cid": 14957,
+    "status": "ok"
+  },
+  "arg-L": {
+    "lookup_name": "L-Arginine",
+    "smiles": "C(C[C@@H](C(=O)O)N)CN=C(N)N",
+    "pubchem_cid": 6322,
+    "status": "ok"
+  },
+  "asn-L": {
+    "lookup_name": "L-Asparagine",
+    "smiles": "C([C@@H](C(=O)O)N)C(=O)N",
+    "pubchem_cid": 6267,
+    "status": "ok"
+  },
+  "asp-L": {
+    "lookup_name": "L-Aspartate",
+    "smiles": "C([C@@H](C(=O)O)N)C(=O)O",
+    "pubchem_cid": 5960,
+    "status": "ok"
+  },
+  "avidin": {
+    "lookup_name": "avidin",
+    "smiles": "C[C@@H]1COCO1",
+    "pubchem_cid": 641528,
+    "status": "ok"
+  },
+  "bacitracin": {
+    "lookup_name": "bacitracin",
+    "smiles": "CC[C@H](C)[C@H]1C(=O)N[C@@H](C(=O)N[C@H](C(=O)N[C@@H](C(=O)N[C@H](C(=O)NCCCC[C@@H](C(=O)N[C@@H](C(=O)N1)CCCN)NC(=O)[C@H]([C@@H](C)CC)NC(=O)[C@@H](CCC(=O)O)NC(=O)[C@H](CC(C)C)NC(=O)[C@@H]2CSC(=N2)[C@H]([C@@H](C)CC)N)CC(=O)N)CC(=O)O)CC3=CN=CN3)CC4=CC=CC=C4",
+    "pubchem_cid": 10909430,
+    "status": "ok"
+  },
+  "bathophenanthrolinedisulfonic acid": {
+    "lookup_name": "bathophenanthrolinedisulfonic acid",
+    "smiles": "C1=CC=C(C=C1)C2=C3C=CC4=C(C(=CN=C4C3=NC=C2S(=O)(=O)[O-])S(=O)(=O)[O-])C5=CC=CC=C5.O.O.O.[Na+].[Na+]",
+    "pubchem_cid": 91886413,
+    "status": "ok"
+  },
+  "benzalkonium chloride": {
+    "lookup_name": "benzalkonium chloride",
+    "smiles": "CCCCCCCCCCCCC[N+](C)(C)CC1=CC=CC=C1.[Cl-]",
+    "pubchem_cid": 3014024,
+    "status": "ok"
+  },
+  "benzethonium chloride": {
+    "lookup_name": "benzethonium chloride",
+    "smiles": "CC(C)(C)CC(C)(C)C1=CC=C(C=C1)OCCOCC[N+](C)(C)CC2=CC=CC=C2.[Cl-]",
+    "pubchem_cid": 8478,
+    "status": "ok"
+  },
+  "benzoic acid": {
+    "lookup_name": "benzoic acid",
+    "smiles": "C1=CC=C(C=C1)C(=O)O",
+    "pubchem_cid": 243,
+    "status": "ok"
+  },
+  "berberine": {
+    "lookup_name": "berberine",
+    "smiles": "COC1=C(C2=C[N+]3=C(C=C2C=C1)C4=CC5=C(C=C4CC3)OCO5)OC",
+    "pubchem_cid": 2353,
+    "status": "ok"
+  },
+  "beta-alanine": {
+    "lookup_name": "beta-alanine",
+    "smiles": "C(CN)C(=O)O",
+    "pubchem_cid": 239,
+    "status": "ok"
+  },
+  "beta-lactose": {
+    "lookup_name": "beta-lactose",
+    "smiles": "C([C@@H]1[C@@H]([C@@H]([C@H]([C@@H](O1)O[C@@H]2[C@H](O[C@H]([C@@H]([C@H]2O)O)O)CO)O)O)O)O",
+    "pubchem_cid": 6134,
+    "status": "ok"
+  },
+  "betaine": {
+    "lookup_name": "betaine",
+    "smiles": "C[N+](C)(C)CC(=O)[O-]",
+    "pubchem_cid": 247,
+    "status": "ok"
+  },
+  "bile salts": {
+    "lookup_name": "bile salts",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "bo3": {
+    "lookup_name": "Borate anion",
+    "smiles": "B(O)(O)[O-]",
+    "pubchem_cid": 4035503,
+    "status": "ok"
+  },
+  "br": {
+    "lookup_name": "Bromide anion",
+    "smiles": "[Br-]",
+    "pubchem_cid": 259,
+    "status": "ok"
+  },
+  "btn": {
+    "lookup_name": "Biotin (B7)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "butanol": {
+    "lookup_name": "butanol",
+    "smiles": "CCCCO",
+    "pubchem_cid": 263,
+    "status": "ok"
+  },
+  "butyl stearate": {
+    "lookup_name": "butyl stearate",
+    "smiles": "CCCCCCCCCCCCCCCCCC(=O)OCCCC",
+    "pubchem_cid": 31278,
+    "status": "ok"
+  },
+  "butyrolactam": {
+    "lookup_name": "butyrolactam",
+    "smiles": "C1CC(=O)NC1",
+    "pubchem_cid": 12025,
+    "status": "ok"
+  },
+  "ca2": {
+    "lookup_name": "Calcium cation",
+    "smiles": "[Ca+2]",
+    "pubchem_cid": 271,
+    "status": "ok"
+  },
+  "cadaverine": {
+    "lookup_name": "cadaverine",
+    "smiles": "C(CCN)CCN",
+    "pubchem_cid": 273,
+    "status": "ok"
+  },
+  "cadmium chloride hemipentahydrate": {
+    "lookup_name": "cadmium chloride hemipentahydrate",
+    "smiles": "O.O.O.O.O.[Cl-].[Cl-].[Cl-].[Cl-].[Cd+2].[Cd+2]",
+    "pubchem_cid": 24978551,
+    "status": "ok"
+  },
+  "caprolactam": {
+    "lookup_name": "caprolactam",
+    "smiles": "C1CCC(=O)NCC1",
+    "pubchem_cid": 7768,
+    "status": "ok"
+  },
+  "capsaicin": {
+    "lookup_name": "capsaicin",
+    "smiles": "CC(C)/C=C/CCCCC(=O)NCC1=CC(=C(C=C1)O)OC",
+    "pubchem_cid": 1548943,
+    "status": "ok"
+  },
+  "carbenicillin": {
+    "lookup_name": "carbenicillin",
+    "smiles": "CC1([C@@H](N2[C@H](S1)[C@@H](C2=O)NC(=O)C(C3=CC=CC=C3)C(=O)O)C(=O)O)C",
+    "pubchem_cid": 20824,
+    "status": "ok"
+  },
+  "carnitine": {
+    "lookup_name": "carnitine",
+    "smiles": "C[N+](C)(C)CC(CC(=O)[O-])O",
+    "pubchem_cid": 288,
+    "status": "ok"
+  },
+  "casamino acids (vitamin assay)": {
+    "lookup_name": "casamino acids (vitamin assay)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "cbl1": {
+    "lookup_name": "Cobalamin (B12)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "cefoxitin": {
+    "lookup_name": "cefoxitin",
+    "smiles": "CO[C@@]1([C@@H]2N(C1=O)C(=C(CS2)COC(=O)N)C(=O)O)NC(=O)CC3=CC=CS3",
+    "pubchem_cid": 441199,
+    "status": "ok"
+  },
+  "ceftazidime": {
+    "lookup_name": "ceftazidime",
+    "smiles": "CC(C)(C(=O)O)O/N=C(/C1=CSC(=N1)N)\\C(=O)N[C@H]2[C@@H]3N(C2=O)C(=C(CS3)C[N+]4=CC=CC=C4)C(=O)[O-]",
+    "pubchem_cid": 5481173,
+    "status": "ok"
+  },
+  "ceftriaxone disodium salt hemi(heptahydrate)": {
+    "lookup_name": "ceftriaxone disodium salt hemi(heptahydrate)",
+    "smiles": "CN1[N-]C(=O)C(=O)N=C1SCC2=C(N3C(=O)[C@H]([C@H]3SC2)NC(=O)/C(=N\\OC)/C4=CSC(=N4)N)C(=O)[O-].CN1[N-]C(=O)C(=O)N=C1SCC2=C(N3C(=O)[C@H]([C@H]3SC2)NC(=O)/C(=N\\OC)/C4=CSC(=N4)N)C(=O)[O-].O.O.O.O.O.O.O.[Na+].[Na+].[Na+].[Na+]",
+    "pubchem_cid": 71307090,
+    "status": "ok"
+  },
+  "cephalothin": {
+    "lookup_name": "cephalothin",
+    "smiles": "CC(=O)OCC1=C(N2[C@@H]([C@@H](C2=O)NC(=O)CC3=CC=CS3)SC1)C(=O)O",
+    "pubchem_cid": 6024,
+    "status": "ok"
+  },
+  "chenodeoxycholic acid": {
+    "lookup_name": "chenodeoxycholic acid",
+    "smiles": "C[C@H](CCC(=O)O)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2[C@@H](C[C@H]4[C@@]3(CC[C@H](C4)O)C)O)C",
+    "pubchem_cid": 10133,
+    "status": "ok"
+  },
+  "chir-090": {
+    "lookup_name": "chir-090",
+    "smiles": "C[C@H]([C@@H](C(=O)NO)NC(=O)C1=CC=C(C=C1)C#CC2=CC=C(C=C2)CN3CCOCC3)O",
+    "pubchem_cid": 11546620,
+    "status": "ok"
+  },
+  "chloramphenicol": {
+    "lookup_name": "chloramphenicol",
+    "smiles": "C1=CC(=CC=C1[C@H]([C@@H](CO)NC(=O)C(Cl)Cl)O)[N+](=O)[O-]",
+    "pubchem_cid": 5959,
+    "status": "ok"
+  },
+  "chlorhexidine diacetate": {
+    "lookup_name": "chlorhexidine diacetate",
+    "smiles": "CC(=O)O.CC(=O)O.C1=CC(=CC=C1N/C(=N/C(=NCCCCCCN=C(/N=C(/NC2=CC=C(C=C2)Cl)\\N)N)N)/N)Cl",
+    "pubchem_cid": 9562059,
+    "status": "ok"
+  },
+  "chlorpromazine": {
+    "lookup_name": "chlorpromazine",
+    "smiles": "CN(C)CCCN1C2=CC=CC=C2SC3=C1C=C(C=C3)Cl",
+    "pubchem_cid": 2726,
+    "status": "ok"
+  },
+  "chol": {
+    "lookup_name": "Choline",
+    "smiles": "C[N+](C)(C)CCO",
+    "pubchem_cid": 305,
+    "status": "ok"
+  },
+  "cholin acetate": {
+    "lookup_name": "cholin acetate",
+    "smiles": "CC(=O)[O-].C[N+](C)(C)CCO",
+    "pubchem_cid": 11643980,
+    "status": "ok"
+  },
+  "choline chloride": {
+    "lookup_name": "choline chloride",
+    "smiles": "C[N+](C)(C)CCO.[Cl-]",
+    "pubchem_cid": 6209,
+    "status": "ok"
+  },
+  "choline lysine": {
+    "lookup_name": "choline lysine",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "chondroitin sulfate a sodium salt from bovine trachea": {
+    "lookup_name": "chondroitin sulfate a sodium salt from bovine trachea",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "ciprofloxacin": {
+    "lookup_name": "ciprofloxacin",
+    "smiles": "C1CC1N2C=C(C(=O)C3=CC(=C(C=C32)N4CCNCC4)F)C(=O)O",
+    "pubchem_cid": 2764,
+    "status": "ok"
+  },
+  "cisplatin": {
+    "lookup_name": "cisplatin",
+    "smiles": "N.N.Cl[Pt]Cl",
+    "pubchem_cid": 5460033,
+    "status": "ok"
+  },
+  "cit": {
+    "lookup_name": "Citrate anion",
+    "smiles": "C(C(=O)[O-])C(CC(=O)[O-])(C(=O)[O-])O",
+    "pubchem_cid": 31348,
+    "status": "ok"
+  },
+  "citric acid": {
+    "lookup_name": "citric acid",
+    "smiles": "C(C(=O)O)C(CC(=O)O)(C(=O)O)O",
+    "pubchem_cid": 311,
+    "status": "ok"
+  },
+  "cl": {
+    "lookup_name": "Chloride anion",
+    "smiles": "[Cl-]",
+    "pubchem_cid": 312,
+    "status": "ok"
+  },
+  "co3": {
+    "lookup_name": "Carbonate anion",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "cobalt2": {
+    "lookup_name": "Cobalt(II) cation",
+    "smiles": "[Co+2]",
+    "pubchem_cid": 104729,
+    "status": "ok"
+  },
+  "csn": {
+    "lookup_name": "Cytosine",
+    "smiles": "C1=C(NC(=O)N=C1)N",
+    "pubchem_cid": 597,
+    "status": "ok"
+  },
+  "cu2": {
+    "lookup_name": "Copper(II) cation",
+    "smiles": "[Cu+2]",
+    "pubchem_cid": 27099,
+    "status": "ok"
+  },
+  "cv.atlantic": {
+    "lookup_name": "cv.atlantic",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "cv.norland": {
+    "lookup_name": "cv.norland",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "cv.upstate": {
+    "lookup_name": "cv.upstate",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "cys-L": {
+    "lookup_name": "L-Cysteine",
+    "smiles": "C([C@@H](C(=O)O)N)S",
+    "pubchem_cid": 5862,
+    "status": "ok"
+  },
+  "cytd": {
+    "lookup_name": "Cytidine",
+    "smiles": "C1=CN(C(=O)N=C1N)[C@H]2[C@@H]([C@@H]([C@H](O2)CO)O)O",
+    "pubchem_cid": 6175,
+    "status": "ok"
+  },
+  "d,l-cysteine": {
+    "lookup_name": "d,l-cysteine",
+    "smiles": "C(C(C(=O)O)N)S",
+    "pubchem_cid": 594,
+    "status": "ok"
+  },
+  "d,l-histidine": {
+    "lookup_name": "d,l-histidine",
+    "smiles": "C1=C(NC=N1)CC(C(=O)O)N",
+    "pubchem_cid": 773,
+    "status": "ok"
+  },
+  "d,l-malic acid": {
+    "lookup_name": "d,l-malic acid",
+    "smiles": "C(C(C(=O)O)O)C(=O)O",
+    "pubchem_cid": 525,
+    "status": "ok"
+  },
+  "d-alanine": {
+    "lookup_name": "d-alanine",
+    "smiles": "C[C@H](C(=O)O)N",
+    "pubchem_cid": 71080,
+    "status": "ok"
+  },
+  "d-arabinose": {
+    "lookup_name": "d-arabinose",
+    "smiles": "C([C@H]([C@H]([C@@H](C=O)O)O)O)O",
+    "pubchem_cid": 66308,
+    "status": "ok"
+  },
+  "d-cellobiose": {
+    "lookup_name": "d-cellobiose",
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@@H](O1)O[C@@H]2[C@H](OC([C@@H]([C@H]2O)O)O)CO)O)O)O)O",
+    "pubchem_cid": 439178,
+    "status": "ok"
+  },
+  "d-cycloserine": {
+    "lookup_name": "d-cycloserine",
+    "smiles": "C1[C@H](C(=O)NO1)N",
+    "pubchem_cid": 6234,
+    "status": "ok"
+  },
+  "d-fructose": {
+    "lookup_name": "d-fructose",
+    "smiles": "C1[C@H]([C@H]([C@@H](C(O1)(CO)O)O)O)O",
+    "pubchem_cid": 2723872,
+    "status": "ok"
+  },
+  "d-galactose": {
+    "lookup_name": "d-galactose",
+    "smiles": "C([C@@H]1[C@@H]([C@@H]([C@H](C(O1)O)O)O)O)O",
+    "pubchem_cid": 6036,
+    "status": "ok"
+  },
+  "d-galacturonic acid": {
+    "lookup_name": "d-galacturonic acid",
+    "smiles": "[C@@H]1([C@H]([C@H](OC([C@@H]1O)O)C(=O)O)O)O",
+    "pubchem_cid": 439215,
+    "status": "ok"
+  },
+  "d-gluconic acid": {
+    "lookup_name": "d-gluconic acid",
+    "smiles": "C([C@H]([C@H]([C@@H]([C@H](C(=O)O)O)O)O)O)O",
+    "pubchem_cid": 10690,
+    "status": "ok"
+  },
+  "d-glucosamine": {
+    "lookup_name": "d-glucosamine",
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H](C(O1)O)N)O)O)O",
+    "pubchem_cid": 439213,
+    "status": "ok"
+  },
+  "d-glucose-6-phosphate": {
+    "lookup_name": "d-glucose-6-phosphate",
+    "smiles": "C([C@H]([C@H]([C@@H]([C@H](C=O)O)O)O)O)OP(=O)(O)O",
+    "pubchem_cid": 439958,
+    "status": "ok"
+  },
+  "d-glucuronic acid": {
+    "lookup_name": "d-glucuronic acid",
+    "smiles": "[C@@H]1([C@@H]([C@H](OC([C@@H]1O)O)C(=O)O)O)O",
+    "pubchem_cid": 94715,
+    "status": "ok"
+  },
+  "d-leucrose": {
+    "lookup_name": "d-leucrose",
+    "smiles": "C1[C@H]([C@H]([C@@H]([C@](O1)(CO)O)O)O)O[C@@H]2[C@@H]([C@H]([C@@H]([C@H](O2)CO)O)O)O",
+    "pubchem_cid": 12305019,
+    "status": "ok"
+  },
+  "d-lysine": {
+    "lookup_name": "d-lysine",
+    "smiles": "C(CCN)C[C@H](C(=O)O)N",
+    "pubchem_cid": 57449,
+    "status": "ok"
+  },
+  "d-maltose": {
+    "lookup_name": "d-maltose",
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O[C@@H]2[C@H](O[C@@H]([C@H]([C@H]2O)O)O)CO)O)O)O)O",
+    "pubchem_cid": 10991489,
+    "status": "ok"
+  },
+  "d-mannitol": {
+    "lookup_name": "d-mannitol",
+    "smiles": "C([C@H]([C@H]([C@@H]([C@@H](CO)O)O)O)O)O",
+    "pubchem_cid": 6251,
+    "status": "ok"
+  },
+  "d-mannose": {
+    "lookup_name": "d-mannose",
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@@H](C(O1)O)O)O)O)O",
+    "pubchem_cid": 18950,
+    "status": "ok"
+  },
+  "d-raffinose": {
+    "lookup_name": "d-raffinose",
+    "smiles": "C([C@@H]1[C@@H]([C@@H]([C@H]([C@H](O1)OC[C@@H]2[C@H]([C@@H]([C@H]([C@H](O2)O[C@]3([C@H]([C@@H]([C@H](O3)CO)O)O)CO)O)O)O)O)O)O)O",
+    "pubchem_cid": 439242,
+    "status": "ok"
+  },
+  "d-ribose": {
+    "lookup_name": "d-ribose",
+    "smiles": "C1[C@H]([C@H]([C@H](C(O1)O)O)O)O",
+    "pubchem_cid": 10975657,
+    "status": "ok"
+  },
+  "d-salicin": {
+    "lookup_name": "d-salicin",
+    "smiles": "C1=CC=C(C(=C1)CO)O[C@H]2[C@@H]([C@H]([C@@H]([C@H](O2)CO)O)O)O",
+    "pubchem_cid": 439503,
+    "status": "ok"
+  },
+  "d-serine": {
+    "lookup_name": "d-serine",
+    "smiles": "C([C@H](C(=O)O)N)O",
+    "pubchem_cid": 71077,
+    "status": "ok"
+  },
+  "d-sorbitol": {
+    "lookup_name": "d-sorbitol",
+    "smiles": "C([C@H]([C@H]([C@@H]([C@H](CO)O)O)O)O)O",
+    "pubchem_cid": 5780,
+    "status": "ok"
+  },
+  "d-tagatose": {
+    "lookup_name": "d-tagatose",
+    "smiles": "C1[C@H]([C@@H]([C@@H](C(O1)(CO)O)O)O)O",
+    "pubchem_cid": 439312,
+    "status": "ok"
+  },
+  "d-trehalose": {
+    "lookup_name": "d-trehalose",
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O[C@@H]2[C@@H]([C@H]([C@@H]([C@H](O2)CO)O)O)O)O)O)O)O",
+    "pubchem_cid": 7427,
+    "status": "ok"
+  },
+  "d-xylose": {
+    "lookup_name": "d-xylose",
+    "smiles": "C1[C@H]([C@@H]([C@H](C(O1)O)O)O)O",
+    "pubchem_cid": 135191,
+    "status": "ok"
+  },
+  "decanoic acid": {
+    "lookup_name": "decanoic acid",
+    "smiles": "CCCCCCCCCC(=O)O",
+    "pubchem_cid": 2969,
+    "status": "ok"
+  },
+  "deoxycholic acid": {
+    "lookup_name": "deoxycholic acid",
+    "smiles": "C[C@H](CCC(=O)O)[C@H]1CC[C@@H]2[C@@]1([C@H](C[C@H]3[C@H]2CC[C@H]4[C@@]3(CC[C@H](C4)O)C)O)C",
+    "pubchem_cid": 222528,
+    "status": "ok"
+  },
+  "deoxyribonucleic acid from herring sperm": {
+    "lookup_name": "deoxyribonucleic acid from herring sperm",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "deta/no": {
+    "lookup_name": "deta/no",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "dextran, mw ~200,000": {
+    "lookup_name": "dextran, mw ~200,000",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "dibucaine": {
+    "lookup_name": "dibucaine",
+    "smiles": "CCCCOC1=NC2=CC=CC=C2C(=C1)C(=O)NCCN(CC)CC",
+    "pubchem_cid": 3025,
+    "status": "ok"
+  },
+  "dimethyl sulfoxide": {
+    "lookup_name": "dimethyl sulfoxide",
+    "smiles": "CS(=O)C",
+    "pubchem_cid": 679,
+    "status": "ok"
+  },
+  "dimetridazole": {
+    "lookup_name": "dimetridazole",
+    "smiles": "CC1=NC=C(N1C)[N+](=O)[O-]",
+    "pubchem_cid": 3090,
+    "status": "ok"
+  },
+  "dl-2-aminobutyric acid": {
+    "lookup_name": "dl-2-aminobutyric acid",
+    "smiles": "CCC(C(=O)O)N",
+    "pubchem_cid": 6657,
+    "status": "ok"
+  },
+  "dl-3-aminoisobutyric acid": {
+    "lookup_name": "dl-3-aminoisobutyric acid",
+    "smiles": "CC(CN)C(=O)O",
+    "pubchem_cid": 64956,
+    "status": "ok"
+  },
+  "dl-isocitric acid": {
+    "lookup_name": "dl-isocitric acid",
+    "smiles": "C(C(C(C(=O)O)O)C(=O)O)C(=O)O",
+    "pubchem_cid": 1198,
+    "status": "ok"
+  },
+  "doxycycline hyclate": {
+    "lookup_name": "doxycycline hyclate",
+    "smiles": "CCO.C[C@@H]1[C@H]2[C@@H]([C@H]3[C@@H](C(=O)C(=C([C@]3(C(=O)C2=C(C4=C1C=CC=C4O)O)O)O)C(=O)N)N(C)C)O.C[C@@H]1[C@H]2[C@@H]([C@H]3[C@@H](C(=O)C(=C([C@]3(C(=O)C2=C(C4=C1C=CC=C4O)O)O)O)C(=O)N)N(C)C)O.O.Cl.Cl",
+    "pubchem_cid": 54686183,
+    "status": "ok"
+  },
+  "e-amino-n-caproic acid": {
+    "lookup_name": "e-amino-n-caproic acid",
+    "smiles": "C(CCC(=O)O)CCN",
+    "pubchem_cid": 564,
+    "status": "ok"
+  },
+  "econazole nitrate": {
+    "lookup_name": "econazole nitrate",
+    "smiles": "C1=CC(=CC=C1COC(CN2C=CN=C2)C3=C(C=C(C=C3)Cl)Cl)Cl.[N+](=O)(O)[O-]",
+    "pubchem_cid": 68589,
+    "status": "ok"
+  },
+  "edta": {
+    "lookup_name": "EDTA",
+    "smiles": "C(CN(CC(=O)O)CC(=O)O)N(CC(=O)O)CC(=O)O",
+    "pubchem_cid": 6049,
+    "status": "ok"
+  },
+  "epiphytic": {
+    "lookup_name": "epiphytic",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "erythromycin": {
+    "lookup_name": "erythromycin",
+    "smiles": "CC[C@@H]1[C@@]([C@@H]([C@H](C(=O)[C@@H](C[C@@]([C@@H]([C@H]([C@@H]([C@H](C(=O)O1)C)O[C@H]2C[C@@]([C@H]([C@@H](O2)C)O)(C)OC)C)O[C@H]3[C@@H]([C@H](C[C@H](O3)C)N(C)C)O)(C)O)C)C)O)(C)O",
+    "pubchem_cid": 12560,
+    "status": "ok"
+  },
+  "etha": {
+    "lookup_name": "Ethanolamine",
+    "smiles": "C(CO)N",
+    "pubchem_cid": 700,
+    "status": "ok"
+  },
+  "ethanol": {
+    "lookup_name": "ethanol",
+    "smiles": "CCO",
+    "pubchem_cid": 702,
+    "status": "ok"
+  },
+  "f": {
+    "lookup_name": "Fluoride anion",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "fccp": {
+    "lookup_name": "fccp",
+    "smiles": "C1=CC(=CC=C1NN=C(C#N)C#N)OC(F)(F)F",
+    "pubchem_cid": 3330,
+    "status": "ok"
+  },
+  "fe2": {
+    "lookup_name": "Iron(II) cation",
+    "smiles": "[Fe+2]",
+    "pubchem_cid": 27284,
+    "status": "ok"
+  },
+  "fe3": {
+    "lookup_name": "Iron(III) cation",
+    "smiles": "[Fe+3]",
+    "pubchem_cid": 29936,
+    "status": "ok"
+  },
+  "ferulic acid": {
+    "lookup_name": "ferulic acid",
+    "smiles": "COC1=C(C=CC(=C1)/C=C/C(=O)O)O",
+    "pubchem_cid": 445858,
+    "status": "ok"
+  },
+  "flavone": {
+    "lookup_name": "flavone",
+    "smiles": "C1=CC=C(C=C1)C2=CC(=O)C3=CC=CC=C3O2",
+    "pubchem_cid": 10680,
+    "status": "ok"
+  },
+  "fol": {
+    "lookup_name": "Folate (B9)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "for": {
+    "lookup_name": "Formate anion",
+    "smiles": "C(=O)[O-]",
+    "pubchem_cid": 283,
+    "status": "ok"
+  },
+  "formamide": {
+    "lookup_name": "formamide",
+    "smiles": "C(=O)N",
+    "pubchem_cid": 713,
+    "status": "ok"
+  },
+  "fructooligosaccharides (fos)": {
+    "lookup_name": "fructooligosaccharides (fos)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "furaltadone": {
+    "lookup_name": "furaltadone",
+    "smiles": "C1COCCN1CC2CN(C(=O)O2)/N=C/C3=CC=C(O3)[N+](=O)[O-]",
+    "pubchem_cid": 9553856,
+    "status": "ok"
+  },
+  "furfuryl alcohol": {
+    "lookup_name": "furfuryl alcohol",
+    "smiles": "C1=COC(=C1)CO",
+    "pubchem_cid": 7361,
+    "status": "ok"
+  },
+  "fusaric acid": {
+    "lookup_name": "fusaric acid",
+    "smiles": "CCCCC1=CN=C(C=C1)C(=O)O",
+    "pubchem_cid": 3442,
+    "status": "ok"
+  },
+  "fusidic acid": {
+    "lookup_name": "fusidic acid",
+    "smiles": "C[C@H]1[C@@H]2CC[C@]3([C@H]([C@]2(CC[C@H]1O)C)[C@@H](C[C@@H]\\4[C@@]3(C[C@@H](/C4=C(/CCC=C(C)C)\\C(=O)O)OC(=O)C)C)O)C",
+    "pubchem_cid": 3000226,
+    "status": "ok"
+  },
+  "g418 disulfate salt solution": {
+    "lookup_name": "g418 disulfate salt solution",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "gelatin": {
+    "lookup_name": "gelatin",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "geneticin g418": {
+    "lookup_name": "geneticin g418",
+    "smiles": "C[C@H]([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O[C@@H]2[C@H](C[C@H]([C@@H]([C@H]2O)O[C@H]3[C@H]([C@@H]([C@](CO3)(C)O)NC)O)N)N)N)O)O)O.OS(=O)(=O)O.OS(=O)(=O)O",
+    "pubchem_cid": 171378501,
+    "status": "ok"
+  },
+  "gentamicin": {
+    "lookup_name": "gentamicin",
+    "smiles": "CC(C1CCC(C(O1)OC2C(CC(C(C2O)OC3C(C(C(CO3)(C)O)NC)O)N)N)N)NC",
+    "pubchem_cid": 3467,
+    "status": "ok"
+  },
+  "glc-D": {
+    "lookup_name": "D-Glucose",
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H](C(O1)O)O)O)O)O",
+    "pubchem_cid": 5793,
+    "status": "ok"
+  },
+  "gln-L": {
+    "lookup_name": "L-Glutamine",
+    "smiles": "C(CC(=O)N)[C@@H](C(=O)O)N",
+    "pubchem_cid": 5961,
+    "status": "ok"
+  },
+  "glu-L": {
+    "lookup_name": "L-Glutamate",
+    "smiles": "C(CC(=O)O)[C@@H](C(=O)O)N",
+    "pubchem_cid": 33032,
+    "status": "ok"
+  },
+  "glucuronamide": {
+    "lookup_name": "glucuronamide",
+    "smiles": "[C@@H]1([C@@H]([C@H](O[C@H]([C@@H]1O)O)C(=O)N)O)O",
+    "pubchem_cid": 636367,
+    "status": "ok"
+  },
+  "gly": {
+    "lookup_name": "Glycine",
+    "smiles": "C(C(=O)O)N",
+    "pubchem_cid": 750,
+    "status": "ok"
+  },
+  "gly-dl-asp": {
+    "lookup_name": "gly-dl-asp",
+    "smiles": "C(C(C(=O)O)NC(=O)CN)C(=O)O",
+    "pubchem_cid": 273261,
+    "status": "ok"
+  },
+  "gly-glu": {
+    "lookup_name": "gly-glu",
+    "smiles": "C(CC(=O)O)[C@@H](C(=O)O)NC(=O)CN",
+    "pubchem_cid": 99278,
+    "status": "ok"
+  },
+  "glyc": {
+    "lookup_name": "Glycerol",
+    "smiles": "C(C(CO)O)O",
+    "pubchem_cid": 753,
+    "status": "ok"
+  },
+  "glycolic acid": {
+    "lookup_name": "glycolic acid",
+    "smiles": "C(C(=O)O)O",
+    "pubchem_cid": 757,
+    "status": "ok"
+  },
+  "green bean": {
+    "lookup_name": "green bean",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "gsn": {
+    "lookup_name": "Guanosine",
+    "smiles": "C1=NC2=C(N1[C@H]3[C@@H]([C@@H]([C@H](O3)CO)O)O)N=C(NC2=O)N",
+    "pubchem_cid": 135398635,
+    "status": "ok"
+  },
+  "gua": {
+    "lookup_name": "Guanine",
+    "smiles": "C1=NC2=C(N1)C(=O)NC(=N2)N",
+    "pubchem_cid": 135398634,
+    "status": "ok"
+  },
+  "h": {
+    "lookup_name": "Proton",
+    "smiles": "[1H+]",
+    "pubchem_cid": 5460653,
+    "status": "ok"
+  },
+  "h2": {
+    "lookup_name": "h2",
+    "smiles": "[HH]",
+    "pubchem_cid": 783,
+    "status": "ok"
+  },
+  "h2s": {
+    "lookup_name": "Hydrogen sulfide",
+    "smiles": "S",
+    "pubchem_cid": 402,
+    "status": "ok"
+  },
+  "hco3": {
+    "lookup_name": "Bicarbonate anion",
+    "smiles": "C(=O)(O)[O-]",
+    "pubchem_cid": 769,
+    "status": "ok"
+  },
+  "heparin sodium salt from porcine intestinal mucosa": {
+    "lookup_name": "heparin sodium salt from porcine intestinal mucosa",
+    "smiles": "C1N(CN(CN1CCO)CC[O-])CCO.[Na+]",
+    "pubchem_cid": 118989588,
+    "status": "ok"
+  },
+  "hepes": {
+    "lookup_name": "HEPES buffer",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "heptanoic acid": {
+    "lookup_name": "heptanoic acid",
+    "smiles": "CCCCCCC(=O)O",
+    "pubchem_cid": 8094,
+    "status": "ok"
+  },
+  "hexanoic acid": {
+    "lookup_name": "hexanoic acid",
+    "smiles": "CCCCCC(=O)O",
+    "pubchem_cid": 8892,
+    "status": "ok"
+  },
+  "his-L": {
+    "lookup_name": "L-Histidine",
+    "smiles": "C1=C(NC=N1)C[C@@H](C(=O)O)N",
+    "pubchem_cid": 6274,
+    "status": "ok"
+  },
+  "hxan": {
+    "lookup_name": "Hypoxanthine",
+    "smiles": "C1=NC2=C(N1)C(=O)NC=N2",
+    "pubchem_cid": 135398638,
+    "status": "ok"
+  },
+  "hyaluronic acid sodium salt from streptococcus equi": {
+    "lookup_name": "hyaluronic acid sodium salt from streptococcus equi",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "hydantoin": {
+    "lookup_name": "hydantoin",
+    "smiles": "C1C(=O)NC(=O)N1",
+    "pubchem_cid": 10006,
+    "status": "ok"
+  },
+  "hydrogen peroxide": {
+    "lookup_name": "hydrogen peroxide",
+    "smiles": "OO",
+    "pubchem_cid": 784,
+    "status": "ok"
+  },
+  "ile-L": {
+    "lookup_name": "L-Isoleucine",
+    "smiles": "CC[C@H](C)[C@@H](C(=O)O)N",
+    "pubchem_cid": 6306,
+    "status": "ok"
+  },
+  "indolicidin": {
+    "lookup_name": "indolicidin",
+    "smiles": "CC[C@H](C)[C@@H](C(=O)N[C@@H](CC(C)C)C(=O)N1CCC[C@H]1C(=O)N[C@@H](CC2=CNC3=CC=CC=C32)C(=O)N[C@@H](CCCCN)C(=O)N[C@@H](CC4=CNC5=CC=CC=C54)C(=O)N6CCC[C@H]6C(=O)N[C@H](CC7=CNC8=CC=CC=C87)C(=O)N[C@@H](CC9=CNC1=CC=CC=C19)C(=O)N1CCC[C@H]1C(=O)N[C@@H](CC1=CNC2=CC=CC=C21)C(=O)N[C@@H](CCCNC(=N)N)C(=O)N[C@@H](CCCNC(=N)N)C(=O)N)N",
+    "pubchem_cid": 90478486,
+    "status": "ok"
+  },
+  "inost": {
+    "lookup_name": "myo-Inositol",
+    "smiles": "C1(C(C(C(C(C1O)O)O)O)O)O",
+    "pubchem_cid": 892,
+    "status": "ok"
+  },
+  "ins": {
+    "lookup_name": "Inosine",
+    "smiles": "C1=NC2=C(C(=O)N1)N=CN2[C@H]3[C@@H]([C@@H]([C@H](O3)CO)O)O",
+    "pubchem_cid": 135398641,
+    "status": "ok"
+  },
+  "irgasan": {
+    "lookup_name": "irgasan",
+    "smiles": "C1=CC(=C(C=C1Cl)O)OC2=C(C=C(C=C2)Cl)Cl",
+    "pubchem_cid": 5564,
+    "status": "ok"
+  },
+  "iron": {
+    "lookup_name": "iron",
+    "smiles": "[Fe]",
+    "pubchem_cid": 23925,
+    "status": "ok"
+  },
+  "isomaltose": {
+    "lookup_name": "isomaltose",
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)OC[C@@H]2[C@H]([C@@H]([C@H](C(O2)O)O)O)O)O)O)O)O",
+    "pubchem_cid": 439193,
+    "status": "ok"
+  },
+  "k": {
+    "lookup_name": "Potassium cation",
+    "smiles": "[K+]",
+    "pubchem_cid": 813,
+    "status": "ok"
+  },
+  "kanamycin": {
+    "lookup_name": "kanamycin",
+    "smiles": "C1[C@H]([C@@H]([C@H]([C@@H]([C@H]1N)O[C@@H]2[C@@H]([C@H]([C@@H]([C@H](O2)CN)O)O)O)O)O[C@@H]3[C@@H]([C@H]([C@@H]([C@H](O3)CO)O)N)O)N",
+    "pubchem_cid": 6032,
+    "status": "ok"
+  },
+  "l-arabinose": {
+    "lookup_name": "l-arabinose",
+    "smiles": "C1[C@@H]([C@@H]([C@H](C(O1)O)O)O)O",
+    "pubchem_cid": 439195,
+    "status": "ok"
+  },
+  "l-carnitine": {
+    "lookup_name": "l-carnitine",
+    "smiles": "C[N+](C)(C)C[C@@H](CC(=O)[O-])O",
+    "pubchem_cid": 10917,
+    "status": "ok"
+  },
+  "l-citrulline": {
+    "lookup_name": "l-citrulline",
+    "smiles": "C(C[C@@H](C(=O)O)N)CNC(=O)N",
+    "pubchem_cid": 9750,
+    "status": "ok"
+  },
+  "l-fucose": {
+    "lookup_name": "l-fucose",
+    "smiles": "C[C@H]1[C@H]([C@H]([C@@H](C(O1)O)O)O)O",
+    "pubchem_cid": 17106,
+    "status": "ok"
+  },
+  "l-homoserine": {
+    "lookup_name": "l-homoserine",
+    "smiles": "C(CO)[C@@H](C(=O)O)N",
+    "pubchem_cid": 12647,
+    "status": "ok"
+  },
+  "l-malic acid": {
+    "lookup_name": "l-malic acid",
+    "smiles": "C([C@@H](C(=O)O)O)C(=O)O",
+    "pubchem_cid": 222656,
+    "status": "ok"
+  },
+  "l-ornithine": {
+    "lookup_name": "l-ornithine",
+    "smiles": "C(C[C@@H](C(=O)O)N)CN",
+    "pubchem_cid": 6262,
+    "status": "ok"
+  },
+  "l-pipecolic acid": {
+    "lookup_name": "l-pipecolic acid",
+    "smiles": "C1CCN[C@@H](C1)C(=O)O",
+    "pubchem_cid": 439227,
+    "status": "ok"
+  },
+  "l-pyroglutamic acid": {
+    "lookup_name": "l-pyroglutamic acid",
+    "smiles": "C1CC(=O)N[C@@H]1C(=O)O",
+    "pubchem_cid": 7405,
+    "status": "ok"
+  },
+  "l-rhamnose": {
+    "lookup_name": "l-rhamnose",
+    "smiles": "C[C@H]1[C@@H]([C@H]([C@H](C(O1)O)O)O)O",
+    "pubchem_cid": 25310,
+    "status": "ok"
+  },
+  "l-sorbose": {
+    "lookup_name": "l-sorbose",
+    "smiles": "C1[C@@H]([C@H]([C@@H](C(O1)(CO)O)O)O)O",
+    "pubchem_cid": 439192,
+    "status": "ok"
+  },
+  "l-valine (hplc purified)": {
+    "lookup_name": "l-valine (hplc purified)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "lac-D": {
+    "lookup_name": "D-Lactate anion",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "lac-L": {
+    "lookup_name": "L-Lactate anion",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "lactitol": {
+    "lookup_name": "lactitol",
+    "smiles": "C([C@@H]1[C@@H]([C@@H]([C@H]([C@@H](O1)O[C@H]([C@@H](CO)O)[C@@H]([C@H](CO)O)O)O)O)O)O",
+    "pubchem_cid": 157355,
+    "status": "ok"
+  },
+  "lactulose": {
+    "lookup_name": "lactulose",
+    "smiles": "C([C@@H]1[C@@H]([C@@H]([C@H]([C@@H](O1)O[C@@H]2[C@H](O[C@@]([C@H]2O)(CO)O)CO)O)O)O)O",
+    "pubchem_cid": 11333,
+    "status": "ok"
+  },
+  "laminaribiose": {
+    "lookup_name": "laminaribiose",
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@@H](O1)O[C@H]([C@H](C=O)O)[C@@H]([C@@H](CO)O)O)O)O)O)O",
+    "pubchem_cid": 122350,
+    "status": "ok"
+  },
+  "lauric acid": {
+    "lookup_name": "lauric acid",
+    "smiles": "CCCCCCCCCCCC(=O)O",
+    "pubchem_cid": 3893,
+    "status": "ok"
+  },
+  "leu-L": {
+    "lookup_name": "L-Leucine",
+    "smiles": "CC(C)C[C@@H](C(=O)O)N",
+    "pubchem_cid": 6106,
+    "status": "ok"
+  },
+  "levan - from erwinia herbicola": {
+    "lookup_name": "levan - from erwinia herbicola",
+    "smiles": "C([C@@H]1C(C([C@](O1)(CO)OC[C@@]2(C(C([C@H](O2)CO)O)O)OC[C@@]3(C(C([C@H](O3)CO)O)O)O[C@H]4C(C([C@@H](C(O4)CO)O)O)O)O)O)O",
+    "pubchem_cid": 132932783,
+    "status": "ok"
+  },
+  "levofloxacin": {
+    "lookup_name": "levofloxacin",
+    "smiles": "C[C@H]1COC2=C3N1C=C(C(=O)C3=CC(=C2N4CCN(CC4)C)F)C(=O)O",
+    "pubchem_cid": 149096,
+    "status": "ok"
+  },
+  "levulinic acid": {
+    "lookup_name": "levulinic acid",
+    "smiles": "CC(=O)CCC(=O)O",
+    "pubchem_cid": 11579,
+    "status": "ok"
+  },
+  "lincomycin": {
+    "lookup_name": "lincomycin",
+    "smiles": "CCC[C@@H]1C[C@H](N(C1)C)C(=O)N[C@@H]([C@@H]2[C@@H]([C@@H]([C@H]([C@H](O2)SC)O)O)O)[C@@H](C)O",
+    "pubchem_cid": 3000540,
+    "status": "ok"
+  },
+  "lipoate": {
+    "lookup_name": "Lipoate",
+    "smiles": "C1CSSC1CCCCC(=O)[O-]",
+    "pubchem_cid": 5460326,
+    "status": "ok"
+  },
+  "lithocholic acid": {
+    "lookup_name": "lithocholic acid",
+    "smiles": "C[C@H](CCC(=O)O)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2CC[C@H]4[C@@]3(CC[C@H](C4)O)C)C",
+    "pubchem_cid": 9903,
+    "status": "ok"
+  },
+  "lomefloxacin": {
+    "lookup_name": "lomefloxacin",
+    "smiles": "CCN1C=C(C(=O)C2=CC(=C(C(=C21)F)N3CCNC(C3)C)F)C(=O)O",
+    "pubchem_cid": 3948,
+    "status": "ok"
+  },
+  "lys-L": {
+    "lookup_name": "L-Lysine",
+    "smiles": "C(CCN)C[C@@H](C(=O)O)N",
+    "pubchem_cid": 5962,
+    "status": "ok"
+  },
+  "m-inositol": {
+    "lookup_name": "m-inositol",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "maltitol": {
+    "lookup_name": "maltitol",
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O[C@H]([C@@H](CO)O)[C@@H]([C@H](CO)O)O)O)O)O)O",
+    "pubchem_cid": 493591,
+    "status": "ok"
+  },
+  "maltohexaose": {
+    "lookup_name": "maltohexaose",
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O[C@@H]2[C@H](O[C@@H]([C@@H]([C@H]2O)O)O[C@@H]3[C@H](O[C@@H]([C@@H]([C@H]3O)O)O[C@@H]4[C@H](O[C@@H]([C@@H]([C@H]4O)O)O[C@@H]5[C@H](O[C@@H]([C@@H]([C@H]5O)O)O[C@H]([C@@H](CO)O)[C@@H]([C@H](C=O)O)O)CO)CO)CO)CO)O)O)O)O",
+    "pubchem_cid": 161828,
+    "status": "ok"
+  },
+  "maltotetraose": {
+    "lookup_name": "maltotetraose",
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O[C@@H]2[C@H](O[C@@H]([C@@H]([C@H]2O)O)O[C@@H]3[C@H](O[C@@H]([C@@H]([C@H]3O)O)O[C@H]([C@@H](CO)O)[C@@H]([C@H](C=O)O)O)CO)CO)O)O)O)O",
+    "pubchem_cid": 123966,
+    "status": "ok"
+  },
+  "mannan from saccharomyces cerevisiae": {
+    "lookup_name": "mannan from saccharomyces cerevisiae",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "mc_vitamins": {
+    "lookup_name": "mc_vitamins",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "melibiose": {
+    "lookup_name": "melibiose",
+    "smiles": "C([C@@H]1[C@@H]([C@@H]([C@H]([C@H](O1)OC[C@@H]2[C@H]([C@@H]([C@H](C(O2)O)O)O)O)O)O)O)O",
+    "pubchem_cid": 440658,
+    "status": "ok"
+  },
+  "mercury (ii) chloride": {
+    "lookup_name": "mercury (ii) chloride",
+    "smiles": "Cl[Hg]Cl",
+    "pubchem_cid": 24085,
+    "status": "ok"
+  },
+  "mes": {
+    "lookup_name": "MES buffer",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "met-L": {
+    "lookup_name": "L-Methionine",
+    "smiles": "CSCC[C@@H](C(=O)O)N",
+    "pubchem_cid": 6137,
+    "status": "ok"
+  },
+  "methanol": {
+    "lookup_name": "methanol",
+    "smiles": "CO",
+    "pubchem_cid": 887,
+    "status": "ok"
+  },
+  "methyl-b-d-galactopyranoside": {
+    "lookup_name": "methyl-b-d-galactopyranoside",
+    "smiles": "COC1C(C(C(C(O1)CO)O)O)O",
+    "pubchem_cid": 2108,
+    "status": "ok"
+  },
+  "methylglyoxal": {
+    "lookup_name": "methylglyoxal",
+    "smiles": "CC(=O)C=O",
+    "pubchem_cid": 880,
+    "status": "ok"
+  },
+  "metronidazole": {
+    "lookup_name": "metronidazole",
+    "smiles": "CC1=NC=C(N1CCO)[N+](=O)[O-]",
+    "pubchem_cid": 4173,
+    "status": "ok"
+  },
+  "mg2": {
+    "lookup_name": "Magnesium cation",
+    "smiles": "[Mg+2]",
+    "pubchem_cid": 888,
+    "status": "ok"
+  },
+  "mitomycin c": {
+    "lookup_name": "mitomycin c",
+    "smiles": "CC1=C(C(=O)C2=C(C1=O)N3C[C@H]4[C@@H]([C@@]3([C@@H]2COC(=O)N)OC)N4)N",
+    "pubchem_cid": 5746,
+    "status": "ok"
+  },
+  "mixed culture; syntrophotalea carbinolica 1:1 starting od to methanogen": {
+    "lookup_name": "mixed culture; syntrophotalea carbinolica 1:1 starting od to methanogen",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "mn2": {
+    "lookup_name": "Manganese(II) cation",
+    "smiles": "[Mn]",
+    "pubchem_cid": 23930,
+    "status": "ok"
+  },
+  "mobd": {
+    "lookup_name": "Molybdate anion",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "mops": {
+    "lookup_name": "MOPS buffer",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "mqn8": {
+    "lookup_name": "Menaquinone-8",
+    "smiles": "CC1=C(C(=O)C2=CC=CC=C2C1=O)C/C=C(\\C)/CC/C=C(\\C)/CC/C=C(\\C)/CC/C=C(\\C)/CC/C=C(\\C)/CC/C=C(\\C)/CC/C=C(\\C)/CCC=C(C)C",
+    "pubchem_cid": 5376507,
+    "status": "ok"
+  },
+  "mreb perturbing compound a22": {
+    "lookup_name": "mreb perturbing compound a22",
+    "smiles": "C1=CC(=C(C=C1CSC(=N)N)Cl)Cl.Cl",
+    "pubchem_cid": 2830968,
+    "status": "ok"
+  },
+  "myristic acid": {
+    "lookup_name": "myristic acid",
+    "smiles": "CCCCCCCCCCCCCC(=O)O",
+    "pubchem_cid": 11005,
+    "status": "ok"
+  },
+  "n,n,n\u2032,n\u2032-tetramethylethylenediamine": {
+    "lookup_name": "n,n,n\u2032,n\u2032-tetramethylethylenediamine",
+    "smiles": "CN(C)CCN(C)C",
+    "pubchem_cid": 8037,
+    "status": "ok"
+  },
+  "n-acetyl-d-glucosamine": {
+    "lookup_name": "n-acetyl-d-glucosamine",
+    "smiles": "CC(=O)N[C@@H]1[C@H]([C@@H]([C@H](OC1O)CO)O)O",
+    "pubchem_cid": 439174,
+    "status": "ok"
+  },
+  "n2": {
+    "lookup_name": "n2",
+    "smiles": "N#N",
+    "pubchem_cid": 947,
+    "status": "ok"
+  },
+  "na1": {
+    "lookup_name": "Sodium cation",
+    "smiles": "[Na+]",
+    "pubchem_cid": 923,
+    "status": "ok"
+  },
+  "nac": {
+    "lookup_name": "Nicotinate (B3)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "nalidixic acid": {
+    "lookup_name": "nalidixic acid",
+    "smiles": "CCN1C=C(C(=O)C2=C1N=C(C=C2)C)C(=O)O",
+    "pubchem_cid": 4421,
+    "status": "ok"
+  },
+  "ncam": {
+    "lookup_name": "Nicotinamide",
+    "smiles": "C1=CC(=CN=C1)C(=O)N",
+    "pubchem_cid": 936,
+    "status": "ok"
+  },
+  "neomycin trisulfate": {
+    "lookup_name": "neomycin trisulfate",
+    "smiles": "C1[C@H]([C@@H]([C@H]([C@@H]([C@H]1N)OC2[C@@H]([C@H]([C@@H]([C@H](O2)CN)O)O)N)OC3[C@@H]([C@@H]([C@H](O3)CO)O[C@@H]4[C@@H]([C@H]([C@@H]([C@@H](O4)CN)O)O)N)O)O)N",
+    "pubchem_cid": 5702092,
+    "status": "ok"
+  },
+  "nh4": {
+    "lookup_name": "Ammonium cation",
+    "smiles": "[NH4+]",
+    "pubchem_cid": 223,
+    "status": "ok"
+  },
+  "ni2": {
+    "lookup_name": "Nickel(II) cation",
+    "smiles": "[Ni+2]",
+    "pubchem_cid": 934,
+    "status": "ok"
+  },
+  "nickel (ii) chloride": {
+    "lookup_name": "nickel (ii) chloride",
+    "smiles": "Cl[Ni]Cl",
+    "pubchem_cid": 24385,
+    "status": "ok"
+  },
+  "nicotinic acid": {
+    "lookup_name": "nicotinic acid",
+    "smiles": "C1=CC(=CN=C1)C(=O)O",
+    "pubchem_cid": 938,
+    "status": "ok"
+  },
+  "nitrofurantoin": {
+    "lookup_name": "nitrofurantoin",
+    "smiles": "C1C(=O)NC(=O)N1/N=C/C2=CC=C(O2)[N+](=O)[O-]",
+    "pubchem_cid": 6604200,
+    "status": "ok"
+  },
+  "no3": {
+    "lookup_name": "Nitrate anion",
+    "smiles": "[N+](=O)([O-])[O-]",
+    "pubchem_cid": 943,
+    "status": "ok"
+  },
+  "nonanoic acid": {
+    "lookup_name": "nonanoic acid",
+    "smiles": "CCCCCCCCC(=O)O",
+    "pubchem_cid": 8158,
+    "status": "ok"
+  },
+  "nta": {
+    "lookup_name": "Nitrilotriacetate",
+    "smiles": "C(C(=O)[O-])N(CC(=O)[O-])CC(=O)[O-]",
+    "pubchem_cid": 3081459,
+    "status": "ok"
+  },
+  "octanoic acid": {
+    "lookup_name": "octanoic acid",
+    "smiles": "CCCCCCCC(=O)O",
+    "pubchem_cid": 379,
+    "status": "ok"
+  },
+  "oh": {
+    "lookup_name": "Hydroxide anion",
+    "smiles": "[OH-]",
+    "pubchem_cid": 961,
+    "status": "ok"
+  },
+  "oleic acid": {
+    "lookup_name": "oleic acid",
+    "smiles": "CCCCCCCC/C=C\\CCCCCCCC(=O)O",
+    "pubchem_cid": 445639,
+    "status": "ok"
+  },
+  "oxaloacetic acid": {
+    "lookup_name": "oxaloacetic acid",
+    "smiles": "C(C(=O)C(=O)O)C(=O)O",
+    "pubchem_cid": 970,
+    "status": "ok"
+  },
+  "oxytetracycline": {
+    "lookup_name": "oxytetracycline",
+    "smiles": "C[C@@]1([C@H]2[C@@H]([C@H]3[C@@H](C(=O)C(=C([C@]3(C(=O)C2=C(C4=C1C=CC=C4O)O)O)O)C(=O)N)N(C)C)O)O",
+    "pubchem_cid": 54675779,
+    "status": "ok"
+  },
+  "p-coumaric acid": {
+    "lookup_name": "p-coumaric acid",
+    "smiles": "C1=CC(=CC=C1/C=C/C(=O)O)O",
+    "pubchem_cid": 637542,
+    "status": "ok"
+  },
+  "palatinose": {
+    "lookup_name": "palatinose",
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)OC[C@H]([C@H]([C@@H](C(=O)CO)O)O)O)O)O)O)O",
+    "pubchem_cid": 83686,
+    "status": "ok"
+  },
+  "parabanic acid": {
+    "lookup_name": "parabanic acid",
+    "smiles": "C1(=O)C(=O)NC(=O)N1",
+    "pubchem_cid": 67126,
+    "status": "ok"
+  },
+  "paraquat dichloride": {
+    "lookup_name": "paraquat dichloride",
+    "smiles": "C[N+]1=CC=C(C=C1)C2=CC=[N+](C=C2)C.[Cl-].[Cl-]",
+    "pubchem_cid": 15938,
+    "status": "ok"
+  },
+  "pectin": {
+    "lookup_name": "pectin",
+    "smiles": "[C@@H]1([C@H]([C@H](O[C@H]([C@@H]1O)O)C(=O)O)O)O",
+    "pubchem_cid": 441476,
+    "status": "ok"
+  },
+  "peroxynitrite": {
+    "lookup_name": "peroxynitrite",
+    "smiles": "N(=O)O[O-]",
+    "pubchem_cid": 104806,
+    "status": "ok"
+  },
+  "phe-L": {
+    "lookup_name": "L-Phenylalanine",
+    "smiles": "C1=CC=C(C=C1)C[C@@H](C(=O)O)N",
+    "pubchem_cid": 6140,
+    "status": "ok"
+  },
+  "pheme": {
+    "lookup_name": "Heme (protoheme IX)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "phenazine ethosulfate": {
+    "lookup_name": "phenazine ethosulfate",
+    "smiles": "CC[N+]1=C2C=CC=CC2=NC3=CC=CC=C31.CCOS(=O)(=O)[O-]",
+    "pubchem_cid": 82688,
+    "status": "ok"
+  },
+  "phenylacetic acid": {
+    "lookup_name": "phenylacetic acid",
+    "smiles": "C1=CC=C(C=C1)CC(=O)O",
+    "pubchem_cid": 999,
+    "status": "ok"
+  },
+  "phloretin": {
+    "lookup_name": "phloretin",
+    "smiles": "C1=CC(=CC=C1CCC(=O)C2=C(C=C(C=C2O)O)O)O",
+    "pubchem_cid": 4788,
+    "status": "ok"
+  },
+  "phosphomycin": {
+    "lookup_name": "phosphomycin",
+    "smiles": "C[C@H]1[C@H](O1)P(=O)(O)O",
+    "pubchem_cid": 446987,
+    "status": "ok"
+  },
+  "phyllo": {
+    "lookup_name": "Phylloquinone (Vitamin K1)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "pi": {
+    "lookup_name": "Inorganic phosphate",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "piperacillin": {
+    "lookup_name": "piperacillin",
+    "smiles": "CCN1CCN(C(=O)C1=O)C(=O)N[C@H](C2=CC=CC=C2)C(=O)N[C@H]3[C@@H]4N(C3=O)[C@H](C(S4)(C)C)C(=O)O",
+    "pubchem_cid": 43672,
+    "status": "ok"
+  },
+  "pipes": {
+    "lookup_name": "PIPES buffer",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "plant=tomato_cv_moneymaker; planttreatment=none; sample=xylem_sap; growthsubstrate=calcine_clay; collection=direct": {
+    "lookup_name": "plant=tomato_cv_moneymaker; planttreatment=none; sample=xylem_sap; growthsubstrate=calcine_clay; collection=direct",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "plant=tomato_moneymaker; planttreatment=exvivo_xylem_sap_from_healthy_plant; sample=xylem_sap; collection=25hr_after_growth_in_xylem_sap": {
+    "lookup_name": "plant=tomato_moneymaker; planttreatment=exvivo_xylem_sap_from_healthy_plant; sample=xylem_sap; collection=25hr_after_growth_in_xylem_sap",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "pnto-R": {
+    "lookup_name": "D-Pantothenate (B5)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "polyethylene glycol": {
+    "lookup_name": "polyethylene glycol",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "polygalact": {
+    "lookup_name": "Polygalacturonate",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "polymyxin b sulfate": {
+    "lookup_name": "polymyxin b sulfate",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "potassium (poly)sulfide": {
+    "lookup_name": "potassium (poly)sulfide",
+    "smiles": "S.[K+]",
+    "pubchem_cid": 5362529,
+    "status": "ok"
+  },
+  "potassium acetate": {
+    "lookup_name": "potassium acetate",
+    "smiles": "CC(=O)[O-].[K+]",
+    "pubchem_cid": 517044,
+    "status": "ok"
+  },
+  "potassium dichromate": {
+    "lookup_name": "potassium dichromate",
+    "smiles": "[O-][Cr](=O)(=O)O[Cr](=O)(=O)[O-].[K+].[K+]",
+    "pubchem_cid": 24502,
+    "status": "ok"
+  },
+  "pro-L": {
+    "lookup_name": "L-Proline",
+    "smiles": "C1C[C@H](NC1)C(=O)O",
+    "pubchem_cid": 145742,
+    "status": "ok"
+  },
+  "propandiamine": {
+    "lookup_name": "propandiamine",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "protocatechuic acid": {
+    "lookup_name": "protocatechuic acid",
+    "smiles": "C1=CC(=C(C=C1C(=O)O)O)O",
+    "pubchem_cid": 72,
+    "status": "ok"
+  },
+  "ptrc": {
+    "lookup_name": "Putrescine",
+    "smiles": "C(CCN)CN",
+    "pubchem_cid": 1045,
+    "status": "ok"
+  },
+  "pydx": {
+    "lookup_name": "Pyridoxal",
+    "smiles": "CC1=NC=C(C(=C1O)C=O)CO",
+    "pubchem_cid": 1050,
+    "status": "ok"
+  },
+  "pydxn": {
+    "lookup_name": "Pyridoxine (B6)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "pyr": {
+    "lookup_name": "Pyruvate anion",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "quin": {
+    "lookup_name": "Quinate anion",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "ramoplanin": {
+    "lookup_name": "ramoplanin",
+    "smiles": "CCC/C=C\\C=C/C(=O)N[C@@H](CC(=O)N)C(=O)NC(CC(=O)N)C(=O)N[C@H](C1CCC(CC1)O)C(=O)N[C@H](CCCN)C(=O)N[C@H]([C@H](C)O)C(=O)N[C@H](C2CCC(CC2)O)C(=O)N[C@H](C3CCC(CC3)O)C(=O)N[C@@H]([C@H](C)O)C(=O)N[C@@H](CC4=CC=CC=C4)C(=O)N[C@H](CCCN)C(=O)NC(C5CCC(CC5)O)C(=O)N[C@@H]([C@H](C)O)C(=O)NC(C6CCC(CC6)O)C(=O)NCC(=O)N[C@@H](CC(C)C)C(=O)N[C@H](C)C(=O)NC(C7CCC(C(C7)Cl)O)C(=O)O",
+    "pubchem_cid": 16132338,
+    "status": "ok"
+  },
+  "red arabinan from sugar-beet": {
+    "lookup_name": "red arabinan from sugar-beet",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "rhamnogalacturonan - from potato": {
+    "lookup_name": "rhamnogalacturonan - from potato",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "ribflv": {
+    "lookup_name": "Riboflavin (B2)",
+    "smiles": "CC1=CC2=C(C=C1C)N(C3=NC(=O)NC(=O)C3=N2)CC(C(C(CO)O)O)O",
+    "pubchem_cid": 1072,
+    "status": "ok"
+  },
+  "rifampicin": {
+    "lookup_name": "rifampicin",
+    "smiles": "C[C@H]1/C=C/C=C(\\C(=O)NC2=C(C(=C3C(=C2O)C(=C(C4=C3C(=O)[C@](O4)(O/C=C/[C@@H]([C@H]([C@H]([C@@H]([C@@H]([C@@H]([C@H]1O)C)O)C)OC(=O)C)C)OC)C)C)O)O)/C=N/N5CCN(CC5)C)/C",
+    "pubchem_cid": 135398735,
+    "status": "ok"
+  },
+  "rotenone": {
+    "lookup_name": "rotenone",
+    "smiles": "CC(=C)[C@H]1CC2=C(O1)C=CC3=C2O[C@@H]4COC5=CC(=C(C=C5[C@@H]4C3=O)OC)OC",
+    "pubchem_cid": 6758,
+    "status": "ok"
+  },
+  "rsz": {
+    "lookup_name": "Resazurin (redox indicator)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "rubidium chloride": {
+    "lookup_name": "rubidium chloride",
+    "smiles": "[Cl-].[Rb+]",
+    "pubchem_cid": 62683,
+    "status": "ok"
+  },
+  "s-adenosyl homocysteine": {
+    "lookup_name": "s-adenosyl homocysteine",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "sel": {
+    "lookup_name": "Selenite anion",
+    "smiles": "[O-][Se](=O)[O-]",
+    "pubchem_cid": 1090,
+    "status": "ok"
+  },
+  "ser-L": {
+    "lookup_name": "L-Serine",
+    "smiles": "C([C@@H](C(=O)O)N)O",
+    "pubchem_cid": 5951,
+    "status": "ok"
+  },
+  "shock": {
+    "lookup_name": "shock",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "si": {
+    "lookup_name": "Silicate",
+    "smiles": "[O-][Si]([O-])([O-])[O-]",
+    "pubchem_cid": 104812,
+    "status": "ok"
+  },
+  "sisomicin": {
+    "lookup_name": "sisomicin",
+    "smiles": "C[C@@]1(CO[C@@H]([C@@H]([C@H]1NC)O)O[C@H]2[C@@H](C[C@@H]([C@H]([C@@H]2O)O[C@@H]3[C@@H](CC=C(O3)CN)N)N)N)O",
+    "pubchem_cid": 36119,
+    "status": "ok"
+  },
+  "so4": {
+    "lookup_name": "Sulfate anion",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "sodium butyrate": {
+    "lookup_name": "sodium butyrate",
+    "smiles": "CCCC(=O)[O-].[Na+]",
+    "pubchem_cid": 5222465,
+    "status": "ok"
+  },
+  "sodium chlorate": {
+    "lookup_name": "sodium chlorate",
+    "smiles": "[O-]Cl(=O)=O.[Na+]",
+    "pubchem_cid": 516902,
+    "status": "ok"
+  },
+  "sodium chlorite": {
+    "lookup_name": "sodium chlorite",
+    "smiles": "[O-]Cl=O.[Na+]",
+    "pubchem_cid": 23668197,
+    "status": "ok"
+  },
+  "sodium chromate": {
+    "lookup_name": "sodium chromate",
+    "smiles": "[O-][Cr](=O)(=O)[O-].[Na+].[Na+]",
+    "pubchem_cid": 24488,
+    "status": "ok"
+  },
+  "sodium d-lactate": {
+    "lookup_name": "sodium d-lactate",
+    "smiles": "C[C@H](C(=O)[O-])O.[Na+]",
+    "pubchem_cid": 23666457,
+    "status": "ok"
+  },
+  "sodium fluorophosphate": {
+    "lookup_name": "sodium fluorophosphate",
+    "smiles": "[O-]P(=O)([O-])F.[Na+].[Na+]",
+    "pubchem_cid": 24266,
+    "status": "ok"
+  },
+  "sodium fumarate dibasic": {
+    "lookup_name": "sodium fumarate dibasic",
+    "smiles": "C(=C/C(=O)[O-])\\C(=O)[O-].[Na+].[Na+]",
+    "pubchem_cid": 6364607,
+    "status": "ok"
+  },
+  "sodium nitrite": {
+    "lookup_name": "sodium nitrite",
+    "smiles": "N(=O)[O-].[Na+]",
+    "pubchem_cid": 23668193,
+    "status": "ok"
+  },
+  "sodium octanoate": {
+    "lookup_name": "sodium octanoate",
+    "smiles": "CCCCCCCC(=O)[O-].[Na+]",
+    "pubchem_cid": 23664772,
+    "status": "ok"
+  },
+  "sodium perchlorate": {
+    "lookup_name": "sodium perchlorate",
+    "smiles": "[O-]Cl(=O)(=O)=O.[Na+]",
+    "pubchem_cid": 522606,
+    "status": "ok"
+  },
+  "sodium persulfate": {
+    "lookup_name": "sodium persulfate",
+    "smiles": "[O-]S(=O)(=O)OOS(=O)(=O)[O-].[Na+].[Na+]",
+    "pubchem_cid": 62655,
+    "status": "ok"
+  },
+  "sodium propionate": {
+    "lookup_name": "sodium propionate",
+    "smiles": "CCC(=O)[O-].[Na+]",
+    "pubchem_cid": 2723816,
+    "status": "ok"
+  },
+  "sodium selenate": {
+    "lookup_name": "sodium selenate",
+    "smiles": "[O-][Se](=O)(=O)[O-].[Na+].[Na+]",
+    "pubchem_cid": 25960,
+    "status": "ok"
+  },
+  "sodium succinate dibasic": {
+    "lookup_name": "sodium succinate dibasic",
+    "smiles": "C(CC(=O)[O-])C(=O)[O-].[Na+].[Na+]",
+    "pubchem_cid": 9020,
+    "status": "ok"
+  },
+  "sodium sulfate": {
+    "lookup_name": "sodium sulfate",
+    "smiles": "[O-]S(=O)(=O)[O-].[Na+].[Na+]",
+    "pubchem_cid": 24436,
+    "status": "ok"
+  },
+  "sodium sulfite": {
+    "lookup_name": "sodium sulfite",
+    "smiles": "[O-]S(=O)[O-].[Na+].[Na+]",
+    "pubchem_cid": 24437,
+    "status": "ok"
+  },
+  "sodium thiosulfate": {
+    "lookup_name": "sodium thiosulfate",
+    "smiles": "[O-]S(=O)(=S)[O-].[Na+].[Na+]",
+    "pubchem_cid": 24477,
+    "status": "ok"
+  },
+  "spectinomycin": {
+    "lookup_name": "spectinomycin",
+    "smiles": "C[C@@H]1CC(=O)[C@]2([C@@H](O1)O[C@@H]3[C@H]([C@@H]([C@@H]([C@@H]([C@H]3O2)NC)O)NC)O)O",
+    "pubchem_cid": 15541,
+    "status": "ok"
+  },
+  "spiramycin": {
+    "lookup_name": "spiramycin",
+    "smiles": "C[C@@H]1C/C=C/C=C/[C@@H]([C@@H](C[C@@H]([C@@H]([C@H]([C@@H](CC(=O)O1)O)OC)O[C@H]2[C@@H]([C@H]([C@@H]([C@H](O2)C)O[C@H]3C[C@@]([C@H]([C@@H](O3)C)O)(C)O)N(C)C)O)CC=O)C)O[C@H]4CC[C@@H]([C@H](O4)C)N(C)C",
+    "pubchem_cid": 5289394,
+    "status": "ok"
+  },
+  "spmd": {
+    "lookup_name": "Spermidine",
+    "smiles": "C(CCNCCCN)CN",
+    "pubchem_cid": 1102,
+    "status": "ok"
+  },
+  "sr2": {
+    "lookup_name": "Strontium cation",
+    "smiles": "[Sr+2]",
+    "pubchem_cid": 104798,
+    "status": "ok"
+  },
+  "stachyose - 70%": {
+    "lookup_name": "stachyose - 70%",
+    "smiles": "C([C@@H]1[C@@H]([C@@H]([C@H]([C@H](O1)OC[C@@H]2[C@@H]([C@@H]([C@H]([C@H](O2)OC[C@@H]3[C@H]([C@@H]([C@H]([C@H](O3)O[C@]4([C@H]([C@@H]([C@H](O4)CO)O)O)CO)O)O)O)O)O)O)O)O)O)O",
+    "pubchem_cid": 439531,
+    "status": "ok"
+  },
+  "starch": {
+    "lookup_name": "Starch (polysaccharide)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "succ": {
+    "lookup_name": "Succinate",
+    "smiles": "C(CC(=O)[O-])C(=O)[O-]",
+    "pubchem_cid": 160419,
+    "status": "ok"
+  },
+  "sucr": {
+    "lookup_name": "Sucrose",
+    "smiles": "C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O[C@]2([C@H]([C@@H]([C@H](O2)CO)O)O)CO)O)O)O)O",
+    "pubchem_cid": 5988,
+    "status": "ok"
+  },
+  "sucrose treatment": {
+    "lookup_name": "sucrose treatment",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "sulfamethizole": {
+    "lookup_name": "sulfamethizole",
+    "smiles": "CC1=NN=C(S1)NS(=O)(=O)C2=CC=C(C=C2)N",
+    "pubchem_cid": 5328,
+    "status": "ok"
+  },
+  "sulfamonomethoxine": {
+    "lookup_name": "sulfamonomethoxine",
+    "smiles": "COC1=NC=NC(=C1)NS(=O)(=O)C2=CC=C(C=C2)N",
+    "pubchem_cid": 5332,
+    "status": "ok"
+  },
+  "sulfaquinoxaline": {
+    "lookup_name": "sulfaquinoxaline",
+    "smiles": "C1=CC=C2C(=C1)N=CC(=N2)NS(=O)(=O)C3=CC=C(C=C3)N",
+    "pubchem_cid": 5338,
+    "status": "ok"
+  },
+  "supernatant; agrobacterium rhizogenes k599 grown in agro_defined_trehalose (~7.5 mm 3-keto-trehalose)": {
+    "lookup_name": "supernatant; agrobacterium rhizogenes k599 grown in agro_defined_trehalose (~7.5 mm 3-keto-trehalose)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "supernatant; trichoderma atroviride imi grown in vogels_fungal_media, filtered": {
+    "lookup_name": "supernatant; trichoderma atroviride imi grown in vogels_fungal_media, filtered",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "supernatant; trichoderma atroviride imi tmk3mutant grown in vogels_fungal_media, filtered": {
+    "lookup_name": "supernatant; trichoderma atroviride imi tmk3mutant grown in vogels_fungal_media, filtered",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "syringaldehyde": {
+    "lookup_name": "syringaldehyde",
+    "smiles": "COC1=CC(=CC(=C1O)OC)C=O",
+    "pubchem_cid": 8655,
+    "status": "ok"
+  },
+  "taps": {
+    "lookup_name": "TAPS buffer",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "tartr-L": {
+    "lookup_name": "L-Tartrate",
+    "smiles": "[C@@H]([C@H](C(=O)[O-])O)(C(=O)[O-])O",
+    "pubchem_cid": 119400,
+    "status": "ok"
+  },
+  "tetracycline": {
+    "lookup_name": "tetracycline",
+    "smiles": "C[C@@]1([C@H]2C[C@H]3[C@@H](C(=O)C(=C([C@]3(C(=O)C2=C(C4=C1C=CC=C4O)O)O)O)C(=O)N)N(C)C)O",
+    "pubchem_cid": 54675776,
+    "status": "ok"
+  },
+  "tetrazolium violet": {
+    "lookup_name": "tetrazolium violet",
+    "smiles": "C1=CC=C(C=C1)C2=NN([N+](=N2)C3=CC=CC4=CC=CC=C43)C5=CC=CC=C5.[Cl-]",
+    "pubchem_cid": 74395,
+    "status": "ok"
+  },
+  "thallium(i) acetate": {
+    "lookup_name": "thallium(i) acetate",
+    "smiles": "CC(=O)[O-].[Tl+]",
+    "pubchem_cid": 11247,
+    "status": "ok"
+  },
+  "thgl": {
+    "lookup_name": "Thioglycolate",
+    "smiles": "C(C(=O)[O-])S",
+    "pubchem_cid": 5086465,
+    "status": "ok"
+  },
+  "thioridazine": {
+    "lookup_name": "thioridazine",
+    "smiles": "CN1CCCCC1CCN2C3=CC=CC=C3SC4=C2C=C(C=C4)SC",
+    "pubchem_cid": 5452,
+    "status": "ok"
+  },
+  "thm": {
+    "lookup_name": "Thiamine (B1)",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "thr-L": {
+    "lookup_name": "L-Threonine",
+    "smiles": "C[C@H]([C@@H](C(=O)O)N)O",
+    "pubchem_cid": 6288,
+    "status": "ok"
+  },
+  "thymd": {
+    "lookup_name": "Thymidine",
+    "smiles": "CC1=CN(C(=O)NC1=O)[C@H]2C[C@@H]([C@H](O2)CO)O",
+    "pubchem_cid": 5789,
+    "status": "ok"
+  },
+  "thymine": {
+    "lookup_name": "thymine",
+    "smiles": "CC1=CNC(=O)NC1=O",
+    "pubchem_cid": 1135,
+    "status": "ok"
+  },
+  "ti3": {
+    "lookup_name": "Titanium(III) cation",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "tricine": {
+    "lookup_name": "Tricine buffer",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "trimethoprim": {
+    "lookup_name": "trimethoprim",
+    "smiles": "COC1=CC(=CC(=C1OC)OC)CC2=CN=C(N=C2N)N",
+    "pubchem_cid": 5578,
+    "status": "ok"
+  },
+  "tris": {
+    "lookup_name": "Tris buffer",
+    "smiles": "C(C(CO)(CO)N)O",
+    "pubchem_cid": 6503,
+    "status": "ok"
+  },
+  "trisodium citrate": {
+    "lookup_name": "trisodium citrate",
+    "smiles": "C(C(=O)[O-])C(CC(=O)[O-])(C(=O)[O-])O.[Na+].[Na+].[Na+]",
+    "pubchem_cid": 6224,
+    "status": "ok"
+  },
+  "trp-L": {
+    "lookup_name": "L-Tryptophan",
+    "smiles": "C1=CC=C2C(=C1)C(=CN2)C[C@@H](C(=O)O)N",
+    "pubchem_cid": 6305,
+    "status": "ok"
+  },
+  "tungs": {
+    "lookup_name": "Tungstate anion",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "tween 20": {
+    "lookup_name": "tween 20",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "tyr-L": {
+    "lookup_name": "L-Tyrosine",
+    "smiles": "C1=CC(=CC=C1C[C@@H](C(=O)O)N)O",
+    "pubchem_cid": 6057,
+    "status": "ok"
+  },
+  "ura": {
+    "lookup_name": "Uracil",
+    "smiles": "C1=CNC(=O)NC1=O",
+    "pubchem_cid": 1174,
+    "status": "ok"
+  },
+  "uranyl acetate": {
+    "lookup_name": "uranyl acetate",
+    "smiles": "CC(=O)[O-].CC(=O)[O-].O=[U+2]=O",
+    "pubchem_cid": 21226249,
+    "status": "ok"
+  },
+  "urea": {
+    "lookup_name": "urea",
+    "smiles": "C(=O)(N)N",
+    "pubchem_cid": 1176,
+    "status": "ok"
+  },
+  "uri": {
+    "lookup_name": "Uridine",
+    "smiles": "C1=CN(C(=O)NC1=O)[C@H]2[C@@H]([C@@H]([C@H](O2)CO)O)O",
+    "pubchem_cid": 6029,
+    "status": "ok"
+  },
+  "val-L": {
+    "lookup_name": "L-Valine",
+    "smiles": "CC(C)[C@@H](C(=O)O)N",
+    "pubchem_cid": 6287,
+    "status": "ok"
+  },
+  "valeric acid": {
+    "lookup_name": "valeric acid",
+    "smiles": "CCCCC(=O)O",
+    "pubchem_cid": 7991,
+    "status": "ok"
+  },
+  "vancomycin": {
+    "lookup_name": "vancomycin",
+    "smiles": "C[C@H]1[C@H]([C@@](C[C@@H](O1)O[C@@H]2[C@H]([C@@H]([C@H](O[C@H]2OC3=C4C=C5C=C3OC6=C(C=C(C=C6)[C@H]([C@H](C(=O)N[C@H](C(=O)N[C@H]5C(=O)N[C@@H]7C8=CC(=C(C=C8)O)C9=C(C=C(C=C9O)O)[C@H](NC(=O)[C@H]([C@@H](C1=CC(=C(O4)C=C1)Cl)O)NC7=O)C(=O)O)CC(=O)N)NC(=O)[C@@H](CC(C)C)NC)O)Cl)CO)O)O)(C)N)O",
+    "pubchem_cid": 14969,
+    "status": "ok"
+  },
+  "vancomycin hydrochloride from streptomyces orientalis": {
+    "lookup_name": "vancomycin hydrochloride from streptomyces orientalis",
+    "smiles": "C[C@H]1[C@H]([C@@](C[C@@H](O1)O[C@@H]2[C@H]([C@@H]([C@H](O[C@H]2OC3=C4C=C5C=C3OC6=C(C=C(C=C6)[C@H]([C@H](C(=O)N[C@H](C(=O)N[C@H]5C(=O)N[C@@H]7C8=CC(=C(C=C8)O)C9=C(C=C(C=C9O)O)[C@H](NC(=O)[C@H]([C@@H](C1=CC(=C(O4)C=C1)Cl)O)NC7=O)C(=O)O)CC(=O)N)NC(=O)[C@@H](CC(C)C)NC)O)Cl)CO)O)O)(C)N)O.Cl",
+    "pubchem_cid": 6420023,
+    "status": "ok"
+  },
+  "vanillic acid": {
+    "lookup_name": "vanillic acid",
+    "smiles": "COC1=C(C=CC(=C1)C(=O)O)O",
+    "pubchem_cid": 8468,
+    "status": "ok"
+  },
+  "vanillin": {
+    "lookup_name": "vanillin",
+    "smiles": "COC1=C(C=CC(=C1)C=O)O",
+    "pubchem_cid": 1183,
+    "status": "ok"
+  },
+  "vogels_fungal_media": {
+    "lookup_name": "vogels_fungal_media",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "vogels_fungal_media, filtered": {
+    "lookup_name": "vogels_fungal_media, filtered",
+    "smiles": null,
+    "pubchem_cid": null,
+    "status": "no_match"
+  },
+  "xan": {
+    "lookup_name": "Xanthine",
+    "smiles": "C1=NC2=C(N1)C(=O)NC(=O)N2",
+    "pubchem_cid": 1188,
+    "status": "ok"
+  },
+  "xylitol": {
+    "lookup_name": "xylitol",
+    "smiles": "C([C@H](C([C@H](CO)O)O)O)O",
+    "pubchem_cid": 6912,
+    "status": "ok"
+  },
+  "zinc pyrithione": {
+    "lookup_name": "zinc pyrithione",
+    "smiles": "C1=CC=[N+](C(=C1)[S-])[O-].C1=CC=[N+](C(=C1)[S-])[O-].[Zn+2]",
+    "pubchem_cid": 26041,
+    "status": "ok"
+  },
+  "zn2": {
+    "lookup_name": "Zinc cation",
+    "smiles": "[Zn+2]",
+    "pubchem_cid": 32051,
+    "status": "ok"
+  }
+}

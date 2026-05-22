@@ -110,6 +110,7 @@ Hypotheses without a clear owner are dropped.
 | H-EMB-02 | A learnable gene-side adapter MLP between the frozen embedding and the fusion concat point unlocks downstream signal that the architecture currently can't extract. | T5-A | No-adapter vs same-dim adapter vs dim-reducing adapter. |
 | H-EMB-03 | The current choice of ProteomeLM-L layer 8 may not be optimal for downstream conditional essentiality prediction. | T5-B | Re-encode at layers {0,4,8,12,18} and compare. |
 | H-EMB-04 | ProteomeLM's proteome-context layer adds value over raw ESM-C 600M embeddings. | T5-C | Frozen ProteomeLM-L layer 8 vs raw mean-pooled ESM-C 600M. |
+| H-EMB-05 | The T5-A adapter winner can be improved further via more aggressive dimension reduction, wider adapter, deeper adapter, or LayerNorm normalization. | T5-D | Adapter variants at fixed output dim and depth axes. |
 | H-HOMO-01 | Model performance is partially explained by train-val sequence similarity. | S1 (diagnostic) | Embedding cosine similarity bins; metric stratification. |
 | H-HOMO-02 | Homology-aware masking reduces optimistic bias vs pure organism holdout. | S3 (conditional, triggered if H-HOMO-01 effect size > 0.5σ on val Spearman). | Add homology-masked diagnostic protocol. |
 | H-METRIC-01 | RMSE and MAE may disagree under heavy-tailed noise. | Always-on policy (per L4). | Report both for every comparison. |
@@ -520,7 +521,13 @@ representation-limited capacity rather than head/optimization limits.
 | T5-A | H-EMB-02 | Learnable gene-side adapter MLP between frozen embedding and concat point. Tests both same-dim and dim-reducing adapters. |
 | T5-B | H-EMB-03 | ProteomeLM-L layer ablation. Re-encode all 48 organisms at layers {0, 4, 8, 12, 18} and compare. |
 | T5-C | H-EMB-04 | ProteomeLM bypass — use raw mean-pooled ESM-C 600M instead. Tests whether proteome-context helps at all. |
-| T5-D | H-EMB-01 | Fine-tune top N ProteomeLM layers with cached per-epoch activations. Most computationally expensive; conditional on T5-A/B/C results. |
+| T5-D | H-EMB-05 | Adapter variants — follow-up to T5-A. Tests output-dim {256 vs 512}, adapter width {1024 vs 2048}, adapter depth {1 vs 2 hidden layers}, and LayerNorm. |
+
+**Dropped from T5:** the original T5-D (ProteomeLM fine-tuning, H-EMB-01)
+was removed after T5-A established that a learnable adapter on top of the
+frozen embedding captures most of the available signal. Fine-tuning the
+ProteomeLM weights themselves was deemed not worth the additional
+infrastructure cost given the modest adapter gains.
 
 **Promotion rule:** best-performing arm on co-primary metrics; bootstrap CIs
 must be disjoint. Sub-threshold gains accepted given diminishing returns in

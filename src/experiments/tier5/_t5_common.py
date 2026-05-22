@@ -67,43 +67,49 @@ def load_t5_inputs(
 
 
 class AdapterResidualMLP(nn.Module):
-    """T3-locked head, with an optional learnable gene-side adapter.
+    """T3-locked head, with a configurable learnable gene-side adapter.
 
-    The adapter is a small MLP that processes the frozen gene embedding
-    before concatenation with the chemistry vector. It lets the model learn
-    a task-specific transformation of the embedding without modifying
+    The adapter is an MLP that processes the frozen gene embedding before
+    concatenation with the chemistry vector. It lets the model learn a
+    task-specific transformation of the embedding without modifying
     ProteomeLM itself.
 
-    Architecture:
-        gene_emb[1152] → [adapter: Linear(1152, adapter_dim) → ReLU →
-                          Dropout → Linear(adapter_dim, adapter_out)]
-                       → cat with chem[425]
-                       → Linear(adapter_out + 425, 512) → ReLU → Dropout
-                       → ResBlock(512)
-                       → Linear(512, 1)
-
-    Setting adapter_dim=None reduces this to the locked T3 architecture
-    (no adapter) — used as the baseline arm.
+    Args:
+        adapter_hidden: hidden dim of the adapter, or None to disable
+            (passes gene_emb through unchanged for the T3 baseline arm).
+        adapter_out: final adapter output dim. Defaults to gene_dim.
+        adapter_n_hidden_layers: number of hidden Linear→ReLU→Dropout
+            blocks in the adapter. 1 = single hidden layer (T5-A default).
+        adapter_layernorm: if True, prepend LayerNorm to the adapter
+            (helps with per-organism distribution drift in frozen embeddings).
     """
 
     def __init__(self, *, gene_dim: int, chem_dim: int,
                  hidden_dim: int = 512, n_blocks: int = 1,
                  dropout: float = 0.1,
                  adapter_hidden: int | None = None,
-                 adapter_out: int | None = None) -> None:
+                 adapter_out: int | None = None,
+                 adapter_n_hidden_layers: int = 1,
+                 adapter_layernorm: bool = False) -> None:
         super().__init__()
         if adapter_hidden is None:
-            # No adapter — gene embedding passes through unchanged.
             self.adapter = nn.Identity()
             effective_gene_dim = gene_dim
         else:
             out_dim = adapter_out if adapter_out is not None else gene_dim
-            self.adapter = nn.Sequential(
-                nn.Linear(gene_dim, adapter_hidden),
-                nn.ReLU(),
-                nn.Dropout(dropout),
-                nn.Linear(adapter_hidden, out_dim),
-            )
+            layers: list[nn.Module] = []
+            if adapter_layernorm:
+                layers.append(nn.LayerNorm(gene_dim))
+            in_dim = gene_dim
+            for _ in range(adapter_n_hidden_layers):
+                layers.extend([
+                    nn.Linear(in_dim, adapter_hidden),
+                    nn.ReLU(),
+                    nn.Dropout(dropout),
+                ])
+                in_dim = adapter_hidden
+            layers.append(nn.Linear(in_dim, out_dim))
+            self.adapter = nn.Sequential(*layers)
             effective_gene_dim = out_dim
 
         self.proj = nn.Sequential(

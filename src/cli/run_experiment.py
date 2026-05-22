@@ -38,6 +38,7 @@ _HANDLERS = {
     "T3": "src.experiments.tier3.run:main",
     "T4": "src.experiments.tier4.run:main",
     "T5": "src.experiments.tier5.run:main",
+    "T6": "src.experiments.tier6.run:main",
 }
 
 
