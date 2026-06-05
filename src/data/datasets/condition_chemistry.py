@@ -38,7 +38,7 @@ def load_condition_chemistry_features(
     orgs: list[str] | None = None,
     *,
     artifact_dir: Path = S4_ARTIFACT_DIR,
-    cache_dir: Path = Path("artifacts/cache/ranking_condition_chem"),
+    cache_dir: Path | None = None,
 ) -> dict[str, np.ndarray]:
     """Return {condition_key -> mean multihot vector (float32)}.
 
@@ -46,6 +46,15 @@ def load_condition_chemistry_features(
     (no media composition) are omitted — the chemistry baselines treat those
     as unscorable (NaN), preserving denominator parity downstream.
     """
+    # Cache must be namespaced by org set — build_or_load_experiment_multihot
+    # caches by directory only, so a shared dir returns a STALE matrix when the
+    # org set changes (bug found in R1 smoke 2026-05-25).
+    if cache_dir is None:
+        import hashlib
+        tag = ("full" if orgs is None
+               else hashlib.sha1("|".join(sorted(orgs)).encode()).hexdigest()[:12])
+        cache_dir = Path("artifacts/cache/ranking_condition_chem") / tag
+
     df = pd.read_parquet(CANONICAL_DIR / "fitness_experiment_long.parquet",
                          columns=_NEEDED).drop_duplicates()
     df = df.dropna(subset=_ID_COLS)
