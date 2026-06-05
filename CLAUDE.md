@@ -3,6 +3,31 @@
 Predicting conditional gene essentiality from Tn-seq fitness data using frozen
 ProteomeLM gene embeddings + condition (media chemistry) features.
 
+## Research goal & publication framing (locked 2026-05-25)
+
+**Primary scientific question:** *Within a known organism, can frozen
+protein-language-model embeddings + media-chemistry features rank a gene's
+conditional essentiality across novel condition combinations — and do they beat
+collaborative filtering (matrix factorization) that uses no side information?*
+Framed as "find the top stressors for a gene." This is an **inductive
+matrix-completion-with-side-information** problem (gene×condition fit matrix;
+genes have embedding features, conditions have chemistry features).
+
+**Three claims the paper must support (define success):**
+1. **Beat matrix factorization** on within-gene ranking — otherwise the
+   embeddings/chemistry add nothing over the matrix's own structure.
+2. **Report the cold-gene split** (held-out whole genes) so reviewers see the
+   *inductive* generalization, not just transductive matrix completion.
+3. **Frame the cross-organism failure as a finding** (T-regime: Spearman ≈
+   noise on held-out orgs), not hidden — the cross-org drift monitor is the
+   evidence of honesty.
+
+**Honest venue scope:** a solid *applied / computational-biology* contribution
+(Bioinformatics, Cell Systems, ISMB, NeurIPS-bio workshops). **Not** a top-tier
+ML-methods paper as scoped — the method is an MLP on frozen features; the
+novelty is biological, not algorithmic. Direct precedent: drug-response
+prediction on DepMap/GDSC/CCLE matrices, which always report MF/CF baselines.
+
 **Two active regimes:**
 - **T-regime (REFACTORPLAN):** pointwise MSE/MAE regression on continuous `fit`
   under cross-organism holdout. Completed through T6-A.
