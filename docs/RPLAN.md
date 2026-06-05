@@ -82,6 +82,35 @@ field. Every field has a default proposal here; R-LOCK-X finalizes the value.
 | `cross_org_diagnostic` | required | Run the T-regime `multi_org_balanced` split as a *drift monitor*. Not gated. |
 | `condition_key_definition` | `(expDesc, media, temperature)` | NOT `(expDesc, media)`. R0 audit (2026-05-24) found 53 of 2246 (2.4%) `(expDesc, media)` groups contain assays at distinct temperatures — different conditions, not replicates. pH excluded from key (53% null overall, doesn't vary within `(expDesc, media)`). Aerobic excluded (doesn't vary within group). |
 
+### 2.2.1 ⚠ COLD-COLUMN PROPERTY (critical — verified empirically 2026-05-25)
+
+**Under the locked condition-holdout split, val conditions are 100% disjoint
+from train conditions** (verified: 0 of 78 val conditions appear in train, on
+DvH/Btheta/Caulo; this is true *by construction* — we hold out whole condition
+columns). Every held-out condition is **cold**: no gene has observed it in
+training. This single fact has large consequences any future audit MUST respect:
+
+1. **`per_condition_train_mean` (the original H-RANK-01) is UNDEFINED** for the
+   primary split — there is no train mean for an unseen condition. It returned
+   `NaN` for all 28,005 val genes when actually run. The cold-condition null is
+   redefined to `chemistry_nearest_condition_profile` (see §2.4).
+2. **Pure matrix factorization / collaborative filtering is INVALID** for the
+   primary split — it cannot place a column with zero observed entries. MF is at
+   most an *optional* baseline on the warm-column `cell_holdout` diagnostic.
+3. **The task is cold-start (inductive) matrix completion**, NOT standard
+   (warm-column) matrix completion. The "it's just matrix completion" critique
+   applies only to `cell_holdout`. The primary task genuinely requires condition
+   side-features (chemistry) to place novel conditions — a more defensible setup.
+4. **Valid baselines are SPLIT-SPECIFIC** (declared in `metric_contract.yaml`):
+   primary → chemistry-kNN; `cell_holdout` → MF + per-condition-mean; `cold_gene`
+   → per-condition-mean (conditions warm there). Do not apply a baseline to a
+   split where its required information is absent.
+
+This was discovered by *computing baselines on the real materialized split*,
+not by reading docs — a reminder that doc-level review cannot catch
+data-dependent invariants. See R-LOCK-4-DEC-002 and
+`research_log/audits/2026-05-25_ranking_pivot_audit.md`.
+
 ### 2.3 Data feeding (locked in R-LOCK-3)
 
 | Field | Default | Notes |

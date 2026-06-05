@@ -85,14 +85,26 @@ gains a `hierarchical` mode + an `orgId` column).
 
 - decision_outcome: **proposed** — adopt the v2 metric contract; resolve the
   blocked promotion-delta number once the chemistry baseline is implemented.
+- implementation_status (2026-05-25): **harness implemented + tested** in
+  `src/evaluation/ranking_eval.py` (18 unit tests pass):
+  - (a) chemistry baselines: `chemistry_nearest_condition_profile` (cold null
+    gate) + `chemistry_knn_predict` (competitive). Decoupled — take a
+    `cond_features` mapping (multihot/fingerprint) so they're testable.
+  - (b) `ndcg_at_k`, `precision_at_k`, `within_gene_retrieval` (relevance = max(0,−fit)).
+  - (c) `hierarchical_bootstrap_ci` (org→gene; test confirms wider CI than flat
+    on clustered data).
+  - (d) `per_organism_breakdown`.
+  - (e) `benjamini_hochberg` (FDR) + `bootstrap_pvalue_delta` (per-arm p-values).
 - risks_remaining:
-  - The chemistry-based null + chemistry-kNN require a chemistry distance matrix
-    (fingerprint Tanimoto / multihot Jaccard) — new code for R1.
-  - Implementations of hierarchical bootstrap, NDCG@k, FDR, per-org table are
-    declared but not yet coded (R-LOCK-4 follow-up before R1 scores anything).
-- next_action: implement (a) chemistry distance + the two chemistry baselines,
-  (b) NDCG@k/precision@k helpers, (c) hierarchical bootstrap, (d) per-org table,
-  (e) FDR helper — then compute the baseline value and set the concrete delta.
+  - The chemistry baselines need the real per-condition chemistry feature
+    vectors wired in (from the S4 feature contract / experiment_chemistry) —
+    the harness accepts them but R1 must supply them.
+  - The concrete promotion delta is still **blocked** on running the chemistry
+    null on the locked val to get the baseline value (noise floor side = 0.358
+    known). One computation once features are wired.
+- next_action: wire real per-condition chemistry features into the chemistry
+  baselines; run the null on locked val → baseline value → set `delta_fraction`
+  concrete number; then R1 is scorable.
 
 ### Reproducibility Attachments
 - code_sha: <fill on commit>
