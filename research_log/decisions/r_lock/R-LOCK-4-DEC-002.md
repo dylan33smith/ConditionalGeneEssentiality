@@ -95,16 +95,27 @@ gains a `hierarchical` mode + an `orgId` column).
     on clustered data).
   - (d) `per_organism_breakdown`.
   - (e) `benjamini_hochberg` (FDR) + `bootstrap_pvalue_delta` (per-arm p-values).
+- blocker_closed (2026-05-25): real per-condition chemistry features wired in via
+  `src/data/datasets/condition_chemistry.py` (maps condition_key →
+  425-dim S4 multihot; experiment_id hashed on RAW media to match artifact
+  `de21504134c84a6c`, condition_key on normalized fields). Ran the chemistry-null
+  gate on real cold-condition val (8 high-rep orgs, 28,005 genes, 1,058 chem
+  conditions):
+  - **chemistry-null baseline within-gene Spearman = 0.0138** [hier 95% CI
+    0.0004, 0.0236] — near zero. The chemistry-transferred population profile
+    barely predicts within-gene rankings (a finding: gene-specificity required).
+  - noise floor = 0.358 → improvable gap = 0.344 → **concrete promotion delta
+    = 0.05** (15% of gap). Set in `metric_contract.yaml`.
 - risks_remaining:
-  - The chemistry baselines need the real per-condition chemistry feature
-    vectors wired in (from the S4 feature contract / experiment_chemistry) —
-    the harness accepts them but R1 must supply them.
-  - The concrete promotion delta is still **blocked** on running the chemistry
-    null on the locked val to get the baseline value (noise floor side = 0.358
-    known). One computation once features are wired.
-- next_action: wire real per-condition chemistry features into the chemistry
-  baselines; run the null on locked val → baseline value → set `delta_fraction`
-  concrete number; then R1 is scorable.
+  - The gene-specific **chemistry_kNN** competitive baseline is implemented but
+    not yet run at scale (per-row lookup is slow; needs vectorization). It is
+    the STRONG baseline the model must beat; once computed, RE-ANCHOR the delta
+    to (noise_floor − chemistry_kNN).
+  - Recompute baseline + noise floor on the FULL locked val (all replicate orgs),
+    not just the high-rep subset, before any R1 promotion.
+- next_action: vectorize + run chemistry_kNN at scale → re-anchor delta; then R1
+  is fully scorable. Per-condition chemistry feature loader is done and validated
+  end-to-end on real data.
 
 ### Reproducibility Attachments
 - code_sha: <fill on commit>
