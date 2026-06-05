@@ -7,17 +7,28 @@ ProteomeLM gene embeddings + condition (media chemistry) features.
 
 **Primary scientific question:** *Within a known organism, can frozen
 protein-language-model embeddings + media-chemistry features rank a gene's
-conditional essentiality across novel condition combinations — and do they beat
-collaborative filtering (matrix factorization) that uses no side information?*
-Framed as "find the top stressors for a gene." This is an **inductive
-matrix-completion-with-side-information** problem (gene×condition fit matrix;
-genes have embedding features, conditions have chemistry features).
+conditional essentiality across **entirely novel conditions** — better than a
+chemistry-similarity baseline that uses condition features but learns no
+gene-specific interaction?* Framed as "find the top stressors for a gene."
+
+**The task is COLD-START over conditions (critical — see RPLAN §2.2.1).** The
+locked condition-holdout split makes val conditions 100% disjoint from train
+(verified: 0/78 overlap). So this is NOT standard matrix completion: a held-out
+condition has zero observed entries, so **pure matrix factorization / collaborative
+filtering cannot solve it** — you genuinely need condition side-features
+(chemistry) to place a never-seen condition. This is **inductive (cold-start)
+matrix completion with side information**, a harder and more defensible setup
+than warm-column completion.
 
 **Three claims the paper must support (define success):**
-1. **Beat matrix factorization** on within-gene ranking — otherwise the
-   embeddings/chemistry add nothing over the matrix's own structure.
+1. **Beat the chemistry-similarity baseline (chemistry-kNN)** on within-gene
+   ranking / top-stressor retrieval — otherwise the learned gene×condition
+   interaction adds nothing over "this new condition behaves like its nearest
+   known chemistry." (Matrix factorization is NOT the primary competitor — it
+   cannot predict cold columns; it is at most an *optional* baseline on the
+   warm-column `cell_holdout` diagnostic.)
 2. **Report the cold-gene split** (held-out whole genes) so reviewers see the
-   *inductive* generalization, not just transductive matrix completion.
+   *inductive-over-genes* generalization, not just per-gene-offset memorization.
 3. **Frame the cross-organism failure as a finding** (T-regime: Spearman ≈
    noise on held-out orgs), not hidden — the cross-org drift monitor is the
    evidence of honesty.
@@ -26,7 +37,9 @@ genes have embedding features, conditions have chemistry features).
 (Bioinformatics, Cell Systems, ISMB, NeurIPS-bio workshops). **Not** a top-tier
 ML-methods paper as scoped — the method is an MLP on frozen features; the
 novelty is biological, not algorithmic. Direct precedent: drug-response
-prediction on DepMap/GDSC/CCLE matrices, which always report MF/CF baselines.
+prediction on DepMap/GDSC/CCLE matrices — specifically their **leave-drugs-out /
+cold-start** evaluation setting (the analog of our cold conditions), which needs
+drug features and is the right comparison, NOT the random-cell-holdout setting.
 
 **Two active regimes:**
 - **T-regime (REFACTORPLAN):** pointwise MSE/MAE regression on continuous `fit`
