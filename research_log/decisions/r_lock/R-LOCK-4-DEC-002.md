@@ -106,16 +106,25 @@ gains a `hierarchical` mode + an `orgId` column).
     barely predicts within-gene rankings (a finding: gene-specificity required).
   - noise floor = 0.358 → improvable gap = 0.344 → **concrete promotion delta
     = 0.05** (15% of gap). Set in `metric_contract.yaml`.
+- full_val_recompute (2026-05-25, both remaining items DONE):
+  - `chemistry_knn_predict` **vectorized** (loops over val conditions not rows;
+    unit test confirms it matches the brute-force reference).
+  - Ran null + kNN + noise floor on the **FULL val (23 replicate orgs)**:
+    - noise floor (ceiling)       = **0.3214** (n=74,804 genes)
+    - chem-NULL baseline (gate)    = **0.0112** [hier CI −0.0017, 0.0286]
+    - chem-kNN baseline (STRONG)   = **0.1694** [hier CI 0.0949, 0.2653]
+  - **Re-anchored** the promotion delta to the gap above the STRONG baseline:
+    0.15 × (0.3214 − 0.1694) = **0.023**. Set in `metric_contract.yaml`.
+  - Finding: the gene-specific kNN already captures ~half the achievable signal
+    (0.169 of 0.321). The deep model must beat 0.169 by ≥0.023; headroom 0.169→0.321.
 - risks_remaining:
-  - The gene-specific **chemistry_kNN** competitive baseline is implemented but
-    not yet run at scale (per-row lookup is slow; needs vectorization). It is
-    the STRONG baseline the model must beat; once computed, RE-ANCHOR the delta
-    to (noise_floor − chemistry_kNN).
-  - Recompute baseline + noise floor on the FULL locked val (all replicate orgs),
-    not just the high-rep subset, before any R1 promotion.
-- next_action: vectorize + run chemistry_kNN at scale → re-anchor delta; then R1
-  is fully scorable. Per-condition chemistry feature loader is done and validated
-  end-to-end on real data.
+  - **Denominator parity:** null/kNN/noise were each scored on the genes each
+    could cover (56,609 / 34,175 / 74,804). The FINAL promotion comparison must
+    score model + chem-kNN + noise floor on the SAME R-LOCK-1-eligible val gene
+    set; the 0.023 delta may shift slightly on the common set.
+- next_action: none blocking — R-LOCK-4 metric/baseline machinery is complete
+  and measured. R1 integration (train-loop wiring to RankingBatch, eligibility
+  w_g, manifest v2 dispatcher) is the next milestone.
 
 ### Reproducibility Attachments
 - code_sha: <fill on commit>

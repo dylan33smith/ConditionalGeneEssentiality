@@ -287,6 +287,9 @@ def chemistry_knn_predict(
     """Primary competitive baseline: predict a val gene g's fit at held-out
     condition c from g's OWN train fit at its k chemically-nearest TRAIN
     conditions. Uses warm rows bridged by chemistry. Index-aligned to val_df.
+
+    Vectorized: loops only over val CONDITIONS (few hundred), not val rows
+    (millions). Builds a gene×val_condition prediction matrix, then fancy-indexes.
     """
     train_conds = [c for c in train_df[condition_col].unique() if c in cond_features]
     val_conds = [c for c in val_df[condition_col].unique() if c in cond_features]
@@ -294,22 +297,32 @@ def chemistry_knn_predict(
         return pd.Series(np.nan, index=val_df.index)
     tfeat = np.vstack([cond_features[c] for c in train_conds])
     vfeat = np.vstack([cond_features[c] for c in val_conds])
-    dist = _cosine_dist_matrix(vfeat, tfeat)
-    # k nearest train conditions per val condition
-    knn = {vc: [train_conds[j] for j in np.argsort(dist[i])[:k]]
-           for i, vc in enumerate(val_conds)}
-    # gene -> {condition -> train fit}
+    dist = _cosine_dist_matrix(vfeat, tfeat)                 # [n_val_cond, n_train_cond]
+    knn_idx = np.argsort(dist, axis=1)[:, :k]                # [n_val_cond, k]
+
+    # gene × train_condition mean-fit matrix (NaN where gene lacks a condition)
     train_lookup = (train_df.groupby([gene_col, condition_col])[fit_col]
-                    .mean().unstack())
-    preds = []
-    for _, row in val_df.iterrows():
-        g, vc = row[gene_col], row[condition_col]
-        neigh = knn.get(vc, [])
-        if g in train_lookup.index and neigh:
-            vals = train_lookup.loc[g, [c for c in neigh if c in train_lookup.columns]]
-            preds.append(float(np.nanmean(vals.to_numpy())) if len(vals) else np.nan)
-        else:
-            preds.append(np.nan)
+                    .mean().unstack().reindex(columns=train_conds))
+    train_mat = train_lookup.to_numpy(dtype=float)           # [n_genes, n_train_cond]
+    gene_to_row = {g: i for i, g in enumerate(train_lookup.index)}
+
+    # P[gene, val_cond_i] = nanmean over the k nearest train cols of vc_i
+    n_genes = train_mat.shape[0]
+    P = np.full((n_genes, len(val_conds)), np.nan)
+    with np.errstate(invalid="ignore"):
+        for i in range(len(val_conds)):
+            sub = train_mat[:, knn_idx[i]]                   # [n_genes, k]
+            allnan = np.all(np.isnan(sub), axis=1)
+            col = np.nanmean(np.where(np.isnan(sub), np.nan, sub), axis=1)
+            col[allnan] = np.nan
+            P[:, i] = col
+
+    val_cond_to_i = {vc: i for i, vc in enumerate(val_conds)}
+    g_rows = val_df[gene_col].map(gene_to_row).to_numpy()
+    c_cols = val_df[condition_col].map(val_cond_to_i).to_numpy()
+    preds = np.full(len(val_df), np.nan)
+    valid = ~pd.isna(g_rows) & ~pd.isna(c_cols)
+    preds[valid] = P[g_rows[valid].astype(int), c_cols[valid].astype(int)]
     return pd.Series(preds, index=val_df.index)
 
 

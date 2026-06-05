@@ -218,6 +218,34 @@ def test_chemistry_baselines_empty_features_return_nan():
     assert pred.isna().all()
 
 
+def test_chemistry_knn_vectorized_matches_bruteforce(chem_split):
+    """Vectorized kNN must equal a transparent per-row reference implementation."""
+    train, val, feats = chem_split
+    k = 2
+    fast = chemistry_knn_predict(train, val, feats, k=k)
+
+    # brute-force reference
+    train_conds = [c for c in train["condition_key"].unique() if c in feats]
+    val_conds = [c for c in val["condition_key"].unique() if c in feats]
+    tfeat = np.vstack([feats[c] for c in train_conds])
+    vfeat = np.vstack([feats[c] for c in val_conds])
+    tn = tfeat / np.maximum(np.linalg.norm(tfeat, axis=1, keepdims=True), 1e-9)
+    vn = vfeat / np.maximum(np.linalg.norm(vfeat, axis=1, keepdims=True), 1e-9)
+    dist = 1.0 - vn @ tn.T
+    knn = {vc: [train_conds[j] for j in np.argsort(dist[i])[:k]]
+           for i, vc in enumerate(val_conds)}
+    lookup = train.groupby(["gene_key", "condition_key"])["fit"].mean().unstack()
+    ref = []
+    for _, row in val.iterrows():
+        g, vc = row["gene_key"], row["condition_key"]
+        neigh = [c for c in knn.get(vc, []) if c in lookup.columns]
+        if g in lookup.index and neigh:
+            ref.append(float(np.nanmean(lookup.loc[g, neigh].to_numpy())))
+        else:
+            ref.append(np.nan)
+    np.testing.assert_allclose(fast.to_numpy(), np.array(ref), rtol=1e-9, equal_nan=True)
+
+
 # ---------------------------------------------------------------------------
 # Per-org breakdown
 # ---------------------------------------------------------------------------

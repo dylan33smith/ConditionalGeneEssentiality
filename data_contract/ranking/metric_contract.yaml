@@ -122,8 +122,9 @@ baselines:
 noise_floor:
   primary:
     id: per_gene_cross_condition_replicate_spearman
-    measured_value_high_rep_orgs: 0.358   # median per-gene cross-cond replicate Spearman
-                                          # (8 high-replicate orgs, real val, n=24,337 genes)
+    measured_value_full_val_23_orgs: 0.3214   # USE THIS — all 23 replicate orgs,
+                                          # real cold-condition val, n=74,804 genes
+    measured_value_high_rep_orgs: 0.358   # 8 high-rep orgs, n=24,337 (subset; higher)
                                           # SUPERSEDES the 0.43/0.506 cross-gene proxy
     description: |
       For each eligible val gene with ≥ 2 replicate measurements at ≥ 5 distinct
@@ -149,24 +150,30 @@ cross_org_drift:
 # PROMOTION — effect-size-anchored, FDR-budgeted
 # ---------------------------------------------------------------------------
 promotion:
-  # Delta is anchored to the IMPROVABLE GAP (noise floor − chemistry-null baseline),
+  # Delta is anchored to the IMPROVABLE GAP above the STRONG baseline (chem-kNN),
   # NOT to an arbitrary absolute or to CI width.
-  # MEASURED 2026-05-25 on real cold-condition val (8 high-replicate orgs):
-  #   noise_floor (ceiling)           = 0.358
-  #   chemistry_null baseline (floor) = 0.0138  [hier 95% CI 0.0004, 0.0236]
-  #   improvable gap                  = 0.344
-  delta_anchor: fraction_of_gap
-  delta_fraction: 0.15                    # 0.15 × 0.344 ≈ 0.05
-  delta_concrete_spearman: 0.05           # promote if Δ-Spearman ≥ 0.05 vs baseline
+  # MEASURED 2026-05-25 on the FULL cold-condition val (23 replicate orgs):
+  #   noise_floor (ceiling)              = 0.3214
+  #   chemistry_null baseline (gate)     = 0.0112  [hier 95% CI -0.0017, 0.0286]
+  #   chemistry_kNN baseline (STRONG)    = 0.1694  [hier 95% CI 0.0949, 0.2653]
+  #   improvable gap above kNN           = 0.3214 - 0.1694 = 0.1520
+  delta_anchor: fraction_of_gap_above_strong_baseline
+  anchor_baseline: chemistry_knn          # the gene-specific strong baseline
+  delta_fraction: 0.15                    # 0.15 × 0.152 ≈ 0.023
+  delta_concrete_spearman: 0.023          # promote if Δ-Spearman ≥ 0.023 vs chem-kNN
   delta_note: |
-    The chemistry-null baseline (~0.014) is near zero — the chemistry-transferred
-    POPULATION profile barely predicts within-gene rankings (CI lower bound
-    touches 0). This is itself a finding: gene-specificity is required. The
-    concrete 0.05 delta uses the null gate as the floor; when the gene-specific
-    chemistry_kNN competitive baseline is computed, RE-ANCHOR to
-    (noise_floor − chemistry_kNN) — the room above the STRONG baseline — which
-    will tighten the bar. Recompute on the full locked val (all replicate orgs),
-    not just the high-rep subset, before R1 promotion.
+    Two-tier baseline result (full val):
+    - chem-NULL (population profile, ignores gene) ≈ 0.011 — near zero; the
+      population condition profile does NOT transfer within-gene rankings.
+    - chem-kNN (gene's OWN fit at chemically-near train conditions) = 0.169 —
+      a SIMPLE non-parametric baseline already captures ~half the achievable
+      signal (0.169 of the 0.321 ceiling). This is the honest bar: the deep
+      model must beat 0.169 by >= 0.023 to justify itself; headroom is 0.169 -> 0.321.
+    DENOMINATOR-PARITY CAVEAT: the three numbers above were each computed on the
+    genes each method could score (null 56,609 genes / kNN 34,175 / noise 74,804).
+    Before a real promotion decision, recompute model + chem-kNN + noise floor on
+    the SAME eligible val gene set (R-LOCK-1 hard filter) so the comparison is
+    apples-to-apples. The delta value may shift on the common set.
   applies_to: [ndcg_at_5, within_gene_spearman_mean]   # retrieval-primary + completeness
   no_regression: within_gene_kendall_mean # must not regress
   baseline_gate: required                 # primary split: beat chemistry_nearest_condition_profile
