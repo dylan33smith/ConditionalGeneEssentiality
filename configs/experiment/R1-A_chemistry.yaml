@@ -1,0 +1,30 @@
+# @package _global_
+# R1-A — Chemistry encoder retest under the ranking regime. Hypothesis H-R-CHEM-01.
+#
+# Tests multihot vs structural fingerprints under within-org condition-holdout
+# ranking. Multihot is the control + the integration baseline; fingerprint arms
+# follow once the multihot path is validated end-to-end.
+#
+# Held constant (Ranking Contract): R-LOCK-1 eligibility/w_g, R-LOCK-2 split,
+# R-LOCK-3 pointwise sampler, R-LOCK-4 metric. Architecture = T5-A locked.
+
+experiment_id: R1-A_chemistry
+stage_or_tier: R1
+regime: R
+
+experiment:
+  hypothesis: H-R-CHEM-01
+  arms:
+    - chemistry: multihot_425
+    # - chemistry: morgan_2048        # enable once fingerprint arm is wired
+    # - chemistry: rdkit_2048
+    # - chemistry: maccs_167
+    # - chemistry: morgan_plus_multihot
+    # - chemistry: maccs_plus_multihot
+  seeds: [0, 1, 2]
+  epochs: 8
+  # orgs: null  -> all replicate orgs (promotion). Dev smoke overrides to [Keio].
+  promotion_rule:
+    primary: [ndcg_at_5, within_gene_spearman]
+    must_beat: [chemistry_knn]
+    delta_spearman: 0.023            # R-LOCK-4-DEC-002 (re-anchor on common gene set)
