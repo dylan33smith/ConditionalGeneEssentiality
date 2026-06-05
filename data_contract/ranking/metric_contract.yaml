@@ -1,0 +1,83 @@
+# R-LOCK-4 — Metric contract for the ranking regime.
+# Locked 2026-05-24 in R-LOCK-4-DEC-001. See that decision for rationale.
+
+contract_id: r_lock_4_v1
+schema_version: 1
+
+# Primary metric (co-primary with kendall)
+primary_metric: within_gene_spearman_mean
+secondary_primary: within_gene_kendall_mean
+# Both must be reported. Promotion requires improvement on BOTH (per RPLAN §2.4).
+
+# Aggregation across eligible val genes
+aggregation: mean                       # NOT per-org-balanced (default)
+                                        # Switch only if R0 surfaces extreme org imbalance.
+tie_handling: average_ranks             # scipy.stats.spearmanr default
+
+# Per-gene eligibility for val (must match R-LOCK-1)
+val_eligibility: hard
+val_eligibility_source: data_contract/ranking/eligibility_policy.yaml
+
+# Bootstrap CI
+bootstrap_n: 1000
+bootstrap_unit: gene                    # resample with replacement across eligible val genes
+ci_level: 0.95                          # percentile method
+
+# Ranking baseline (H-RANK-01 gate)
+ranking_baseline:
+  id: per_condition_train_mean
+  description: |
+    For each val condition_key c: predict mean of train-gene fit values at c.
+    Assigns the SAME prediction vector (the condition-mean profile) to every
+    val gene. The per-gene within-gene Spearman correlates that shared profile
+    against each gene's OWN observed fit, so it VARIES across genes (it is not
+    constant): genes that track the bulk stress response score high,
+    idiosyncratic genes score low. The baseline value is the mean across genes.
+  promotion_gate: |
+    Model must beat baseline on within_gene_spearman_mean (CI for the
+    delta excludes zero). Any model that loses to this baseline is
+    ineligible for promotion.
+
+# Noise floor — PRIMARY = task-relevant
+noise_floor:
+  primary:
+    id: per_gene_cross_condition_replicate_spearman
+    description: |
+      For each eligible val gene with ≥ 2 replicate measurements at ≥ 5
+      distinct conditions:
+        rep_A_fit[c] = first replicate's fit at condition c
+        rep_B_fit[c] = second replicate's fit at condition c
+        Spearman across c of (rep_A_fit, rep_B_fit) → one r per gene.
+      Median across genes is the noise floor.
+    min_replicate_pairs_per_gene: 1
+    min_conditions_per_gene: 5
+    aggregator: median
+  secondary_proxy:
+    id: cross_gene_within_condition_replicate_spearman
+    description: |
+      Cross-gene Spearman within a single condition between replicate assays
+      (R0 fig 04). Retained as diagnostic.
+
+# Drift monitor (not gated)
+cross_org_drift:
+  enabled: true
+  source: data_contract/splits/multi_org_balanced.yaml
+  metric: within_gene_spearman_mean
+  description: |
+    Same R-regime checkpoint scored on T-regime multi_org_balanced split.
+    Tells us whether R-regime gains came at the cost of cross-org transfer.
+
+# Promotion deltas
+promotion_delta:
+  within_gene_spearman: 0.01            # absolute Δ on the mean
+  within_gene_kendall:  0.008           # absolute Δ on the mean
+  ci_must_be_disjoint: true             # 95% bootstrap CIs of the two arms must not overlap
+  baseline_gate: required               # H-RANK-01
+
+# Required figure decorations (per RPLAN §13)
+figure_requirements:
+  must_show_on_every_spearman_plot:
+    - bootstrap_ci_95
+    - h_rank_01_baseline_horizontal_line
+    - noise_floor_horizontal_line
+    - cross_org_drift_horizontal_dashed

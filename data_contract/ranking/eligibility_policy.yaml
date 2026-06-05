@@ -1,0 +1,77 @@
+# R-LOCK-1 — Eligibility policy for the ranking regime.
+# Locked 2026-05-24 in R-LOCK-1-DEC-001. See that decision for rationale.
+#
+# Hash of this file body is the `eligibility_filter_hash` field in run
+# manifest v2. Computed by src/evaluation/ranking_metrics.py::policy_hash.
+
+policy_id: r_lock_1_v1
+schema_version: 1
+
+# Spread metric
+spread_metric: tail_g                   # = p95 − p5 of fit across conditions
+spread_metric_diagnostic: iqr_g         # retained for analysis only
+
+# Training-target eligibility
+m_min: 10                               # min conditions per gene
+tail_min_scheme: per_org                # NOT global
+tail_min_floor: 0.20
+tail_min_noise_coef: 0.80
+# Per-org formula:
+#   tail_min_org = max(tail_min_floor, tail_min_noise_coef × (1 − r_replicate_org_median))
+# Orgs without replicate data fall back to tail_min_floor.
+tail_min_computed_on: train_rows_only
+
+# Weighting (applies on top of filter — see train_eligibility)
+weighting_scheme: tail_x_m
+# w_g = clip((tail_g_train − tail_min_org) / (tail_ref_org − tail_min_org), 0, 1)
+#       × min(m_g_train / m_min, 1)
+# tail_ref_org = per-org p75 of tail_g on train rows.
+
+train_eligibility: weighted_all
+val_eligibility: hard
+m_min_val: 5
+tail_min_val_scheme: per_org            # same formula, val rows only
+
+# Per-org r_replicate values from R0 fig 04 (median cross-replicate Spearman
+# across all replicate pairs in that org). Orgs not listed have no replicate
+# data and default to tail_min = floor (0.20).
+# Source: research_log/figures/r0_data/04_replicate_noise_floor.csv
+#
+# ⚠ KNOWN LIMITATION (train-only-preprocessing waiver — audit 2026-05-25):
+# These r_replicate values were computed on the FULL dataset (train+val), not
+# train-only, because R0 ran before the split was materialized. They drive the
+# per-org tail_min threshold, so strictly this is a train-only-preprocessing
+# violation of the clean-room charter. Magnitude is small: r_replicate is an
+# aggregate median over thousands of (gene, condition) pairs per org, so val's
+# marginal contribution to it is negligible — but it is a real violation baked
+# into a locked artifact.
+# REQUIRED at R1 integration time: the eligibility filter must recompute
+# `tail_g`, `m_g`, AND (ideally) per-org `r_replicate` on TRAIN ROWS ONLY,
+# per fold. If a per-fold r_replicate recompute is impractical, this waiver
+# must be explicitly accepted in the R1 decision with a sensitivity check
+# showing the threshold is insensitive to the train/full distinction.
+# Tracked as a blocker in R-LOCK-1-DEC-001 (risks) and the Phase-R audit report.
+r_replicate_org:
+  ANA3: 0.801
+  BFirm: 0.420
+  Btheta: 0.389
+  Burk376: 0.506
+  Caulo: 0.885
+  Cola: 0.396
+  Cup4G11: 0.162
+  Dda3937: 0.471
+  Ddia6719: 0.418
+  DdiaME23: 0.441
+  Dino: 0.392
+  DvH: 0.588
+  Dyella79: 0.437
+  HerbieS: 0.445
+  Kang: 0.618
+  Keio: 0.571
+  Korea: 0.556
+  Koxy: 0.341
+  MR1: 0.590
+  Marino: 0.598
+  Methanococcus_JJ: 0.873
+  Methanococcus_S2: 0.856
+  Miya: 0.509

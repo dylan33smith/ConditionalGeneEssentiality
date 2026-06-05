@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "run_manifest_v2.schema.json",
+  "title": "Run Manifest v2 (R-regime)",
+  "description": "Extends v1 with R-regime fields. Dispatcher inspects cfg.regime to pick schema: T-regime runs validate against v1; R-regime runs validate against v2. Per RPLAN §2.6.",
+  "type": "object",
+  "required": [
+    "run_id",
+    "experiment_id",
+    "stage_or_tier",
+    "regime",
+    "git_sha",
+    "code_sha",
+    "seed",
+    "data_contract_checksums",
+    "split_protocol",
+    "scored_rowset",
+    "metrics_ranking",
+    "ranking_baseline",
+    "noise_floor",
+    "eligibility_filter_hash",
+    "sampler_mode",
+    "primary_metric_name",
+    "preprocessing_artifact_id",
+    "config_snapshot_path"
+  ],
+  "properties": {
+    "regime": {"type": "string", "const": "R"},
+    "run_id": {"type": "string"},
+    "experiment_id": {"type": "string"},
+    "stage_or_tier": {
+      "type": "string",
+      "enum": ["R0", "R-LOCK-1", "R-LOCK-2", "R-LOCK-3", "R-LOCK-4",
+               "R1", "R2", "R-LOSS", "R-CAP", "R-EMB",
+               "R-COND", "R-SAMPLE", "R-META", "R-SNR", "R-CURRIC"]
+    },
+    "git_sha": {"type": "string", "minLength": 7},
+    "code_sha": {"type": "string"},
+    "seed": {"type": "integer"},
+    "data_contract_checksums": {
+      "type": "object",
+      "required": [
+        "feba_db_sha256",
+        "workbook_v4_sha256",
+        "workbook_v4_sheet",
+        "embedding_manifest_id",
+        "canonical_manifest_id",
+        "eligibility_policy_sha256",
+        "split_protocol_sha256",
+        "metric_contract_sha256"
+      ],
+      "properties": {
+        "feba_db_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "workbook_v4_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "workbook_v4_sheet": {"type": "string", "const": "Media_Components_ML"},
+        "embedding_manifest_id": {"type": "string"},
+        "canonical_manifest_id": {"type": "string"},
+        "eligibility_policy_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "split_protocol_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "metric_contract_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "split_protocol": {
+      "type": "object",
+      "required": ["protocol_id", "split_manifest_sha256"],
+      "properties": {
+        "protocol_id": {"type": "string"},
+        "split_manifest_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "preprocessing_artifact_id": {"type": "string"},
+    "config_snapshot_path": {"type": "string"},
+    "eligibility_filter_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256 of locked eligibility_policy.yaml body. Same hash means same eligibility — required for cross-tier metric comparability."
+    },
+    "sampler_mode": {
+      "type": "string",
+      "enum": ["pointwise", "pairwise", "listwise"]
+    },
+    "ranking_loss": {
+      "type": "string",
+      "enum": ["pointwise_mse", "pointwise_huber", "pairwise_margin", "listmle", "softrank", "approxndcg"]
+    },
+    "primary_metric_name": {
+      "type": "string",
+      "const": "within_gene_spearman_mean"
+    },
+    "scored_rowset": {
+      "type": "object",
+      "required": ["scored_rowset_hash", "n_val_rows_after_pooling", "n_eligible_val_genes"],
+      "properties": {
+        "scored_rowset_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "n_val_rows_after_pooling": {"type": "integer", "minimum": 0},
+        "n_eligible_val_genes": {"type": "integer", "minimum": 0}
+      }
+    },
+    "metrics_ranking": {
+      "type": "object",
+      "required": ["within_gene_spearman", "within_gene_kendall"],
+      "properties": {
+        "within_gene_spearman": {"$ref": "#/$defs/bootstrap_metric"},
+        "within_gene_kendall":  {"$ref": "#/$defs/bootstrap_metric"},
+        "rmse": {"type": "number", "description": "secondary drift monitor only"},
+        "mae":  {"type": "number", "description": "secondary drift monitor only"}
+      }
+    },
+    "ranking_baseline": {
+      "type": "object",
+      "required": ["baseline_id", "spearman_mean", "kendall_mean", "model_beats"],
+      "properties": {
+        "baseline_id": {"type": "string", "const": "per_condition_train_mean"},
+        "spearman_mean": {"type": "number"},
+        "kendall_mean":  {"type": "number"},
+        "model_beats": {"type": "boolean", "description": "true iff model beats baseline on within_gene_spearman_mean (H-RANK-01 gate)"}
+      }
+    },
+    "noise_floor": {
+      "type": "object",
+      "required": ["primary_value", "n_genes_used"],
+      "properties": {
+        "primary_value": {
+          "type": "number",
+          "description": "Task-relevant: per-gene cross-condition Spearman across replicate pairs, median across val genes with ≥ 2 reps at ≥ 5 distinct conditions"
+        },
+        "n_genes_used": {"type": "integer", "minimum": 0},
+        "proxy_value": {
+          "type": ["number", "null"],
+          "description": "Secondary: cross-gene Spearman within-condition between replicate assays, per-org median. Retained as diagnostic."
+        }
+      }
+    },
+    "cross_org_drift": {
+      "type": ["object", "null"],
+      "description": "Same R-regime checkpoint scored on T-regime multi_org_balanced split. Not gated.",
+      "properties": {
+        "within_gene_spearman_mean": {"type": "number"},
+        "split_protocol_id": {"type": "string"}
+      }
+    },
+    "unknown_category_rate": {"type": "number", "minimum": 0, "maximum": 1},
+    "leakage_checks": {
+      "type": "object",
+      "properties": {
+        "vocab_train_only_pass": {"type": "boolean"},
+        "scaler_train_only_pass": {"type": "boolean"},
+        "eligibility_train_only_pass": {"type": "boolean"},
+        "split_overlap_pass": {"type": "boolean"},
+        "replicate_group_intact_pass": {"type": "boolean"}
+      }
+    },
+    "notes": {"type": "string"}
+  },
+  "$defs": {
+    "bootstrap_metric": {
+      "type": "object",
+      "required": ["mean", "ci_low", "ci_high", "n_genes_used", "n_bootstrap"],
+      "properties": {
+        "mean":     {"type": "number"},
+        "ci_low":   {"type": "number"},
+        "ci_high":  {"type": "number"},
+        "n_genes_used": {"type": "integer", "minimum": 0},
+        "n_bootstrap":  {"type": "integer", "minimum": 100}
+      }
+    }
+  }
+}

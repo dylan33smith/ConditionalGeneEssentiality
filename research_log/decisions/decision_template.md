@@ -2,7 +2,8 @@
 
 ### Header
 - decision_id: <e.g., T1-DEC-001 or S3-DEC-001>
-- stage_or_tier: <S0|S1|S2|S3|S4|S5|T1|T2|T3|T4>
+- stage_or_tier: <S0|S1|S2|S3|S4|S5|T1|T2|T3|T4|T5|T6|R0|R-LOCK-1|R-LOCK-2|R-LOCK-3|R-LOCK-4|R1|R2|R3>
+- regime: <T|R>     # T = pointwise MSE/MAE (REFACTORPLAN); R = ranking (RPLAN)
 - date: <YYYY-MM-DD>
 - owner: <name>
 - status: <proposed|approved|rejected|superseded>
@@ -23,13 +24,25 @@
   - seed_set: [0, 1, 2]
   - training_budget: <epochs / steps>
   - code_sha: <commit hash>
-- metrics_primary: [rmse, mae]                     # co-primary per L4
-- metrics_secondary: [within_gene_spearman, per_organism_rmse_spread]
+- metrics_primary:
+    # T-regime: [rmse, mae]
+    # R-regime: [within_gene_spearman, within_gene_kendall]
+    <list>
+- metrics_secondary:
+    # T-regime: [within_gene_spearman, per_organism_rmse_spread]
+    # R-regime: [rmse, mae, cross_org_within_gene_spearman, per_organism_spearman_spread]
+    <list>
 - promotion_rule:
-  - rmse_improvement: <delta required>
-  - mae_improvement: <delta required>
-  - spearman_non_degradation_tolerance: <delta>
-  - additive_baseline_gate: required               # H-BASE-01
+    # T-regime fields:
+    # - rmse_improvement: <delta>
+    # - mae_improvement: <delta>
+    # - additive_baseline_gate: required           # H-BASE-01
+    # R-regime fields:
+    # - spearman_improvement: <delta>
+    # - kendall_improvement: <delta>
+    # - ranking_baseline_gate: required            # H-RANK-01 (per-cond mean)
+    # - noise_floor_reported: required
+    <fields>
 - failure_guardrails:
   - leakage_checks_pass: required
   - split_overlap_pass: required
@@ -69,3 +82,7 @@
 - preprocessing_artifact_id: <id>
 - code_sha: <sha>
 - report_path: <path>
+- # R-regime only:
+- # eligibility_filter_hash: <hash>
+- # sampler_mode: <pointwise|pairwise|listwise>
+- # primary_metric_name: <within_gene_spearman_mean|within_gene_spearman_per_org_balanced>
