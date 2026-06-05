@@ -1,62 +1,140 @@
 # R-LOCK-4 — Metric contract for the ranking regime.
-# Locked 2026-05-24 in R-LOCK-4-DEC-001. See that decision for rationale.
+# v1 locked 2026-05-24 (R-LOCK-4-DEC-001).
+# v2 amended 2026-05-25 (R-LOCK-4-DEC-002) after the publication-readiness audit:
+#   + matrix-factorization baseline, + NDCG@k/precision@k retrieval metrics,
+#   + effect-size-anchored promotion delta, + hierarchical (org→gene) bootstrap,
+#   + multiple-comparison (FDR) budget, + required per-organism breakdown.
 
-contract_id: r_lock_4_v1
-schema_version: 1
+contract_id: r_lock_4_v2
+schema_version: 2
 
-# Primary metric (co-primary with kendall)
-primary_metric: within_gene_spearman_mean
-secondary_primary: within_gene_kendall_mean
-# Both must be reported. Promotion requires improvement on BOTH (per RPLAN §2.4).
+# ---------------------------------------------------------------------------
+# METRICS
+# ---------------------------------------------------------------------------
+# Two metric families, both reported every run:
+#   (A) RETRIEVAL ("find the top stressors") — the application-facing family,
+#       VALUED ABOVE full-list correlation per project-lead 2026-05-25.
+#   (B) FULL-LIST RANK CORRELATION — Spearman/Kendall, the completeness check.
+metrics:
+  retrieval_primary:                      # family A — headline for the use case
+    names: [ndcg_at_k, precision_at_k]
+    k_values: [1, 3, 5]
+    relevance: |
+      For gene g, condition c's relevance = max(0, -fit_gc) — a stressor reduces
+      fitness (fit < 0), so "more stressful" = more negative fit = higher gain.
+      Non-stressors (fit >= 0) get relevance 0. Model ranks conditions by
+      PREDICTED fit ascending (most-essential first); NDCG@k / precision@k score
+      whether the predicted top-k are the truly most-stressful conditions.
+  full_list_coprimary:                    # family B — completeness / anti-gaming
+    names: [within_gene_spearman_mean, within_gene_kendall_mean]
+  # Promotion priority: a model must NOT regress family B, and is PROMOTED on
+  # family A (retrieval) — the metric the application cares about. See promotion.
+  reporting: both families on every run, per-organism (below) and pooled.
 
-# Aggregation across eligible val genes
-aggregation: mean                       # NOT per-org-balanced (default)
-                                        # Switch only if R0 surfaces extreme org imbalance.
-tie_handling: average_ranks             # scipy.stats.spearmanr default
+aggregation: mean                         # global mean across eligible val genes
+                                          # (per-org table ALSO required — see below)
+tie_handling: average_ranks               # scipy default
 
 # Per-gene eligibility for val (must match R-LOCK-1)
 val_eligibility: hard
 val_eligibility_source: data_contract/ranking/eligibility_policy.yaml
 
-# Bootstrap CI
-bootstrap_n: 1000
-bootstrap_unit: gene                    # resample with replacement across eligible val genes
-ci_level: 0.95                          # percentile method
+# ---------------------------------------------------------------------------
+# BOOTSTRAP — hierarchical (org → gene), NOT flat
+# ---------------------------------------------------------------------------
+bootstrap:
+  scheme: hierarchical                    # v2 change (was flat gene resample)
+  level_1: orgId                          # resample organisms with replacement
+  level_2: gene_key                       # then resample genes within each chosen org
+  n_bootstrap: 1000
+  ci_level: 0.95                          # percentile method
+  rationale: |
+    Genes within an organism share conditions, batch effects, and noise floor,
+    so they are NOT independent. A flat gene-level bootstrap underestimates the
+    CI width (overconfident), inflating "disjoint CI" promotions. Resampling
+    orgs first, then genes within, respects the clustering and yields honest
+    (wider, correct) intervals. Flat bootstrap retained only as a diagnostic.
 
-# Ranking baseline (H-RANK-01 gate)
-ranking_baseline:
-  id: per_condition_train_mean
-  description: |
-    For each val condition_key c: predict mean of train-gene fit values at c.
-    Assigns the SAME prediction vector (the condition-mean profile) to every
-    val gene. The per-gene within-gene Spearman correlates that shared profile
-    against each gene's OWN observed fit, so it VARIES across genes (it is not
-    constant): genes that track the bulk stress response score high,
-    idiosyncratic genes score low. The baseline value is the mean across genes.
-  promotion_gate: |
-    Model must beat baseline on within_gene_spearman_mean (CI for the
-    delta excludes zero). Any model that loses to this baseline is
-    ineligible for promotion.
+# ---------------------------------------------------------------------------
+# BASELINES — SPLIT-SPECIFIC (critical finding 2026-05-25, R-LOCK-4-DEC-002)
+# ---------------------------------------------------------------------------
+# DISCOVERY: under the PRIMARY condition-holdout split, val conditions are 100%
+# disjoint from train (cold columns — verified: 0/78 overlap). This means:
+#   (a) the original H-RANK-01 "per-condition train mean" is UNDEFINED for the
+#       primary split (no train mean for an unseen condition) — it returned NaN
+#       for all 28,005 val genes on real data.
+#   (b) pure matrix factorization is ALSO invalid for the primary split — it
+#       cannot place a cold column with zero observed entries.
+#   (c) the "it's just matrix completion" critique therefore applies to the
+#       CELL-holdout diagnostic, NOT the primary. The primary is cold-start /
+#       inductive matrix completion, which genuinely needs chemistry features.
+# Baselines are therefore declared PER SPLIT.
+baselines:
+  primary_condition_holdout:
+    gate:                                 # H-RANK-01 REDEFINED for cold conditions
+      id: chemistry_nearest_condition_profile
+      description: |
+        For a held-out condition c, find its chemically-nearest TRAIN
+        condition c' (fingerprint Tanimoto / multihot Jaccard); predict gene g's
+        fit at c as the train-gene MEAN fit at c' (population profile transferred
+        via chemistry, ignoring gene identity). Beating it requires gene-specific
+        deviation from the chemistry-transferred population profile. This is the
+        valid cold-condition null (the old per-condition-mean is undefined here).
+    competitive:
+      - id: chemistry_knn
+        description: |
+          Predict gene g's fit at held-out condition c from g's OWN train fit at
+          its k chemically-nearest train conditions. Uses warm rows bridged by
+          chemistry. The non-parametric version of R1's fingerprint hypothesis
+          and the baseline the deep model must beat.
+    invalid_here: [matrix_factorization, per_condition_train_mean]   # cold columns
+  diagnostic_cell_holdout:                # standard matrix completion lives HERE
+    competitive:
+      - id: matrix_factorization
+        method: truncated_SVD_or_ALS
+        rank_grid: [8, 16, 32, 64]
+        uses_side_info: false
+        description: |
+          Low-rank completion of the gene×condition fit matrix with random
+          missing entries (columns partially observed → MF is valid). THE
+          baseline for the matrix-completion critique. If the deep model cannot
+          beat MF on cell_holdout, side features add nothing on the easy regime.
+      - id: per_condition_train_mean      # the original H-RANK-01, valid here
+        description: Per-condition mean; valid because columns are warm here.
+  diagnostic_cold_gene:                   # cold rows, warm columns
+    gate:
+      id: per_condition_train_mean        # VALID here (conditions are seen)
+      description: |
+        Conditions are warm in cold-gene holdout, so per-condition train mean is
+        well-defined. Beating it requires using the held-out gene's EMBEDDING
+        (the inductive-over-genes test).
+    competitive:
+      - id: additive_two_factor
+        method: "fit ~ alpha[gene] + beta[condition]"
+        description: β[condition] defined (warm columns); α[gene] from embedding regression.
+  oracle:
+    id: replicate_oracle                  # = noise floor, reported as a baseline line
+    description: Best a second replicate achieves; attainable-performance ceiling.
 
-# Noise floor — PRIMARY = task-relevant
+# ---------------------------------------------------------------------------
+# NOISE FLOOR — PRIMARY = task-relevant (measured 2026-05-25)
+# ---------------------------------------------------------------------------
 noise_floor:
   primary:
     id: per_gene_cross_condition_replicate_spearman
+    measured_value_high_rep_orgs: 0.358   # median per-gene cross-cond replicate Spearman
+                                          # (8 high-replicate orgs, real val, n=24,337 genes)
+                                          # SUPERSEDES the 0.43/0.506 cross-gene proxy
     description: |
-      For each eligible val gene with ≥ 2 replicate measurements at ≥ 5
-      distinct conditions:
-        rep_A_fit[c] = first replicate's fit at condition c
-        rep_B_fit[c] = second replicate's fit at condition c
-        Spearman across c of (rep_A_fit, rep_B_fit) → one r per gene.
-      Median across genes is the noise floor.
+      For each eligible val gene with ≥ 2 replicate measurements at ≥ 5 distinct
+      conditions: per-gene Spearman across conditions of rep_A fit vs rep_B fit.
+      Median across genes. This is the TRUE ceiling for within_gene_spearman.
     min_replicate_pairs_per_gene: 1
     min_conditions_per_gene: 5
     aggregator: median
   secondary_proxy:
     id: cross_gene_within_condition_replicate_spearman
-    description: |
-      Cross-gene Spearman within a single condition between replicate assays
-      (R0 fig 04). Retained as diagnostic.
+    description: Cross-gene within-condition Spearman (R0 fig 04). Diagnostic only.
 
 # Drift monitor (not gated)
 cross_org_drift:
@@ -65,19 +143,51 @@ cross_org_drift:
   metric: within_gene_spearman_mean
   description: |
     Same R-regime checkpoint scored on T-regime multi_org_balanced split.
-    Tells us whether R-regime gains came at the cost of cross-org transfer.
+    Frames cross-org transfer as a reported FINDING (per the research goal).
 
-# Promotion deltas
-promotion_delta:
-  within_gene_spearman: 0.01            # absolute Δ on the mean
-  within_gene_kendall:  0.008           # absolute Δ on the mean
-  ci_must_be_disjoint: true             # 95% bootstrap CIs of the two arms must not overlap
-  baseline_gate: required               # H-RANK-01
+# ---------------------------------------------------------------------------
+# PROMOTION — effect-size-anchored, FDR-budgeted
+# ---------------------------------------------------------------------------
+promotion:
+  # Delta is anchored to the IMPROVABLE GAP (noise floor − H-RANK-01 baseline),
+  # NOT to an arbitrary absolute or to CI width. Concrete value set once the
+  # H-RANK-01 baseline is computed on the locked val (see R-LOCK-4-DEC-002).
+  delta_anchor: fraction_of_gap
+  delta_fraction: 0.15                    # promote if Δ ≥ 0.15 × (noise_floor − baseline)
+  applies_to: [ndcg_at_5, within_gene_spearman_mean]   # retrieval-primary + completeness
+  no_regression: within_gene_kendall_mean # must not regress
+  baseline_gate: required                 # primary split: beat chemistry_nearest_condition_profile
+  must_beat_competitive: [chemistry_knn]  # primary split (NOT matrix_factorization — cold columns)
+  # matrix_factorization is the gate on the cell_holdout DIAGNOSTIC only.
+  # Multiple-comparison control across arms within a tier and across tiers:
+  multiple_comparison:
+    within_tier: benjamini_hochberg       # FDR across the tier's arms (R1: 6 arms, etc.)
+    across_tiers: pre_registered_alpha_budget
+    alpha: 0.05                           # family-wise target across the full R-tier sequence
+    note: |
+      Pre-register the full tier sequence (R1, R2, R-LOSS, R-CAP, R-EMB, R-COND,
+      R-SAMPLE, R-META, R-SNR, R-CURRIC). Apply BH-FDR to the arm comparisons
+      within each tier; budget alpha across tiers. The per-lock "may be revised
+      after R1" clauses collapse into ONE pre-registered recalibration checkpoint.
+
+# ---------------------------------------------------------------------------
+# REQUIRED REPORTING — per-organism breakdown every run
+# ---------------------------------------------------------------------------
+per_organism_breakdown:
+  required: true
+  computed: every val scoring (cheap — group per-gene scores by org before the mean)
+  columns: [orgId, n_eligible_genes, model_ndcg_at_5, model_spearman,
+            baseline_spearman, mf_spearman, noise_floor, cross_org_drift]
+  rationale: |
+    Global mean lets large orgs (17× size spread) dominate. Per-org tables
+    expose where the model works and prevent a single-org win masquerading as
+    general skill.
 
 # Required figure decorations (per RPLAN §13)
 figure_requirements:
-  must_show_on_every_spearman_plot:
-    - bootstrap_ci_95
+  must_show_on_every_ranking_plot:
+    - hierarchical_bootstrap_ci_95
     - h_rank_01_baseline_horizontal_line
-    - noise_floor_horizontal_line
+    - matrix_factorization_baseline_line
+    - noise_floor_horizontal_line          # measured ≈ 0.358
     - cross_org_drift_horizontal_dashed
