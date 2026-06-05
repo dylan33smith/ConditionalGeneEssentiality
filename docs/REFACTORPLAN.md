@@ -3,6 +3,14 @@
 **Status:** plan revision (v2). Supersedes the v1 plan archived at
 `archive/docs/REFACTORPLAN_v1.md`.
 
+**Regime scope:** this document governs the **T-regime** only —
+pointwise MSE/MAE regression on continuous `fit` under cross-organism
+holdout. The T-pipeline is **considered complete at T6-A**; new work
+proceeds in the **R-regime** under `docs/RPLAN.md` (per-gene ranking of
+conditions under within-organism cross-experiment holdout). The fork
+was triggered by T7-prep diagnostics showing the locked T5-A model
+achieves within-gene Spearman ≈ 0.045 vs noise floor ≈ 0.43.
+
 **Scope:** clean-room rebuild of a continuous-fitness regression system for
 `(gene, condition)` pairs from Tn-seq fitness data, using frozen ProteomeLM gene
 embeddings and chemistry features from `media_composition_v4.xlsx` →
@@ -10,7 +18,8 @@ embeddings and chemistry features from `media_composition_v4.xlsx` →
 
 **Reading order:** §1 (charter) → §2 (locked decisions) → §3 (data scope) →
 §7 (stage pipeline) → §8 (tiers). §4 (hypothesis registry) and §5 (decision
-ledger) are referenced but not read end-to-end.
+ledger) are referenced but not read end-to-end. **For ranking-regime work,
+read `docs/RPLAN.md` instead.**
 
 ---
 

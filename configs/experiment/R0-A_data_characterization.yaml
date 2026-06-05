@@ -1,0 +1,43 @@
+# @package _global_
+# R0-A — Data Characterization for the Ranking Regime.
+#
+# Per docs/RPLAN.md §5. Emits 10 figures + candidate eligibility/split
+# protocols. No model training — read-only diagnostics over the full canonical
+# fitness table.
+#
+# Hypotheses (informational, not promotion gates):
+#   H-R0-01: >30% of genes per organism carry rankable signal.
+#   H-R0-02: Within-org cross-experiment splits preserve enough conditions
+#            per gene for stable per-gene Spearman.
+#   H-R0-03: Low-IQR genes partially shared across orgs (weighting > filtering).
+#   H-R0-04: Replicate noise floor varies materially by org.
+
+experiment_id: R0-A_data_characterization
+stage_or_tier: R0
+
+experiment:
+  hypotheses: [H-R0-01, H-R0-02, H-R0-03, H-R0-04]
+  scope: all_organisms_all_conditions
+
+r0:
+  # Eligibility frontier grid — explored, not locked here.
+  # Threshold grid widened for tail_g (typically ~2x larger than IQR_g).
+  m_min_grid: [3, 5, 10, 15, 20, 30, 50]
+  tail_min_grid: [0.10, 0.20, 0.30, 0.40, 0.60, 0.80, 1.00, 1.50]
+  # Diagnostic-only IQR grid (for the secondary frontier, kept for comparison)
+  iqr_min_grid: [0.05, 0.10, 0.15, 0.20, 0.30, 0.50]
+
+  # Split feasibility preview (R-LOCK-2 will lock the real protocol).
+  # Fraction-based now — fixed-k was degenerate at small k (k=1 → can't get m≥5;
+  # k=5 → trivially passes for every gene). Holdout = condition `(expDesc, media)`
+  # with replicate-group-together constraint.
+  split_preview:
+    holdout_fractions: [0.10, 0.15, 0.20, 0.25, 0.30]
+    min_holdout: 3
+    max_holdout: 30
+
+  # Cap on per-org orgs included in expensive analyses (replicate Spearman).
+  noise_floor_max_orgs: 24
+
+  # Random seed for any sampling done in figures (low-IQR Jaccard etc.).
+  seed: 0

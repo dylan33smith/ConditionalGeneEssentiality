@@ -1,0 +1,75 @@
+# R-LOCK-2 — Split protocol for the ranking regime.
+# Locked 2026-05-24 in R-LOCK-2-DEC-001. See that decision for rationale.
+
+protocol_id: r_lock_2_v1_within_org_condition_holdout
+schema_version: 1
+
+# Condition key — INCLUDES temperature (2.4% of (expDesc, media) pairs hid
+# distinct temperatures per R0 audit 2026-05-24).
+condition_key_columns: [expDesc, media, temperature]
+
+# Primary split
+holdout_unit: condition_key
+holdout_scope: within_organism
+holdout_fraction: 0.20
+min_holdout: 3                          # at least 3 val conditions per org
+max_holdout: 30                         # cap for very large orgs
+
+# Replicate handling — enforced by holdout_unit=condition_key
+replicate_group_constraint: hold_out_together
+
+# Stratification
+stratify_by: expGroup
+stratification_min_groups: 2
+stratification_min_group_size: 10       # need ≥10 to source ≥2 val items at 20%
+stratification_fallback: random_within_org
+
+# Diagnostic splits (NOT promotion gates)
+diagnostic_splits:
+  - id: cell_holdout
+    description: |
+      Easy-ceiling: random (gene, condition_key) cells held out from known
+      conditions. Conditions appear in train for OTHER genes, so the model
+      can look up condition behavior from siblings. Bounds "how much of the
+      gap is condition-novelty vs raw signal limits."
+    holdout_fraction: 0.20
+    seed: 0
+  - id: stressor_class_holdout
+    description: |
+      Hard-floor: hold out one entire chemical class per org per fold (analog
+      of S3's low_overlap_stress). Tests generalization to novel chemical
+      families.
+    n_folds: 1
+  - id: cross_org_balanced_drift
+    description: |
+      T-regime multi_org_balanced split scored on the same R-regime
+      checkpoint. Drift monitor — tells us whether R-regime gains came at
+      the cost of cross-org transfer.
+    source: data_contract/splits/multi_org_balanced.yaml
+
+# Seeds
+primary_seed: 0
+multi_seed_check: [0, 1, 2]
+
+# Dev subset (RPLAN §6)
+dev_subset_org: Keio
+dev_subset_seed: 0
+# Rationale: median data volume (rank 12 of 23 orgs with replicate data);
+# mid-noise (r=0.57); stratification feasible (6 expGroups, 3 pass threshold);
+# biologically iconic (E. coli K-12 BW25113).
+
+# Promotion-target vs diagnostic-only org partition
+# (emergent from intersection of split feasibility AND stratification AND
+# R-LOCK-1 eligibility — surfaced in R0 fig 10 + fig 11).
+diagnostic_only_orgs:
+  - Burk376                              # 13 conditions total (R-LOCK-2 floor=3)
+  - Dda3937
+  - Ddia6719
+  - DdiaME23
+  - Magneto
+  - RalstoniaBSBF1503
+  - RalstoniaGMI1000
+  - RalstoniaPSI07
+  - RalstoniaUW163
+  - SyringaeB728a_mexBdelta
+# All other orgs are primary (38+ orgs).
