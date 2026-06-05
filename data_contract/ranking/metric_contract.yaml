@@ -149,11 +149,24 @@ cross_org_drift:
 # PROMOTION — effect-size-anchored, FDR-budgeted
 # ---------------------------------------------------------------------------
 promotion:
-  # Delta is anchored to the IMPROVABLE GAP (noise floor − H-RANK-01 baseline),
-  # NOT to an arbitrary absolute or to CI width. Concrete value set once the
-  # H-RANK-01 baseline is computed on the locked val (see R-LOCK-4-DEC-002).
+  # Delta is anchored to the IMPROVABLE GAP (noise floor − chemistry-null baseline),
+  # NOT to an arbitrary absolute or to CI width.
+  # MEASURED 2026-05-25 on real cold-condition val (8 high-replicate orgs):
+  #   noise_floor (ceiling)           = 0.358
+  #   chemistry_null baseline (floor) = 0.0138  [hier 95% CI 0.0004, 0.0236]
+  #   improvable gap                  = 0.344
   delta_anchor: fraction_of_gap
-  delta_fraction: 0.15                    # promote if Δ ≥ 0.15 × (noise_floor − baseline)
+  delta_fraction: 0.15                    # 0.15 × 0.344 ≈ 0.05
+  delta_concrete_spearman: 0.05           # promote if Δ-Spearman ≥ 0.05 vs baseline
+  delta_note: |
+    The chemistry-null baseline (~0.014) is near zero — the chemistry-transferred
+    POPULATION profile barely predicts within-gene rankings (CI lower bound
+    touches 0). This is itself a finding: gene-specificity is required. The
+    concrete 0.05 delta uses the null gate as the floor; when the gene-specific
+    chemistry_kNN competitive baseline is computed, RE-ANCHOR to
+    (noise_floor − chemistry_kNN) — the room above the STRONG baseline — which
+    will tighten the bar. Recompute on the full locked val (all replicate orgs),
+    not just the high-rep subset, before R1 promotion.
   applies_to: [ndcg_at_5, within_gene_spearman_mean]   # retrieval-primary + completeness
   no_regression: within_gene_kendall_mean # must not regress
   baseline_gate: required                 # primary split: beat chemistry_nearest_condition_profile
