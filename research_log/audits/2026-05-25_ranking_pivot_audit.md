@@ -107,6 +107,18 @@ These come from the Phase-2 research audit and **require project-lead decisions*
 1. **Compute the task-relevant noise floor on the real locked val rows** and
    reconcile the three circulating numbers (0.43 proxy / 0.506 R0 / unmeasured
    task-relevant). No result is interpretable without the true ceiling.
+   **→ DONE 2026-05-25 (partial):** materialized the R-LOCK-2 condition-holdout
+   split (`src/data/datasets/build_ranking_split.py`), leakage-checked on real
+   data (PASS), and computed the task-relevant floor on the 8 high-replicate
+   orgs' real val rows: **median per-gene cross-condition replicate Spearman =
+   0.358** (mean 0.361; n=24,337 val genes; 3,668 skipped for <5 paired
+   conditions). This is the TRUE ceiling for the ranking metric and is **lower
+   than the 0.43–0.506 cross-gene proxies** — replicates agree less on
+   *within-gene condition ranking* than on *within-condition gene ranking*.
+   Implication: the "room to improve" from the H-RANK-01 baseline up to ~0.36
+   is narrower than the pivot's headline 0.43 suggested; every R-tier promotion
+   delta must be judged against ~0.36, not 0.43. **Remaining:** extend to all
+   replicate-bearing orgs and recompute per-fold for the final locked split.
 2. **Add strong baselines to the H-RANK-01 gate**, above all **matrix
    factorization / low-rank completion** on the gene×condition `fit` matrix.
    The primary split is **transductive over genes** (every gene's embedding is
