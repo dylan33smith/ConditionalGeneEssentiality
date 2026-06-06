@@ -137,6 +137,23 @@ noise_floor:
     id: cross_gene_within_condition_replicate_spearman
     description: Cross-gene within-condition Spearman (R0 fig 04). Diagnostic only.
 
+# ---------------------------------------------------------------------------
+# ALL-ORG REFERENCE TABLE (measured 2026-05-25; 23 replicate orgs, eligible val
+# genes, MEAN aggregation). The yardstick the full-sweep MODEL is compared to —
+# in BOTH Spearman AND the retrieval metrics it is valued on. The model's
+# headline (NDCG@5) must be read against chem-kNN (bar) and NOISE-FLOOR (ceiling).
+# ---------------------------------------------------------------------------
+reference_baselines_all_org:                # method: [spearman, ndcg@1, ndcg@3, ndcg@5, prec@1, prec@5]
+  chem_null:   [0.016, 0.222, 0.265, 0.310, 0.051, 0.268]   # floor (n=54,593)
+  chem_knn:    [0.222, 0.377, 0.431, 0.481, 0.142, 0.446]   # STRONG bar (n=45,769)
+  noise_floor: [0.393, 0.558, 0.609, 0.658, 0.335, 0.604]   # ceiling (n=45,943)
+  note: |
+    NDCG >> Spearman everywhere (e.g. kNN Spearman 0.222 but NDCG@5 0.481):
+    agreement is much stronger at the TOP of the list than across the full list.
+    Even replicates only reach NDCG@5 0.658 — that's the real top-5 ceiling.
+    Denominator caveat: each method scored on the genes it could cover; the
+    model-vs-baseline promotion comparison uses the COMMON gene set per run.
+
 # Drift monitor (not gated)
 cross_org_drift:
   enabled: true
