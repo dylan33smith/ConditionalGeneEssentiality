@@ -206,32 +206,67 @@ def _val_spearman(model, data: R1Data, arm: str, dev) -> float:
     return float(pg["value"].mean()) if len(pg) else float("nan")
 
 
+def _metrics_for_pred(df: pd.DataFrame, pred_col: str) -> dict:
+    """Spearman/Kendall + NDCG@k + precision@k for one prediction column.
+
+    All on the SAME rows passed in (caller restricts to the common gene set
+    for denominator parity).
+    """
+    d = df.rename(columns={pred_col: "pred"})
+    pg_sp = per_gene_correlations(d, metric="spearman", pred_col="pred")
+    pg_kd = per_gene_correlations(d, metric="kendall", pred_col="pred")
+    sp_ci = hierarchical_bootstrap_ci(pg_sp, n_bootstrap=300)
+    ret = within_gene_retrieval(d, k_values=(1, 3, 5), pred_col="pred")
+    out = {
+        "spearman": sp_ci["mean"],
+        "spearman_ci_low": sp_ci["ci_low"], "spearman_ci_high": sp_ci["ci_high"],
+        "kendall": float(pg_kd["value"].mean()) if len(pg_kd) else float("nan"),
+        "n_genes": int(sp_ci["n_genes"]),
+    }
+    for k in (1, 3, 5):
+        out[f"ndcg_at_{k}"] = float(ret[f"ndcg_at_{k}"].mean()) if len(ret) else float("nan")
+        out[f"precision_at_{k}"] = float(ret[f"precision_at_{k}"].mean()) if len(ret) else float("nan")
+    return out
+
+
 def _full_eval(model, data: R1Data, arm: str, dev, *, seed: int, best_spear: float) -> dict:
     v = _predict_val(model, data, arm, dev)
-    elig = v[v["eligible"]].copy()
-    pg_sp = per_gene_correlations(elig, metric="spearman", pred_col="pred")
-    pg_kd = per_gene_correlations(elig, metric="kendall", pred_col="pred")
-    sp_ci = hierarchical_bootstrap_ci(pg_sp, n_bootstrap=300)
-    kd_ci = hierarchical_bootstrap_ci(pg_kd, n_bootstrap=300)
-    ret = within_gene_retrieval(elig, k_values=(1, 3, 5), pred_col="pred")
-    ndcg5 = float(ret["ndcg_at_5"].mean()) if "ndcg_at_5" in ret else float("nan")
-    per_org = per_organism_breakdown(pg_sp, retrieval_per_gene=ret)
+    elig = v[v["eligible"]].rename(columns={"pred": "model_pred"}).copy()
 
-    # baselines on the SAME eligible val gene set (denominator parity)
+    # Baseline predictions on the eligible val rows
     tr = data.train
-    base_null = chemistry_nearest_condition_profile(tr, elig, data.cond_features)
-    elig_n = elig.assign(pred=base_null.values).dropna(subset=["pred"])
-    null_sp = per_gene_correlations(elig_n, metric="spearman", pred_col="pred")
-    base_knn = chemistry_knn_predict(tr, elig, data.cond_features, k=5)
-    elig_k = elig.assign(pred=base_knn.values).dropna(subset=["pred"])
-    knn_sp = per_gene_correlations(elig_k, metric="spearman", pred_col="pred")
+    elig["null_pred"] = chemistry_nearest_condition_profile(tr, elig, data.cond_features).values
+    elig["knn_pred"] = chemistry_knn_predict(tr, elig, data.cond_features, k=5).values
 
-    return {
+    # COMMON gene set: rows where ALL THREE methods produce a prediction
+    # (denominator parity — model, chem-null, chem-kNN scored on identical genes).
+    common = elig.dropna(subset=["model_pred", "null_pred", "knn_pred"]).copy()
+
+    model_m = _metrics_for_pred(common, "model_pred")
+    null_m = _metrics_for_pred(common, "null_pred")
+    knn_m = _metrics_for_pred(common, "knn_pred")
+
+    # per-org breakdown on the model (side metric)
+    pg_model = per_gene_correlations(common.rename(columns={"model_pred": "pred"}),
+                                     metric="spearman", pred_col="pred")
+    ret_model = within_gene_retrieval(common.rename(columns={"model_pred": "pred"}),
+                                      k_values=(1, 3, 5), pred_col="pred")
+    per_org = per_organism_breakdown(pg_model, retrieval_per_gene=ret_model)
+
+    # Flat row for the results CSV (model headline + key baseline comparators)
+    flat = {
         "arm": arm, "seed": seed,
-        "model_spearman": sp_ci["mean"], "model_spearman_ci": [sp_ci["ci_low"], sp_ci["ci_high"]],
-        "model_kendall": kd_ci["mean"], "model_ndcg_at_5": ndcg5,
-        "n_eligible_val_genes": int(sp_ci["n_genes"]), "n_orgs": int(sp_ci["n_orgs"]),
-        "baseline_chem_null_spearman": float(null_sp["value"].mean()) if len(null_sp) else float("nan"),
-        "baseline_chem_knn_spearman": float(knn_sp["value"].mean()) if len(knn_sp) else float("nan"),
-        "per_org": per_org,
+        "n_common_genes": model_m["n_genes"],
+        "model_spearman": model_m["spearman"],
+        "model_ndcg_at_1": model_m["ndcg_at_1"], "model_ndcg_at_3": model_m["ndcg_at_3"],
+        "model_ndcg_at_5": model_m["ndcg_at_5"],
+        "model_precision_at_1": model_m["precision_at_1"],
+        "model_precision_at_5": model_m["precision_at_5"],
+        "knn_spearman": knn_m["spearman"], "knn_ndcg_at_5": knn_m["ndcg_at_5"],
+        "knn_precision_at_1": knn_m["precision_at_1"],
+        "null_spearman": null_m["spearman"], "null_ndcg_at_5": null_m["ndcg_at_5"],
+        "beats_knn_spearman": bool(model_m["spearman"] > knn_m["spearman"]),
+        "beats_knn_ndcg5": bool(model_m["ndcg_at_5"] > knn_m["ndcg_at_5"]),
     }
+    return {"flat": flat, "comparison": {"model": model_m, "chem_knn": knn_m,
+                                         "chem_null": null_m}, "per_org": per_org}

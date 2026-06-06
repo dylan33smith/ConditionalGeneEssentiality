@@ -41,22 +41,37 @@ def main(cfg: DictConfig) -> None:
 
     log.info("[2/3] training %d arm(s) × %d seed(s)", len(arms), len(seeds))
     results = []
+    comparisons = []
     for arm in arms:
         for seed in seeds:
             log.info("──── arm=%s seed=%d ────", arm, seed)
             res = train_r1_arm(arm, data, seed=seed, epochs=epochs)
-            per_org = res.pop("per_org")
-            per_org.to_csv(OUT / f"per_org_{arm}_s{seed}.csv", index=False)
-            results.append(res)
-            log.info("    arm=%s seed=%d  model Spearman=%.4f [%.4f,%.4f]  "
-                     "NDCG@5=%.4f  | chem-null=%.4f  chem-kNN=%.4f",
-                     arm, seed, res["model_spearman"], res["model_spearman_ci"][0],
-                     res["model_spearman_ci"][1], res["model_ndcg_at_5"],
-                     res["baseline_chem_null_spearman"], res["baseline_chem_knn_spearman"])
+            res["per_org"].to_csv(OUT / f"per_org_{arm}_s{seed}.csv", index=False)
+            results.append(res["flat"])
+
+            # side-by-side: model vs chem-kNN vs chem-NULL on the SAME genes
+            comp = res["comparison"]
+            for method in ("model", "chem_knn", "chem_null"):
+                m = comp[method]
+                comparisons.append({"arm": arm, "seed": seed, "method": method,
+                                    "spearman": m["spearman"], "kendall": m["kendall"],
+                                    "ndcg_at_1": m["ndcg_at_1"], "ndcg_at_3": m["ndcg_at_3"],
+                                    "ndcg_at_5": m["ndcg_at_5"],
+                                    "precision_at_1": m["precision_at_1"],
+                                    "precision_at_3": m["precision_at_3"],
+                                    "precision_at_5": m["precision_at_5"],
+                                    "n_genes": m["n_genes"]})
+            cmp_df = pd.DataFrame([c for c in comparisons
+                                   if c["arm"] == arm and c["seed"] == seed])
+            log.info("    SIDE-BY-SIDE (arm=%s seed=%d, same %d genes):\n%s",
+                     arm, seed, comp["model"]["n_genes"],
+                     cmp_df[["method", "spearman", "ndcg_at_1", "ndcg_at_3",
+                             "ndcg_at_5", "precision_at_5"]].to_string(index=False))
 
     df = pd.DataFrame(results)
     df.to_csv(OUT / "r1_results.csv", index=False)
-    log.info("[3/3] DONE. results:\n%s",
+    pd.DataFrame(comparisons).to_csv(OUT / "r1_metric_comparison.csv", index=False)
+    log.info("[3/3] DONE. headline:\n%s",
              df[["arm", "seed", "model_spearman", "model_ndcg_at_5",
-                 "baseline_chem_knn_spearman"]].to_string(index=False))
-    log.info("artifacts in %s", OUT)
+                 "knn_ndcg_at_5", "beats_knn_spearman", "beats_knn_ndcg5"]].to_string(index=False))
+    log.info("artifacts in %s (r1_results.csv + r1_metric_comparison.csv)", OUT)
