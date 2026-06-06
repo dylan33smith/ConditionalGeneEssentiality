@@ -67,6 +67,9 @@ def main(cfg: DictConfig) -> None:
                      arm, seed, comp["model"]["n_genes"],
                      cmp_df[["method", "spearman", "ndcg_at_1", "ndcg_at_3",
                              "ndcg_at_5", "precision_at_5"]].to_string(index=False))
+            # write incrementally so partial sweep results are available
+            pd.DataFrame(results).to_csv(OUT / "r1_results.csv", index=False)
+            pd.DataFrame(comparisons).to_csv(OUT / "r1_metric_comparison.csv", index=False)
 
     df = pd.DataFrame(results)
     df.to_csv(OUT / "r1_results.csv", index=False)
