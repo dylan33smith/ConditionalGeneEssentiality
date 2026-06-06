@@ -338,6 +338,7 @@ def chemistry_knn_predict(
     train_df: pd.DataFrame, val_df: pd.DataFrame,
     cond_features: dict[str, np.ndarray], *, k: int = 5,
     gene_col="gene_key", condition_col="condition_key", fit_col="fit",
+    exclude_self: bool = False,
 ) -> pd.Series:
     """Primary competitive baseline: predict a val gene g's fit at held-out
     condition c from g's OWN train fit at its k chemically-nearest TRAIN
@@ -345,6 +346,11 @@ def chemistry_knn_predict(
 
     Vectorized: loops only over val CONDITIONS (few hundred), not val rows
     (millions). Builds a gene×val_condition prediction matrix, then fancy-indexes.
+
+    exclude_self: when True, if a val condition_key also exists in the TRAIN
+        condition vocabulary, that exact condition is removed from its own
+        neighbor set before taking the k nearest. This enables LEAVE-ONE-OUT
+        kNN (call with val_df == train_df to get an honest train-side target).
     """
     train_conds = [c for c in train_df[condition_col].unique() if c in cond_features]
     val_conds = [c for c in val_df[condition_col].unique() if c in cond_features]
@@ -353,6 +359,13 @@ def chemistry_knn_predict(
     tfeat = np.vstack([cond_features[c] for c in train_conds])
     vfeat = np.vstack([cond_features[c] for c in val_conds])
     dist = _cosine_dist_matrix(vfeat, tfeat)                 # [n_val_cond, n_train_cond]
+    if exclude_self:
+        # mask the exact same condition (by key) so it cannot be its own neighbor
+        train_cond_to_j = {c: j for j, c in enumerate(train_conds)}
+        for i, vc in enumerate(val_conds):
+            j = train_cond_to_j.get(vc)
+            if j is not None:
+                dist[i, j] = np.inf
     knn_idx = np.argsort(dist, axis=1)[:, :k]                # [n_val_cond, k]
 
     # gene × train_condition mean-fit matrix (NaN where gene lacks a condition)
@@ -379,6 +392,100 @@ def chemistry_knn_predict(
     valid = ~pd.isna(g_rows) & ~pd.isna(c_cols)
     preds[valid] = P[g_rows[valid].astype(int), c_cols[valid].astype(int)]
     return pd.Series(preds, index=val_df.index)
+
+
+# ===========================================================================
+# RETRIEVAL FEATURES  (gene g's k nearest train-condition fits + similarities)
+# ===========================================================================
+
+def chemistry_retrieval_features(
+    train_df: pd.DataFrame, query_df: pd.DataFrame,
+    cond_features: dict[str, np.ndarray], *, k: int = 5,
+    gene_col="gene_key", condition_col="condition_key", fit_col="fit",
+    exclude_self: bool = False,
+) -> np.ndarray:
+    """Per-row retrieval features: for each (gene g, condition c) in query_df,
+    retrieve gene g's fits at its k chemically-nearest TRAIN conditions and the
+    cosine similarities to those train conditions.
+
+    Returns a [len(query_df), 2*k + 2] float32 array per row:
+      [ neighbor_fit_0 .. neighbor_fit_{k-1},          # g's fit at the k neighbors
+        sim_0 .. sim_{k-1},                            # cosine sim query<->neighbor
+        weighted_mean_fit,                             # sim-weighted mean of fits
+        n_valid_neighbors / k ]                        # coverage (how many of g's
+                                                       #   k neighbors g actually has)
+    Missing neighbor fits (gene g has no train row at that condition) are imputed
+    with 0.0 in the per-slot fit columns and EXCLUDED from the weighted mean /
+    coverage. This is the kNN "evidence" handed to a learned model.
+
+    exclude_self mirrors chemistry_knn_predict: for a train-side query, exclude
+    the exact same condition_key from its own neighbor set (leave-one-out).
+    No val leakage: neighbors are always drawn from TRAIN conditions only.
+    """
+    train_conds = [c for c in train_df[condition_col].unique() if c in cond_features]
+    n_out = 2 * k + 2
+    if not train_conds:
+        return np.zeros((len(query_df), n_out), dtype=np.float32)
+    q_all = list(query_df[condition_col].unique())
+    q_conds = [c for c in q_all if c in cond_features]
+    tfeat = np.vstack([cond_features[c] for c in train_conds])
+    qfeat = np.vstack([cond_features[c] for c in q_conds]) if q_conds else None
+
+    train_cond_to_j = {c: j for j, c in enumerate(train_conds)}
+    # gene × train_condition mean-fit matrix (NaN where gene lacks a condition)
+    train_lookup = (train_df.groupby([gene_col, condition_col])[fit_col]
+                    .mean().unstack().reindex(columns=train_conds))
+    train_mat = train_lookup.to_numpy(dtype=float)            # [n_genes, n_train_cond]
+    gene_to_row = {g: i for i, g in enumerate(train_lookup.index)}
+
+    out = np.zeros((len(query_df), n_out), dtype=np.float32)
+    if qfeat is None:
+        return out
+
+    # Per query-condition: indices + similarities of its k nearest train conds.
+    # Build padded [n_q_cond, k] index/sim arrays (pad with -1 / 0 when < k conds).
+    dist = _cosine_dist_matrix(qfeat, tfeat)                  # [n_q_cond, n_train_cond]
+    sim_full = 1.0 - dist
+    if exclude_self:
+        for i, qc in enumerate(q_conds):
+            j = train_cond_to_j.get(qc)
+            if j is not None:
+                dist[i, j] = np.inf
+    kk = min(k, dist.shape[1])
+    nn = np.argsort(dist, axis=1)[:, :kk]                     # [n_q_cond, kk]
+    cond_idx = np.full((len(q_conds), k), -1, dtype=np.int64)
+    cond_sim = np.zeros((len(q_conds), k), dtype=np.float32)
+    cond_idx[:, :kk] = nn
+    cond_sim[:, :kk] = np.take_along_axis(sim_full, nn, axis=1)
+    q_cond_to_i = {c: i for i, c in enumerate(q_conds)}
+
+    # Map each query ROW to its gene row + query-condition row (vectorized).
+    g_rows = query_df[gene_col].map(gene_to_row).to_numpy()
+    qc_rows = query_df[condition_col].map(q_cond_to_i).to_numpy()
+    valid_row = ~pd.isna(g_rows) & ~pd.isna(qc_rows)
+    if not valid_row.any():
+        return out
+    gr = g_rows[valid_row].astype(np.int64)                  # [m]
+    qi = qc_rows[valid_row].astype(np.int64)                 # [m]
+    nb_idx = cond_idx[qi]                                    # [m, k]
+    nb_sim = cond_sim[qi]                                    # [m, k]
+    slot_present = nb_idx >= 0                                # padded slots are -1
+    safe_idx = np.where(slot_present, nb_idx, 0)
+    fits = train_mat[gr[:, None], safe_idx]                  # [m, k] (NaN where g lacks cond)
+    fit_present = slot_present & ~np.isnan(fits)
+    fits_filled = np.where(np.isnan(fits), 0.0, fits)
+
+    m_block = np.zeros((gr.shape[0], n_out), dtype=np.float32)
+    m_block[:, :k] = np.where(slot_present, fits_filled, 0.0)
+    m_block[:, k:2 * k] = np.where(slot_present, nb_sim, 0.0)
+    w = np.where(fit_present, np.clip(nb_sim, 0.0, None), 0.0)
+    wsum = w.sum(axis=1)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        wmean = np.where(wsum > 1e-9, (w * fits_filled).sum(axis=1) / wsum, 0.0)
+    m_block[:, 2 * k] = wmean
+    m_block[:, 2 * k + 1] = fit_present.sum(axis=1) / k
+    out[valid_row] = m_block
+    return out
 
 
 # ===========================================================================
