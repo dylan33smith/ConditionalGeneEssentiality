@@ -145,12 +145,20 @@ noise_floor:
 # ---------------------------------------------------------------------------
 reference_baselines_all_org:                # method: [spearman, ndcg@1, ndcg@3, ndcg@5, prec@1, prec@5]
   chem_null:   [0.016, 0.222, 0.265, 0.310, 0.051, 0.268]   # floor (n=54,593)
-  chem_knn:    [0.222, 0.377, 0.431, 0.481, 0.142, 0.446]   # STRONG bar (n=45,769)
+  linear_mf:   [0.128, 0.287, 0.330, 0.384, null,  0.327]   # bilinear inductive MF (n=54,545)
+  model_multihot_r1: [0.130, 0.310, null, 0.422, null, 0.392]  # R1 deep model (reference)
+  chem_knn:    [0.222, 0.377, 0.431, 0.481, 0.142, 0.446]   # STRONG bar / GATE (n=45,769)
   noise_floor: [0.393, 0.558, 0.609, 0.658, 0.335, 0.604]   # ceiling (n=45,943)
   note: |
-    NDCG >> Spearman everywhere (e.g. kNN Spearman 0.222 but NDCG@5 0.481):
-    agreement is much stronger at the TOP of the list than across the full list.
-    Even replicates only reach NDCG@5 0.658 — that's the real top-5 ceiling.
+    KEY FINDING (2026-06-06): linear inductive-MF (0.128 Spearman / 0.384 NDCG@5)
+    is statistically indistinguishable from the deep model (0.130 / 0.422) — the
+    deep model's NONLINEARITY buys ~nothing over a bilinear feature factorization.
+    BOTH global parametric models lose to the non-parametric chem-kNN (0.485).
+    => the bottleneck is NOT model capacity/expressiveness; it is the OBJECTIVE
+    (pointwise MSE for a ranking task) and/or the local-vs-global nature of the
+    signal (kNN exploits gene-specific chemical-neighborhoods directly). Strongly
+    supports R-LOSS-before-R2.
+    NDCG >> Spearman everywhere (top-of-list agreement is stronger than full-list).
     Denominator caveat: each method scored on the genes it could cover; the
     model-vs-baseline promotion comparison uses the COMMON gene set per run.
 
