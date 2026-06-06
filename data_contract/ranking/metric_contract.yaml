@@ -194,8 +194,14 @@ promotion:
   applies_to: [ndcg_at_5, within_gene_spearman_mean]   # retrieval-primary + completeness
   no_regression: within_gene_kendall_mean # must not regress
   baseline_gate: required                 # primary split: beat chemistry_nearest_condition_profile
-  must_beat_competitive: [chemistry_knn]  # primary split (NOT matrix_factorization — cold columns)
-  # matrix_factorization is the gate on the cell_holdout DIAGNOSTIC only.
+  must_beat_competitive: [chemistry_knn]  # HARD GATE (R1-DEC-001, approved 2026-06-06):
+  # chemistry_knn (NDCG@5 0.485 / Spearman 0.240, all-org) is the bar every
+  # R-tier model MUST clear — R1 showed the locked deep model loses to this
+  # non-parametric gene-specific lookup. A model that does not beat chem-kNN on
+  # NDCG@5 is ineligible for promotion. matrix_factorization (vanilla CF) is NOT
+  # a primary-split baseline (cold columns); it gates the cell_holdout diagnostic
+  # only. A LINEAR INDUCTIVE-MF baseline (U[g]·W·x[c], chemistry features) DOES
+  # apply on the primary split and should be added (see R1-DEC-001 / next_action).
   # Multiple-comparison control across arms within a tier and across tiers:
   multiple_comparison:
     within_tier: benjamini_hochberg       # FDR across the tier's arms (R1: 6 arms, etc.)
