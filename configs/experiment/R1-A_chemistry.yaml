@@ -16,14 +16,18 @@ experiment:
   hypothesis: H-R-CHEM-01
   arms:
     - chemistry: multihot_425
-    # - chemistry: morgan_2048        # enable once fingerprint arm is wired
-    # - chemistry: rdkit_2048
-    # - chemistry: maccs_167
-    # - chemistry: morgan_plus_multihot
-    # - chemistry: maccs_plus_multihot
+    - chemistry: morgan_2048
+    - chemistry: rdkit_2048
+    - chemistry: maccs_167
+    - chemistry: morgan_plus_multihot
+    - chemistry: maccs_plus_multihot
   seeds: [0, 1, 2]
   epochs: 8
-  # orgs: null  -> all replicate orgs (promotion). Dev smoke overrides to [Keio].
+  # 23 replicate orgs — matches the all-org reference table (noise floor + kNN
+  # defined here). Dev smoke overrides orgs to [Keio].
+  orgs: [ANA3, BFirm, Btheta, Burk376, Caulo, Cola, Cup4G11, Dda3937, Ddia6719,
+         DdiaME23, Dino, DvH, Dyella79, HerbieS, Kang, Keio, Korea, Koxy, MR1,
+         Marino, Methanococcus_JJ, Methanococcus_S2, Miya]
   promotion_rule:
     primary: [ndcg_at_5, within_gene_spearman]
     must_beat: [chemistry_knn]

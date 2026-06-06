@@ -52,6 +52,7 @@ class R1Data:
     exp_to_row: dict
     cond_features: dict           # condition_key -> multihot vec (for baselines)
     eligible_val_genes: set
+    fp_bundle: dict               # experiment fingerprint bundle (morgan/rdkit/maccs)
 
 
 def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
@@ -104,28 +105,62 @@ def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
         cache_dir=Path("artifacts/cache/r1") / ("_".join(orgs) if orgs else "full"),
     )
     cond_features = load_condition_chemistry_features(orgs=orgs)
+    from src.experiments.tier6._t6_common import load_experiment_fingerprints
+    fp_bundle = load_experiment_fingerprints()
 
     return R1Data(train, val, val_raw, emb, gene_to_row, multihot, exp_to_row,
-                  cond_features, elig_val)
+                  cond_features, elig_val, fp_bundle)
 
 
 # ---------------------------------------------------------------------------
 # Chemistry per arm
 # ---------------------------------------------------------------------------
 
+def _multihot_rows(exp_ids: np.ndarray, data: R1Data) -> np.ndarray:
+    rows = np.array([data.exp_to_row.get(e, -1) for e in exp_ids])
+    out = np.zeros((len(exp_ids), data.multihot.shape[1]), dtype=np.float32)
+    valid = rows >= 0
+    out[valid] = data.multihot[rows[valid]].toarray()
+    out[out != 0] = 1.0
+    return out
+
+
+def _fp_rows(exp_ids: np.ndarray, data: R1Data, key: str) -> np.ndarray:
+    """Per-row fingerprint matrix for a bundle key (morgan/rdkit/maccs_mean).
+
+    Missing experiments (not in the fingerprint bundle) get a zero row.
+    """
+    mat = data.fp_bundle[key]
+    e2r = data.fp_bundle["exp_to_row"]
+    out = np.zeros((len(exp_ids), mat.shape[1]), dtype=np.float32)
+    for i, e in enumerate(exp_ids):
+        r = e2r.get(e)
+        if r is not None:
+            out[i] = mat[r]
+    return out
+
+
 def chem_matrix_for_rows(arm: str, exp_ids: np.ndarray, data: R1Data) -> np.ndarray:
     """Dense chemistry features for a list of experiment_ids, per arm.
 
-    R1-A arm 'multihot_425' is implemented here; fingerprint arms reuse the
-    T6 fingerprint bundle (left as a follow-up — multihot is the control and
-    suffices for the integration smoke + the headline comparison)."""
+    Arms (match R1-A_chemistry.yaml / T6-A): multihot_425, morgan_2048,
+    rdkit_2048, maccs_167, morgan_plus_multihot, maccs_plus_multihot.
+    """
     if arm == "multihot_425":
-        rows = np.array([data.exp_to_row.get(e, -1) for e in exp_ids])
-        out = np.zeros((len(exp_ids), data.multihot.shape[1]), dtype=np.float32)
-        valid = rows >= 0
-        out[valid] = data.multihot[rows[valid]].toarray()
-        return out
-    raise NotImplementedError(f"arm {arm!r} not wired yet (multihot_425 available)")
+        return _multihot_rows(exp_ids, data)
+    if arm == "morgan_2048":
+        return _fp_rows(exp_ids, data, "morgan_mean")
+    if arm == "rdkit_2048":
+        return _fp_rows(exp_ids, data, "rdkit_mean")
+    if arm == "maccs_167":
+        return _fp_rows(exp_ids, data, "maccs_mean")
+    if arm == "morgan_plus_multihot":
+        return np.concatenate([_fp_rows(exp_ids, data, "morgan_mean"),
+                               _multihot_rows(exp_ids, data)], axis=1)
+    if arm == "maccs_plus_multihot":
+        return np.concatenate([_fp_rows(exp_ids, data, "maccs_mean"),
+                               _multihot_rows(exp_ids, data)], axis=1)
+    raise ValueError(f"unknown chemistry arm: {arm!r}")
 
 
 # ---------------------------------------------------------------------------
@@ -144,18 +179,25 @@ def train_r1_arm(arm: str, data: R1Data, *, seed: int = 0, epochs: int = 8,
     # Build train arrays (drop genes missing an embedding)
     tr = data.train[data.train["gene_key"].isin(data.gene_to_row)].copy()
     g_row = tr["gene_key"].map(data.gene_to_row).to_numpy()
-    chem = chem_matrix_for_rows(arm, tr["experiment_id"].to_numpy(), data)
     y = tr["fit"].to_numpy(np.float32)
     w = tr["w_g"].to_numpy(np.float32)
 
+    # MEMORY-SAFE chemistry: build a small per-experiment matrix and gather per
+    # batch (materializing per-row chem for ~11M rows × 2048 dims would be ~90GB).
+    uexp = pd.unique(tr["experiment_id"])
+    exp_chem = chem_matrix_for_rows(arm, uexp, data)          # [n_uexp, chem_dim]
+    exp_to_i = {e: i for i, e in enumerate(uexp)}
+    row_exp = tr["experiment_id"].map(exp_to_i).to_numpy()
+
     emb_t = torch.tensor(data.emb, dtype=torch.float32, device=dev)
+    exp_chem_t = torch.tensor(exp_chem, dtype=torch.float32, device=dev)
     g_row_t = torch.tensor(g_row, dtype=torch.long, device=dev)
-    chem_t = torch.tensor(chem, dtype=torch.float32, device=dev)
+    row_exp_t = torch.tensor(row_exp, dtype=torch.long, device=dev)
     y_t = torch.tensor(y, device=dev)
     w_t = torch.tensor(w, device=dev)
 
     model = AdapterResidualMLP(
-        gene_dim=data.emb.shape[1], chem_dim=chem.shape[1], hidden_dim=512,
+        gene_dim=data.emb.shape[1], chem_dim=exp_chem.shape[1], hidden_dim=512,
         n_blocks=1, dropout=0.1, adapter_hidden=1024, adapter_out=512,
         adapter_n_hidden_layers=1, adapter_layernorm=False).to(dev)
     opt = torch.optim.Adam(model.parameters(), lr=lr)
@@ -167,7 +209,8 @@ def train_r1_arm(arm: str, data: R1Data, *, seed: int = 0, epochs: int = 8,
         perm = torch.randperm(n, device=dev)
         for i in range(0, n, batch_size):
             idx = perm[i:i + batch_size]
-            pred = model(emb_t[g_row_t[idx]], chem_t[idx]).squeeze(-1)
+            chem_b = exp_chem_t[row_exp_t[idx]]
+            pred = model(emb_t[g_row_t[idx]], chem_b).squeeze(-1)
             wse = (w_t[idx] * (pred - y_t[idx]) ** 2).sum() / w_t[idx].sum().clamp_min(1e-6)
             opt.zero_grad(); wse.backward(); opt.step()
         sp = _val_spearman(model, data, arm, dev)
@@ -185,15 +228,21 @@ def _predict_val(model, data: R1Data, arm: str, dev) -> pd.DataFrame:
     v = data.val[data.val["gene_key"].isin(data.gene_to_row)].copy()
     g_row = torch.tensor(v["gene_key"].map(data.gene_to_row).to_numpy(),
                          dtype=torch.long, device=dev)
-    chem = torch.tensor(chem_matrix_for_rows(arm, v["experiment_id"].to_numpy(), data),
-                        dtype=torch.float32, device=dev)
+    # gather chem per batch from a small per-experiment matrix (memory-safe)
+    uexp = pd.unique(v["experiment_id"])
+    exp_chem = chem_matrix_for_rows(arm, uexp, data)
+    exp_to_i = {e: i for i, e in enumerate(uexp)}
+    row_exp = torch.tensor(v["experiment_id"].map(exp_to_i).to_numpy(),
+                           dtype=torch.long, device=dev)
+    exp_chem_t = torch.tensor(exp_chem, dtype=torch.float32, device=dev)
     emb_t = torch.tensor(data.emb, dtype=torch.float32, device=dev)
     model.eval()
     with torch.no_grad():
         preds = []
         for i in range(0, len(v), 16384):
             sl = slice(i, i + 16384)
-            preds.append(model(emb_t[g_row[sl]], chem[sl]).squeeze(-1).cpu().numpy())
+            chem_b = exp_chem_t[row_exp[sl]]
+            preds.append(model(emb_t[g_row[sl]], chem_b).squeeze(-1).cpu().numpy())
     v["pred"] = np.concatenate(preds)
     return v
 
