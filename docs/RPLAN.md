@@ -25,12 +25,16 @@ the ranking objective will change the answer. See §10 for the carry-over table.
 ## 1. Pipeline shape
 
 ```
-R0  →  R-LOCK-{1,2}  →  R-LOCK-{3,4}  →  R1  →  R-LOSS  →  R2  →  R1-revisit  →  R3+
-       (parallel)        (depend on 1,2)   ✓     (next)
-# Ordering updated 2026-06-06 (R1-DEC-001 approved): R-LOSS promoted ahead of R2.
-# R1 showed all encoders cluster + lose to chem-kNN under pointwise MSE — the
-# objective mismatch (MSE for a ranking metric) is the most fundamental lever, so
-# fix the LOSS before fusion. R1-revisit (re-test chemistry) runs after both.
+R0  →  R-LOCK-{1,2}  →  R-LOCK-{3,4}  →  R1  →  R-LOSS  →  R-HYBRID  →  (R1-revisit)
+       (parallel)        (depend on 1,2)   ✓      ✓        (next)
+# Ordering updated 2026-06-06 (R1-DEC-001, R-LOSS-DEC-001 approved):
+#   R1 (encoder) and R-LOSS (objective) BOTH rejected — no parametric model beats
+#   the LOCAL chem-kNN gate (0.485). Capacity also failed (linear-MF ≈ deep model).
+#   => bottleneck is LOCAL-vs-GLOBAL, not encoder/objective/capacity.
+#   R2 (fusion) DEMOTED — another capacity lever, low expected value.
+#   NeuralNDCG SKIPPED — lambdarank already optimized NDCG directly and lost.
+#   PIVOT to R-HYBRID: combine the global parametric model with the local kNN
+#   (residual/retrieval/attention), which is the lever the evidence points to.
 ```
 
 | Phase | Concern | Output | Depends on |
@@ -41,9 +45,11 @@ R0  →  R-LOCK-{1,2}  →  R-LOCK-{3,4}  →  R1  →  R-LOSS  →  R2  →  R1
 | **R-LOCK-3** | `RankingBatch` contract + default sampler mode + run-manifest v2 | `src/data/datasets/ranking_batch.py`, `data_contract/schemas/run_manifest_v2.schema.json` | R-LOCK-1, R-LOCK-2 |
 | **R-LOCK-4** | Primary metric + ranking baseline + noise-floor protocol | `data_contract/ranking/metric_contract.yaml` | R-LOCK-1, R-LOCK-2 |
 | **R1** | Representation retest — chemistry encoder (fingerprints vs multihot) under ranking | **COMPLETE (provisional, R1-DEC-001):** no_winner; multihot carried forward; fingerprints DEFERRED to R1-revisit. No arm beat chem-kNN. | R-LOCK-{1..4} |
-| **R2** | Architecture retest — fusion topology under ranking (multihot held constant) | locked fusion for R-regime | R1 |
-| **R3+** | R-LOSS (loss family), R-CAP (capacity), R-EMB (embedding), R-COND (condition-discriminability weighting), R-SAMPLE (org-balanced sampling), R-META (metadata features: temp/pH/expGroup), R-SNR (SNR-based eligibility), R-CURRIC (iterative pseudo-labeling) — one axis per tier, run as needed | tier-specific | R2 |
-| **R1-revisit** | Re-run the 6 chemistry arms under the R2+R-LOSS winning architecture+loss; finalize the encoder. R1 was confounded by MSE+T5-A. | final chemistry encoder | R2, R-LOSS |
+| **R-LOSS** | Loss family under ranking | **COMPLETE (R-LOSS-DEC-001):** no_winner; Huber > MSE (carried); ranking losses rejected; nothing beats chem-kNN. | R1 |
+| **R-HYBRID** | **NEXT.** Combine the global parametric model with the local chem-kNN — residual correction / retrieval-augmentation / learned ensemble — the lever R1+R-LOSS evidence points to. Paired with the cold-gene diagnostic to decompose memorization vs learned generalization. | hybrid model + memorization-vs-generalization decomposition | R-LOSS |
+| **R2 (DEMOTED)** | Fusion topology — another capacity lever; LOW expected value (capacity already failed in R1). Run only if R-HYBRID implicates architecture. | — | — |
+| **R3+** | R-CAP, R-EMB (esp. fitness-aware/fine-tuned embeddings — the frozen embedding is a prime suspect), R-COND, R-SAMPLE, R-META, R-SNR, R-CURRIC — run as needed | tier-specific | R-HYBRID |
+| **R1-revisit** | Re-run the 6 chemistry arms under the final architecture; finalize the encoder. | final chemistry encoder | R-HYBRID |
 
 **Confound note (R1-DEC-001):** R1 tested the chemistry encoder while holding
 fusion (T5-A) and loss (pointwise MSE) fixed at suspected-suboptimal values.
