@@ -1,0 +1,23 @@
+# @package _global_
+# R-CONF — measurement-confidence characterization (idea 1). NOT a promotion gate.
+#
+# Uses abs_t (Wetmore-et-al-2015 moderated t, already in the canonical data) as a
+# per-cell label-confidence signal to ask: how much of the model-vs-chem-kNN gap
+# and the gap to the replicate ceiling is imposed by label NOISE vs structure?
+#   1. confidence-stratified eval: bin eligible val genes by median abs_t, score
+#      model/kNN/null + the replicate ceiling per stratum.
+#   2. t-weighted training: retrain the locked base with loss weight w_g*f(abs_t).
+# Architecture (T5-A) + encoder (multihot_425) + loss (Huber) held at locked base.
+
+experiment_id: R-CONF_confidence_strat
+stage_or_tier: R-CONF
+regime: R
+
+experiment:
+  hypothesis: H-R-CONF-01      # label noise masks model signal / explains the gap
+  seeds: [0, 1, 2]
+  epochs: 8
+  n_strata: 4
+  orgs: [ANA3, BFirm, Btheta, Burk376, Caulo, Cola, Cup4G11, Dda3937, Ddia6719,
+         DdiaME23, Dino, DvH, Dyella79, HerbieS, Kang, Keio, Korea, Koxy, MR1,
+         Marino, Methanococcus_JJ, Methanococcus_S2, Miya]
