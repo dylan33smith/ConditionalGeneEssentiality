@@ -5,7 +5,8 @@ questions* we have asked and answered — not by gate/stage/tier. Read this to
 understand what is durably established, the mechanisms behind each result, and
 the strategic fork we now face (esp. the fitness-aware-embedding decision).
 
-**Last updated:** 2026-06-06 (after R1-DEC-001 + R-LOSS-DEC-001).
+**Last updated:** 2026-06-06 (after R-HYBRID-A + R-HYBRID-B; modeling thread
+concluded, characterization scope adopted — R-HYBRID-DEC-002 approved).
 
 For the operational pipeline and per-decision detail see `docs/REFACTORPLAN.md`
 (T-regime), `docs/RPLAN.md` (R-regime), and `research_log/decisions/`.
@@ -185,21 +186,55 @@ near-intractable.
 
 ---
 
-## 7. The strategic fork
+## 7. R-HYBRID resolved the fork: the hybrid does NOT beat kNN
 
-| Path | What it is | Upside | Risk / cost | Evidence-based prior |
-|---|---|---|---|---|
-| **R-HYBRID** | Global model + local kNN (residual / retrieval / ensemble) on the WARM task; fix kNN's sparse-neighborhood & cross-gene blind spots | Beat the 0.485 lookup → a real model contribution | Cheap, reuses everything | The only path with a clear positive-result mechanism |
-| **Characterization** | No new modeling; publish the rigorous negative: memorization-dominated task, strong-baseline benchmark, why learned models don't win | Honest, credible (pre-registration), publishable at a benchmark/methods venue | Low effort; modest contribution | Already largely supported by current results |
-| **R-EMB (fitness-aware embedding)** | Fine-tune / jointly-learn an inductive fitness-aware gene representation | Could move cold-gene/cold-org off the floor (transferable biology) | High effort; biggest lift | linear-MF says it won't help warm; cold prior discouraging (T-stage 0.045) |
+We ran R-HYBRID in two rounds on the warm task. **Both failed to beat the
+chem-kNN gate by a promotable margin**, and the second round — three orthogonal
+*learned* fusions — converged on ≈ 0, which is the decisive evidence.
 
-**Recommended order:** **R-HYBRID first** — cheapest, decisive, and the only
-path with a positive-result mechanism. If it beats kNN, that is the contribution.
-If it merely ties kNN, that is strong evidence the task is pure lookup, which
-(a) makes the **characterization** paper the honest scope, and (b) tells us a
-global model isn't the answer — at which point the **embedding moonshot** (R-EMB)
-is the only remaining lever, to be entered with eyes open about its cold-regime
-prior.
+- **R-HYBRID-A (static z-score ensemble; R-HYBRID-DEC-001).** A fixed convex
+  combination `α·z(kNN)+(1−α)·z(model)` with honest held-out α-selection gave
+  +0.008 NDCG@5 over kNN — real complementary signal, but **below** the ~0.026
+  promotion delta. First thing to edge past kNN, but not promotable.
+- **R-HYBRID-B (three learned hybrids; R-HYBRID-DEC-002, approved).** Residual,
+  retrieval-augmented, and learned-gating models, full 23-org eval, 3 seeds,
+  denominator parity:
+
+  | model | Δ NDCG@5 | Δ Spearman | honest held-out Δ NDCG@5 |
+  |---|---|---|---|
+  | residual | +0.0002 | −0.0049 | +0.0009 |
+  | retrieval-augmented | −0.0059 | −0.0109 | −0.0057 |
+  | learned gating | −0.0081 | −0.0181 | −0.0081 |
+
+  The learned hybrids extracted **less** complementary signal than the crude
+  static ensemble. The best (residual) is a statistical tie that **sign-flips
+  across seeds** (+0.0048 / −0.0076 / +0.0033) — within split-noise, not a
+  stable gain. Learned gating settled at mean α ≈ 0.46 but every bit of weight
+  it placed on the model *hurt*: the data says "trust the lookup." (A Keio-only
+  dev run gave residual a misleading +0.042 that vanished on full multi-org
+  eval — the known single-org-ceiling artifact.)
+
+**Conclusion.** Three orthogonal fusion designs converging on ≈ 0, on top of the
+earlier encoder (R1), capacity, and objective (R-LOSS) sweeps all failing, is
+strong evidence the chem-kNN ceiling is **real, not a fusion-design artifact**.
+A global model — alone or hybridized — adds nothing promotable over local lookup
+on the warm task.
+
+### Remaining paths
+
+| Path | What it is | Status |
+|---|---|---|
+| **Characterization (ADOPTED)** | Publish the rigorous negative: memorization-dominated task, strong-baseline benchmark, pre-registered evidence that learned global models don't beat chemistry-similarity lookup | **This is the scope.** Already supported by R1 + capacity + R-LOSS + R-HYBRID-A/B. |
+| Cold-gene diagnostic | Quantify how far chem-kNN degrades on unseen genes — the one regime a global model could in principle help — to bound the value of any future modeling | Optional, characterization (not a gate). The next concrete measurement. |
+| R-EMB (fitness-aware embedding) | Fine-tune / jointly-learn an inductive fitness-aware gene representation | Deferred. linear-MF shows it won't help warm; its only target (cold transfer) has a discouraging prior (T-stage 0.045). Eyes-open moonshot only. |
+
+**The decision (2026-06-06):** the modeling thread is concluded. The honest,
+publishable result is the rigorous negative — a pre-registered benchmark showing
+the within-org conditional-essentiality ranking task is memorization-dominated,
+with a simple chemistry-similarity lookup as the strong baseline that learned
+global models (across encoders, objectives, capacities, and frozen *and*
+learned-fitness-aware representations, alone *and* hybridized with the lookup)
+cannot surpass.
 
 **What the cold-gene split is for (corrected framing):** it is a *diagnostic*,
 not a target. chem-kNN vanishes on cold genes, so the split measures the

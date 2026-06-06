@@ -6,7 +6,8 @@
 - regime: R
 - date: 2026-06-06
 - owner: project lead
-- status: proposed
+- status: approved
+- approved_date: 2026-06-06
 - related_experiments: [R-HYBRID-B residual / retrieval-augmented / learned-gating]
 - related_hypotheses: [H-R-HYBRID-01]
 - supersedes: none (extends R-HYBRID-DEC-001)
