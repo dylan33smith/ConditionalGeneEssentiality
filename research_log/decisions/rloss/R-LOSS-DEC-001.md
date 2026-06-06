@@ -6,7 +6,8 @@
 - regime: R
 - date: 2026-06-06
 - owner: project lead
-- status: proposed
+- status: approved
+- approved_date: 2026-06-06
 - related_experiments: [R-LOSS_loss_family]
 - related_hypotheses: [H-R-LOSS-01]
 
