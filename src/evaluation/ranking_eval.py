@@ -13,6 +13,11 @@ Implements `data_contract/ranking/metric_contract.yaml` (contract_id r_lock_4_v2
   BASELINES (split-specific; primary split has COLD columns — see §2.2.1):
     - chemistry_nearest_condition_profile   (cold-condition null gate)
     - chemistry_knn_predict                 (primary competitive baseline)
+    - inductive_mf_predict                  (LINEAR inductive matrix factorization:
+        Fit[g,c] = U[g]·(W·x[c]) + b[g]; free per-gene latents (warm rows) +
+        chemistry-feature condition factors (handles COLD columns). The honest
+        "matrix factorization" baseline for this cold-start setup — tests whether
+        the deep model's nonlinearity buys anything over a bilinear feature MF.)
   REPORTING:
     - per_organism_breakdown
 
@@ -374,6 +379,89 @@ def chemistry_knn_predict(
     valid = ~pd.isna(g_rows) & ~pd.isna(c_cols)
     preds[valid] = P[g_rows[valid].astype(int), c_cols[valid].astype(int)]
     return pd.Series(preds, index=val_df.index)
+
+
+# ===========================================================================
+# LINEAR INDUCTIVE MATRIX FACTORIZATION  (the cold-column "MF" baseline)
+# ===========================================================================
+
+def inductive_mf_predict(
+    train_df: pd.DataFrame, val_df: pd.DataFrame,
+    cond_features: dict[str, np.ndarray], *,
+    rank: int = 32, epochs: int = 20, lr: float = 0.05,
+    weight_decay: float = 1e-5, batch_size: int = 65536,
+    gene_col="gene_key", condition_col="condition_key", fit_col="fit",
+    weight_col: str | None = None, seed: int = 0, device: str | None = None,
+) -> pd.Series:
+    """Linear inductive matrix factorization for cold-start columns.
+
+    Model:  Fit[g, c] ≈ U[g] · (W · x[c]) + b[g]
+      - U[g] : free per-gene latent (rank r). Genes are warm (all seen) so free
+               row factors are fine — this is the transductive-over-genes part.
+      - x[c] : the condition's chemistry feature vector (multihot). W maps it to
+               the latent space, so a COLD condition (no observed entries) is
+               placed via its features — the inductive-over-conditions part.
+      - b[g] : per-gene bias (the gene's baseline fitness level).
+    Trained with (optionally w_g-weighted) MSE on train pairs; predicts val.
+    Returns predictions index-aligned to val_df (NaN for genes/conditions not
+    learnable). Decoupled from feature source for unit-testability.
+    """
+    import torch
+
+    dev = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
+    rng = np.random.default_rng(seed)
+    torch.manual_seed(seed)
+
+    genes = pd.Index(pd.unique(train_df[gene_col]))
+    g2i = {g: i for i, g in enumerate(genes)}
+    conds = [c for c in pd.unique(pd.concat([train_df[condition_col], val_df[condition_col]]))
+             if c in cond_features]
+    if not conds or len(genes) == 0:
+        return pd.Series(np.nan, index=val_df.index)
+    c2i = {c: i for i, c in enumerate(conds)}
+    X = torch.tensor(np.vstack([cond_features[c] for c in conds]).astype(np.float32), device=dev)
+    d = X.shape[1]
+
+    tr = train_df[train_df[gene_col].isin(g2i) & train_df[condition_col].isin(c2i)]
+    if len(tr) == 0:
+        return pd.Series(np.nan, index=val_df.index)
+    gi = torch.tensor(tr[gene_col].map(g2i).to_numpy(), dtype=torch.long, device=dev)
+    ci = torch.tensor(tr[condition_col].map(c2i).to_numpy(), dtype=torch.long, device=dev)
+    y = torch.tensor(tr[fit_col].to_numpy(np.float32), device=dev)
+    w = (torch.tensor(tr[weight_col].to_numpy(np.float32), device=dev)
+         if weight_col and weight_col in tr.columns else torch.ones_like(y))
+
+    n_genes = len(genes)
+    U = torch.nn.Parameter(torch.tensor(
+        rng.normal(0, 0.1, (n_genes, rank)).astype(np.float32), device=dev))
+    W = torch.nn.Parameter(torch.tensor(
+        rng.normal(0, 0.1, (d, rank)).astype(np.float32), device=dev))
+    b = torch.nn.Parameter(torch.zeros(n_genes, device=dev))
+    opt = torch.optim.Adam([U, W, b], lr=lr, weight_decay=weight_decay)
+
+    n = len(y)
+    for _ep in range(epochs):
+        perm = torch.randperm(n, device=dev)
+        for i in range(0, n, batch_size):
+            idx = perm[i:i + batch_size]
+            z = X[ci[idx]] @ W                      # [B, r]  condition latent from features
+            pred = (U[gi[idx]] * z).sum(-1) + b[gi[idx]]
+            wb = w[idx]
+            loss = (wb * (pred - y[idx]) ** 2).sum() / wb.sum().clamp_min(1e-6)
+            opt.zero_grad(); loss.backward(); opt.step()
+
+    # Predict val
+    with torch.no_grad():
+        Zall = X @ W                                # [n_cond, r]  all condition latents
+        out = np.full(len(val_df), np.nan, dtype=np.float32)
+        vg = val_df[gene_col].map(g2i).to_numpy()
+        vc = val_df[condition_col].map(c2i).to_numpy()
+        valid = ~pd.isna(vg) & ~pd.isna(vc)
+        gi_v = torch.tensor(vg[valid].astype(np.int64), device=dev)
+        ci_v = torch.tensor(vc[valid].astype(np.int64), device=dev)
+        preds = (U[gi_v] * Zall[ci_v]).sum(-1) + b[gi_v]
+        out[valid] = preds.cpu().numpy()
+    return pd.Series(out, index=val_df.index)
 
 
 # ===========================================================================

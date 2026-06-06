@@ -11,6 +11,7 @@ from src.evaluation.ranking_eval import (
     chemistry_knn_predict,
     chemistry_nearest_condition_profile,
     hierarchical_bootstrap_ci,
+    inductive_mf_predict,
     ndcg_at_k,
     per_gene_correlations,
     per_organism_breakdown,
@@ -277,6 +278,46 @@ def test_retrieval_noise_floor_skips_too_few_conditions():
     df = pd.DataFrame(rows)
     out = retrieval_noise_floor(df, min_conditions=5)
     assert out["n_genes_used"] == 0
+
+
+def test_inductive_mf_recovers_bilinear_signal_on_cold_columns():
+    """Generate fit[g,c] = u[g]·(W0·x[c]) with a true low-rank bilinear structure,
+    hold out whole conditions (cold columns), and check inductive MF recovers a
+    strong within-gene ranking on those held-out conditions — proving it places
+    cold columns via their features."""
+    rng = np.random.default_rng(0)
+    n_genes, n_cond, d, r = 40, 30, 12, 4
+    U0 = rng.normal(size=(n_genes, r))
+    W0 = rng.normal(size=(d, r))
+    X = rng.normal(size=(n_cond, d)).astype(np.float32)
+    cond_keys = [f"c{c}" for c in range(n_cond)]
+    cond_features = {cond_keys[c]: X[c] for c in range(n_cond)}
+    fit = U0 @ (X @ W0).T          # [n_genes, n_cond]  true bilinear fit
+
+    # hold out the last 8 conditions entirely (cold columns)
+    train_conds, val_conds = cond_keys[:22], cond_keys[22:]
+    rows = []
+    for g in range(n_genes):
+        for c in range(n_cond):
+            rows.append({"gene_key": f"g{g}", "condition_key": cond_keys[c],
+                         "fit": float(fit[g, c])})
+    df = pd.DataFrame(rows)
+    train = df[df["condition_key"].isin(train_conds)]
+    val = df[df["condition_key"].isin(val_conds)].copy()
+
+    val["pred"] = inductive_mf_predict(train, val, cond_features, rank=r,
+                                       epochs=60, lr=0.1).values
+    val = val.dropna(subset=["pred"])
+    pg = per_gene_correlations(val, metric="spearman", pred_col="pred", min_n=5)
+    # should recover the bilinear ranking well on cold columns
+    assert pg["value"].mean() > 0.8
+
+
+def test_inductive_mf_empty_features_returns_nan():
+    train = pd.DataFrame({"gene_key": ["g0"], "condition_key": ["c0"], "fit": [1.0]})
+    val = pd.DataFrame({"gene_key": ["g0"], "condition_key": ["cv0"], "fit": [0.0]})
+    pred = inductive_mf_predict(train, val, {})
+    assert pred.isna().all()
 
 
 def test_per_organism_breakdown(chem_split):

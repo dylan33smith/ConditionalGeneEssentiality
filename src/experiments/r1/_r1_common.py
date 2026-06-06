@@ -53,6 +53,7 @@ class R1Data:
     cond_features: dict           # condition_key -> multihot vec (for baselines)
     eligible_val_genes: set
     fp_bundle: dict               # experiment fingerprint bundle (morgan/rdkit/maccs)
+    mf_val_pred: "object" = None  # cached linear inductive-MF val predictions (Series)
 
 
 def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
@@ -108,8 +109,14 @@ def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
     from src.experiments.tier6._t6_common import load_experiment_fingerprints
     fp_bundle = load_experiment_fingerprints()
 
+    # Linear inductive-MF baseline — depends only on (train, val, features), so
+    # compute ONCE here and reuse across all arms/seeds (it's model-independent).
+    from src.evaluation.ranking_eval import inductive_mf_predict
+    mf_val_pred = inductive_mf_predict(
+        train, val, cond_features, rank=32, epochs=20, lr=0.05, weight_col="w_g")
+
     return R1Data(train, val, val_raw, emb, gene_to_row, multihot, exp_to_row,
-                  cond_features, elig_val, fp_bundle)
+                  cond_features, elig_val, fp_bundle, mf_val_pred)
 
 
 # ---------------------------------------------------------------------------
@@ -286,14 +293,20 @@ def _full_eval(model, data: R1Data, arm: str, dev, *, seed: int, best_spear: flo
     tr = data.train
     elig["null_pred"] = chemistry_nearest_condition_profile(tr, elig, data.cond_features).values
     elig["knn_pred"] = chemistry_knn_predict(tr, elig, data.cond_features, k=5).values
+    # linear inductive-MF: precomputed once in prepare_r1_data (model-independent)
+    if data.mf_val_pred is not None:
+        elig["mf_pred"] = data.mf_val_pred.reindex(elig.index).values
+    else:
+        elig["mf_pred"] = np.nan
 
-    # COMMON gene set: rows where ALL THREE methods produce a prediction
-    # (denominator parity — model, chem-null, chem-kNN scored on identical genes).
-    common = elig.dropna(subset=["model_pred", "null_pred", "knn_pred"]).copy()
+    # COMMON gene set: rows where ALL methods produce a prediction
+    # (denominator parity — scored on identical genes).
+    common = elig.dropna(subset=["model_pred", "null_pred", "knn_pred", "mf_pred"]).copy()
 
     model_m = _metrics_for_pred(common, "model_pred")
     null_m = _metrics_for_pred(common, "null_pred")
     knn_m = _metrics_for_pred(common, "knn_pred")
+    mf_m = _metrics_for_pred(common, "mf_pred")
 
     # per-org breakdown on the model (side metric)
     pg_model = per_gene_correlations(common.rename(columns={"model_pred": "pred"}),
@@ -318,4 +331,5 @@ def _full_eval(model, data: R1Data, arm: str, dev, *, seed: int, best_spear: flo
         "beats_knn_ndcg5": bool(model_m["ndcg_at_5"] > knn_m["ndcg_at_5"]),
     }
     return {"flat": flat, "comparison": {"model": model_m, "chem_knn": knn_m,
-                                         "chem_null": null_m}, "per_org": per_org}
+                                         "linear_mf": mf_m, "chem_null": null_m},
+            "per_org": per_org}

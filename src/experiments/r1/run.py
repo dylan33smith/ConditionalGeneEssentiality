@@ -51,7 +51,7 @@ def main(cfg: DictConfig) -> None:
 
             # side-by-side: model vs chem-kNN vs chem-NULL on the SAME genes
             comp = res["comparison"]
-            for method in ("model", "chem_knn", "chem_null"):
+            for method in ("model", "chem_knn", "linear_mf", "chem_null"):
                 m = comp[method]
                 comparisons.append({"arm": arm, "seed": seed, "method": method,
                                     "spearman": m["spearman"], "kendall": m["kendall"],
