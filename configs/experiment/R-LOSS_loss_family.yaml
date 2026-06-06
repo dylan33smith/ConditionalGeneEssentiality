@@ -1,0 +1,31 @@
+# @package _global_
+# R-LOSS — Loss family under ranking. Hypothesis H-R-LOSS-01.
+#
+# Tests whether changing the OBJECTIVE (pointwise MSE -> pairwise/listwise ranking
+# losses, incl. NDCG-direct) closes the gap to the chem-kNN gate (NDCG@5 0.485).
+# Architecture (T5-A) + encoder (multihot_425) held constant (R1-DEC-001).
+# Promoted ahead of R2 (2026-06-06): the objective mismatch is the most
+# fundamental lever (R1 showed linear-MF == deep model, both lose to kNN).
+
+experiment_id: R-LOSS_loss_family
+stage_or_tier: R-LOSS
+regime: R
+
+experiment:
+  hypothesis: H-R-LOSS-01
+  arms:
+    - loss: pointwise_mse          # control (R1 baseline)
+    - loss: pointwise_huber        # pointwise robustness control
+    - loss: pairwise_ranknet       # simplest ranking loss
+    - loss: lambdarank             # NDCG-weighted pairwise (directly targets NDCG)
+    - loss: listmle                # listwise permutation
+    - loss: approxndcg             # smooth NDCG surrogate (directly targets NDCG)
+  seeds: [0, 1, 2]
+  epochs: 15
+  orgs: [ANA3, BFirm, Btheta, Burk376, Caulo, Cola, Cup4G11, Dda3937, Ddia6719,
+         DdiaME23, Dino, DvH, Dyella79, HerbieS, Kang, Keio, Korea, Koxy, MR1,
+         Marino, Methanococcus_JJ, Methanococcus_S2, Miya]
+  promotion_rule:
+    primary: [ndcg_at_5, within_gene_spearman]
+    must_beat: [chemistry_knn]     # NDCG@5 0.485 gate (R1-DEC-001)
+    delta_spearman: 0.023
