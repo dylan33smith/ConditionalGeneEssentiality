@@ -25,8 +25,12 @@ the ranking objective will change the answer. See §10 for the carry-over table.
 ## 1. Pipeline shape
 
 ```
-R0  →  R-LOCK-{1,2}  →  R-LOCK-{3,4}  →  R1  →  R2  →  R3+
-       (parallel)        (depend on 1,2)
+R0  →  R-LOCK-{1,2}  →  R-LOCK-{3,4}  →  R1  →  R-LOSS  →  R2  →  R1-revisit  →  R3+
+       (parallel)        (depend on 1,2)   ✓     (next)
+# Ordering updated 2026-06-06 (R1-DEC-001 approved): R-LOSS promoted ahead of R2.
+# R1 showed all encoders cluster + lose to chem-kNN under pointwise MSE — the
+# objective mismatch (MSE for a ranking metric) is the most fundamental lever, so
+# fix the LOSS before fusion. R1-revisit (re-test chemistry) runs after both.
 ```
 
 | Phase | Concern | Output | Depends on |
