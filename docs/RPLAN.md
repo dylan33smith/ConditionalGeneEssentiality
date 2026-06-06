@@ -36,9 +36,22 @@ R0  →  R-LOCK-{1,2}  →  R-LOCK-{3,4}  →  R1  →  R2  →  R3+
 | **R-LOCK-2** | Split protocol (within-org cross-experiment) | `data_contract/ranking/split_protocol.yaml` | R0 |
 | **R-LOCK-3** | `RankingBatch` contract + default sampler mode + run-manifest v2 | `src/data/datasets/ranking_batch.py`, `data_contract/schemas/run_manifest_v2.schema.json` | R-LOCK-1, R-LOCK-2 |
 | **R-LOCK-4** | Primary metric + ranking baseline + noise-floor protocol | `data_contract/ranking/metric_contract.yaml` | R-LOCK-1, R-LOCK-2 |
-| **R1** | Representation retest — chemistry encoder (fingerprints vs multihot) under ranking | locked chemistry encoder for R-regime | R-LOCK-{1..4} |
-| **R2** | Architecture retest — fusion topology under ranking | locked fusion for R-regime | R1 |
+| **R1** | Representation retest — chemistry encoder (fingerprints vs multihot) under ranking | **COMPLETE (provisional, R1-DEC-001):** no_winner; multihot carried forward; fingerprints DEFERRED to R1-revisit. No arm beat chem-kNN. | R-LOCK-{1..4} |
+| **R2** | Architecture retest — fusion topology under ranking (multihot held constant) | locked fusion for R-regime | R1 |
 | **R3+** | R-LOSS (loss family), R-CAP (capacity), R-EMB (embedding), R-COND (condition-discriminability weighting), R-SAMPLE (org-balanced sampling), R-META (metadata features: temp/pH/expGroup), R-SNR (SNR-based eligibility), R-CURRIC (iterative pseudo-labeling) — one axis per tier, run as needed | tier-specific | R2 |
+| **R1-revisit** | Re-run the 6 chemistry arms under the R2+R-LOSS winning architecture+loss; finalize the encoder. R1 was confounded by MSE+T5-A. | final chemistry encoder | R2, R-LOSS |
+
+**Confound note (R1-DEC-001):** R1 tested the chemistry encoder while holding
+fusion (T5-A) and loss (pointwise MSE) fixed at suspected-suboptimal values.
+Its "no_winner / multihot" verdict is therefore PROVISIONAL — the encoder may
+interact with fusion (R2) and loss (R-LOSS). multihot is carried forward as the
+held-constant encoder for R2/R-LOSS; the fingerprint question is re-opened in
+R1-revisit once a better architecture+loss is locked.
+
+**chem-kNN as gate:** R1 showed the locked deep model loses to a non-parametric
+gene-specific chemistry-kNN (NDCG@5 0.485 vs ~0.42). chem-kNN is therefore the
+**promotion-gate baseline** for R2, R-LOSS, and beyond — a model must beat it to
+claim it learns more than a similarity lookup.
 
 **Parallelism:** R-LOCK-1 and R-LOCK-2 are independent — both depend only on R0
 outputs and can be done in parallel (or even folded into a single decision-day).
