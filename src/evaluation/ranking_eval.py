@@ -102,6 +102,56 @@ def within_gene_retrieval(
     return pd.DataFrame(rows)
 
 
+def retrieval_noise_floor(
+    val_rows_pre_pool: pd.DataFrame, *, k_values=(1, 3, 5),
+    orgId_col="orgId", gene_col="gene_key", condition_col="condition_key",
+    expName_col="expName", fit_col="fit", min_conditions=5,
+) -> dict:
+    """NDCG@k / precision@k CEILING from biological replicates.
+
+    The retrieval analog of the Spearman noise floor: for each gene with >=2
+    replicate expNames at >= min_conditions distinct conditions, use replicate A's
+    fit as the PREDICTION and replicate B's fit as the TRUTH, then compute
+    NDCG@k / precision@k. This is the best NDCG any model could achieve — it's
+    how well one replicate's top-k stressors match the other replicate's.
+
+    Returns {ndcg_at_k: median, precision_at_k: median, n_genes_used}.
+    """
+    df = val_rows_pre_pool.dropna(
+        subset=[orgId_col, gene_col, condition_col, expName_col, fit_col]).copy()
+    df = (df.groupby([orgId_col, gene_col, condition_col, expName_col])[fit_col]
+          .median().reset_index())
+    per_gene = {f"ndcg_at_{k}": [] for k in k_values}
+    per_gene.update({f"precision_at_{k}": [] for k in k_values})
+    n_used = 0
+    for (_org, _gene), g in df.groupby([orgId_col, gene_col], sort=False):
+        a, b = [], []
+        for _cond, gc in g.groupby(condition_col):
+            ens = sorted(gc[expName_col].unique())
+            if len(ens) < 2:
+                continue
+            a.append(float(gc.loc[gc[expName_col] == ens[0], fit_col].iloc[0]))
+            b.append(float(gc.loc[gc[expName_col] == ens[1], fit_col].iloc[0]))
+        if len(a) < min_conditions:
+            continue
+        a_arr, b_arr = np.asarray(a), np.asarray(b)
+        used_any = False
+        for k in k_values:
+            nd = ndcg_at_k(fit_true=b_arr, fit_pred=a_arr, k=k)
+            pr = precision_at_k(fit_true=b_arr, fit_pred=a_arr, k=k)
+            if not np.isnan(nd):
+                per_gene[f"ndcg_at_{k}"].append(nd); used_any = True
+            if not np.isnan(pr):
+                per_gene[f"precision_at_{k}"].append(pr)
+        if used_any:
+            n_used += 1
+    # MEAN aggregation (not median) to match how baselines/model retrieval is
+    # summarized — median of binary precision@1 collapses to 0 and is misleading.
+    out = {kk: (float(np.mean(v)) if v else float("nan")) for kk, v in per_gene.items()}
+    out["n_genes_used"] = int(n_used)
+    return out
+
+
 # ===========================================================================
 # PER-GENE FULL-LIST CORRELATIONS (with org tag for hierarchical bootstrap)
 # ===========================================================================

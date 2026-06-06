@@ -15,6 +15,7 @@ from src.evaluation.ranking_eval import (
     per_gene_correlations,
     per_organism_breakdown,
     precision_at_k,
+    retrieval_noise_floor,
     within_gene_retrieval,
 )
 
@@ -249,6 +250,34 @@ def test_chemistry_knn_vectorized_matches_bruteforce(chem_split):
 # ---------------------------------------------------------------------------
 # Per-org breakdown
 # ---------------------------------------------------------------------------
+
+def test_retrieval_noise_floor_perfect_replicates():
+    """Identical replicates, all conditions stressors (distinct negative fit) =>
+    NDCG@k and precision@k ceiling = 1.0 (no zero-relevance ties)."""
+    rows = []
+    for g in range(3):
+        for c in range(6):
+            f = -float(c + 1)        # all negative & distinct => all stressors, strict order
+            for en in ("A", "B"):
+                rows.append({"orgId": "O", "gene_key": f"g{g}", "condition_key": f"c{c}",
+                             "expName": en, "fit": f})   # A == B
+    df = pd.DataFrame(rows)
+    out = retrieval_noise_floor(df, k_values=(1, 3, 5), min_conditions=5)
+    assert out["ndcg_at_5"] == pytest.approx(1.0)
+    assert out["precision_at_5"] == pytest.approx(1.0)
+    assert out["n_genes_used"] == 3
+
+
+def test_retrieval_noise_floor_skips_too_few_conditions():
+    rows = []
+    for c in range(3):
+        for en in ("A", "B"):
+            rows.append({"orgId": "O", "gene_key": "g1", "condition_key": f"c{c}",
+                         "expName": en, "fit": float(c)})
+    df = pd.DataFrame(rows)
+    out = retrieval_noise_floor(df, min_conditions=5)
+    assert out["n_genes_used"] == 0
+
 
 def test_per_organism_breakdown(chem_split):
     pg = pd.DataFrame({
