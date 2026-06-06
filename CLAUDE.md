@@ -52,6 +52,16 @@ drug features and is the right comparison, NOT the random-cell-holdout setting.
 
 `refactor` — all new work goes here. `main` has the pre-refactor code.
 
+## Scientific synthesis (read first)
+
+`research_log/SCIENTIFIC_SYNTHESIS.md` is the canonical project-state narrative,
+organized by scientific *questions* (not tiers). One-line state: **the within-org
+conditional-ranking task is memorization-dominated — a chemistry-kNN (NDCG@5
+0.485) beats every global parametric model (encoder, objective, capacity, and
+frozen-OR-learned-fitness-aware gene reps all fail); cross-org transfer of the
+conditional signal is ≈ 0.** Next fork: R-HYBRID (global+kNN) vs characterization
+paper vs R-EMB (fitness-aware embedding).
+
 ## Governing plans
 
 - **`docs/REFACTORPLAN.md` (v2)** — T-tier pipeline (S0..S5, T1..T6). T-regime is
