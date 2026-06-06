@@ -38,7 +38,7 @@ log = logging.getLogger(__name__)
 EMB_DIR = Path("data/processed/ProtLM_embeddings_layer8")
 S4_DIR = Path("data_contract/preprocessing/de21504134c84a6c")
 _FIT_COLS = ["orgId", "setName", "seqindex", "media", "expName", "expDesc",
-             "temperature", "expGroup", "gene_key", "fit"]
+             "temperature", "expGroup", "gene_key", "fit", "abs_t"]
 
 
 @dataclass
@@ -87,9 +87,12 @@ def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
     train["w_g"] = train["gene_key"].map(gene_to_w).fillna(0.0)
     elig_val = val_eligible_genes(val_raw, policy=policy)
 
-    # val pooled per (gene, condition)
+    # val pooled per (gene, condition). abs_t (Wetmore moderated-t) is carried as
+    # a per-cell measurement-confidence signal for R-CONF confidence stratification
+    # (mean over replicate measurements); n_rep = #replicate rows behind the cell.
     val = (val_raw.groupby(["orgId", "gene_key", "condition_key"])
-           .agg(fit=("fit", "mean"), experiment_id=("experiment_id", "first"))
+           .agg(fit=("fit", "mean"), experiment_id=("experiment_id", "first"),
+                abs_t=("abs_t", "mean"), n_rep=("fit", "size"))
            .reset_index())
     val["eligible"] = val["gene_key"].isin(elig_val)
 
