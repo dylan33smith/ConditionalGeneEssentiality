@@ -183,6 +183,17 @@ near-intractable.
 5. **The task is memorization-dominated.** The useful product — "rank a known
    gene's stressors in a known organism" — is achievable (~0.485 NDCG@5), via
    lookup. Deep learning, as configured, adds nothing over it.
+6. **The negative is noise-robust, not a label-noise artifact (R-CONF-DEC-001).**
+   Stratifying eligible val genes by measurement confidence (`abs_t`, the Wetmore
+   moderated t), chem-kNN beats the deep model in *every* confidence quartile and
+   at *every* per-cell |t| threshold — the model never overtakes lookup even on
+   the cleanest-measured genes. Label noise *does* depress measured performance
+   (every method and the replicate ceiling rise monotonically with confidence:
+   ceiling 0.59→0.83) and accounts for *part* of the model's deficit (the gap
+   narrows 0.055→0.040 across strata) — but never enough to close it. Confidence-
+   weighted training does not help (Δ≈−0.004). So a meaningful share of the
+   model–ceiling gap is irreducible biological noise, and the rest is structural
+   (local-vs-global) — not something cleaner labels would fix.
 
 ---
 
