@@ -15,7 +15,7 @@ For the operational pipeline and per-decision detail see `docs/REFACTORPLAN.md`
 
 ## 0. The foundational bet
 
-> A **frozen, sequence-derived** protein embedding (ProteomeLM) + a
+> A **frozen, proteome-contextualized, sequence-derived** protein embedding (ProteomeLM) + a
 > **condition / media-chemistry encoding** contains enough information to
 > predict **conditional gene essentiality**, and this generalizes across genes
 > and organisms.

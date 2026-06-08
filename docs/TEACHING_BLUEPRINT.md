@@ -1,5 +1,5 @@
 # MISSION
-Generate a comprehensive teaching document named `PROJECT_TEXTBOOK.md` (target length: 5,000–8,000 words). This document must serve as a rigorous cross-domain bridge. It must explain the intuition of advanced machine learning architectures clearly enough for a biologist to grasp, while simultaneously explaining the biological constraints and realities rigorously enough for a computer scientist. Write for an incoming PhD student sitting exactly at this intersection.
+Generate a comprehensive teaching document named `PROJECT_TEXTBOOK.md`. This document must serve as a rigorous cross-domain bridge. It must explain the intuition of advanced machine learning architectures clearly enough for a biologist to grasp, while simultaneously explaining the biological constraints and realities rigorously enough for a computer scientist. Write for an incoming PhD student sitting exactly at this intersection.
 
 # CONTEXT & SCOPE
 Scan the entire codebase, commit history, and any available logs or scripts across all programming languages used in this repository. 
