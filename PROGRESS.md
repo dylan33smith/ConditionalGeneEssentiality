@@ -5,6 +5,24 @@ or structure; record what was done, what was learned, and the regression result.
 
 ---
 
+## 2026-06-15 — Layering fixes (post-cleanup polish)
+
+Resolved the two items flagged at the end of the cleanup, each gated:
+- **Fix A** — extracted the condition-key helpers (`_condition_key`,
+  `_normalize_string_keys`, `load_fitness`) from `src/experiments/r0/analyses.py`
+  into `src/data/datasets/conditions.py`. They belong in the data layer because the
+  data modules AND the ranking pipeline both consume them. Net: nothing in `src/data`
+  or `src/ranking` imports upward into `src/experiments` — clean layering.
+- **Fix B** — deduped `eval/contract.py`'s per-gene-correlation against the
+  canonical `harness.per_gene_correlations` (verified equivalent: test_ranking_metrics
+  17/17 unchanged). **Learned:** contract's flat bootstrap and harness's hierarchical
+  org→gene bootstrap are genuinely DIFFERENT methods, not duplicates — kept both,
+  documented; did not merge (would have swapped a flat CI for a hierarchical one).
+
+Regression: R-EVAL fast gate bit-exact (Δ=0.0000); pytest 119 passed.
+
+---
+
 ## 2026-06-15 — Ranking-branch cleanup (reorganize + aggressive prune + modular runner)
 
 **Goal.** Produce a clean `ranking` branch as the basis for the top-k objective:

@@ -26,12 +26,10 @@ stressors" actually lives), evaluated against the chem-kNN gate.
 ## Cleanup follow-ups (low priority, tracked)
 
 - Migrate `r1/run.py` and `rconf/run.py` onto the runner (reval + rloss already are).
-- Resolve the one layering note: `src/ranking/pipeline.py` imports fitness-loading
-  + condition-key helpers from `src/experiments/r0/analyses.py`; extract those into
-  `src/ranking/data/conditions.py` so `src/ranking` is fully self-contained.
-- Optionally physically de-duplicate `eval/contract.py`'s within-gene-correlation
-  helpers against `eval/harness.py` (kept separate during cleanup to avoid a silent
-  behavior change to the contract test — verify equivalence first).
+
+(Resolved: condition-key helpers extracted to `src/data/datasets/conditions.py` —
+clean layering, no upward imports; `eval/contract.py` per-gene-correlation deduped
+against `harness.py`, flat-vs-hierarchical bootstrap kept distinct + documented.)
 
 ## Done (this branch)
 
