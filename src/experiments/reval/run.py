@@ -1,9 +1,9 @@
 """R-EVAL handler — locked-best ranking model vs chem-kNN, in one pinned command.
 
-This is the regression check for the cleanup migration. It trains the locked
-arm (pointwise_huber + multihot_425) at a fixed split seed and compares it to the
-chem-kNN baseline on the identical eligible val gene set (denominator parity),
-reusing the existing R-LOSS training + R1 eval harness (no behavior change).
+The regression check for the cleanup migration: trains the locked arm
+(pointwise_huber + multihot_425) at a fixed split seed via the shared runner and
+compares to the chem-kNN baseline on the identical eligible val gene set, then
+gates the result against a stored baseline (PASS/FAIL within tolerance).
 """
 from __future__ import annotations
 
@@ -11,13 +11,12 @@ import json
 import logging
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import torch
 from omegaconf import DictConfig
 
-from src.experiments.r1._r1_common import prepare_r1_data
-from src.experiments.rloss._rloss_common import train_arm
+from src.ranking.pipeline import prepare_r1_data
+from src.ranking.runner import ArmSpec, run_arm, METHODS
 
 log = logging.getLogger(__name__)
 OUT = Path("artifacts/runs/reval")
@@ -25,13 +24,6 @@ BASELINE = Path("data_contract/ranking/reval_baseline.json")
 LOCKED_LOSS = "pointwise_huber"          # R-LOSS-DEC-001 carried-forward arm
 GATE_METRICS = ("ndcg_at_5", "spearman")  # the metrics the regression gate checks
 TOL = 0.003                               # abs tolerance (GPU jitter + seed noise)
-
-
-def _agg(rows: list[dict], key: str) -> dict:
-    """Mean over seeds for one method's metric dict."""
-    keys = ("spearman", "kendall", "ndcg_at_1", "ndcg_at_3", "ndcg_at_5",
-            "precision_at_5", "n_genes")
-    return {k: float(np.mean([r[key][k] for r in rows])) for k in keys}
 
 
 def main(cfg: DictConfig) -> None:
@@ -53,48 +45,30 @@ def main(cfg: DictConfig) -> None:
              tag, LOCKED_LOSS, orgs if orgs else "ALL", split_seed, model_seeds)
     log.info("=" * 64)
 
-    log.info("[1/3] preparing data (split seed=%d)", split_seed)
     data = prepare_r1_data(orgs, seed=split_seed)
     log.info("    train=%d val=%d eligible val genes=%d",
              len(data.train), len(data.val), len(data.eligible_val_genes))
 
-    log.info("[2/3] training '%s' x %d seed(s)", LOCKED_LOSS, len(model_seeds))
-    comps = []
-    for s in model_seeds:
-        res = train_arm(LOCKED_LOSS, data, seed=s, epochs=epochs)
-        comps.append(res["comparison"])
-        c = res["comparison"]
-        log.info("    seed=%d  model NDCG@5=%.4f Spearman=%.4f | kNN NDCG@5=%.4f Spearman=%.4f",
-                 s, c["model"]["ndcg_at_5"], c["model"]["spearman"],
-                 c["chem_knn"]["ndcg_at_5"], c["chem_knn"]["spearman"])
+    res = run_arm(ArmSpec("locked", loss=LOCKED_LOSS, epochs=epochs),
+                  data, model_seeds=model_seeds)
+    agg = res["agg"]
 
-    model_m = _agg(comps, "model")
-    knn_m = _agg(comps, "chem_knn")
-    null_m = _agg(comps, "chem_null")
-    mf_m = _agg(comps, "linear_mf")
-
-    summary = {
-        "tag": tag, "orgs": orgs, "split_seed": split_seed, "model_seeds": model_seeds,
-        "epochs": epochs, "locked_loss": LOCKED_LOSS,
-        "model": model_m, "chem_knn": knn_m, "chem_null": null_m, "linear_mf": mf_m,
-    }
+    summary = {"tag": tag, "orgs": orgs, "split_seed": split_seed,
+               "model_seeds": model_seeds, "epochs": epochs, "locked_loss": LOCKED_LOSS,
+               **{m: agg[m] for m in METHODS}}
     (OUT / f"reval_{tag}.json").write_text(json.dumps(summary, indent=2))
-    pd.DataFrame([
-        {"method": m, **summary[m]} for m in ("model", "chem_knn", "linear_mf", "chem_null")
-    ]).to_csv(OUT / f"reval_{tag}.csv", index=False)
+    pd.DataFrame([{"method": m, **agg[m]} for m in METHODS]).to_csv(
+        OUT / f"reval_{tag}.csv", index=False)
 
-    # ---- side-by-side ----
-    log.info("[3/3] RESULT (mean over %d seed(s), %d common eligible val genes):",
-             len(model_seeds), int(model_m["n_genes"]))
-    hdr = f"    {'method':<12} {'Spearman':>9} {'NDCG@1':>8} {'NDCG@5':>8} {'prec@5':>8}"
-    log.info(hdr)
-    for name, m in (("model", model_m), ("chem_knn", knn_m),
-                    ("linear_mf", mf_m), ("chem_null", null_m)):
-        log.info("    %-12s %9.4f %8.4f %8.4f %8.4f",
-                 name, m["spearman"], m["ndcg_at_1"], m["ndcg_at_5"], m["precision_at_5"])
-    log.info("    gap (kNN - model) NDCG@5 = %.4f", knn_m["ndcg_at_5"] - model_m["ndcg_at_5"])
+    log.info("RESULT (mean over %d seed(s), %d common eligible val genes):",
+             len(model_seeds), int(agg["model"]["n_genes"]))
+    log.info("    %-12s %9s %8s %8s", "method", "Spearman", "NDCG@1", "NDCG@5")
+    for m in METHODS:
+        log.info("    %-12s %9.4f %8.4f %8.4f",
+                 m, agg[m]["spearman"], agg[m]["ndcg_at_1"], agg[m]["ndcg_at_5"])
+    log.info("    gap (kNN - model) NDCG@5 = %.4f",
+             agg["chem_knn"]["ndcg_at_5"] - agg["model"]["ndcg_at_5"])
 
-    # ---- regression gate vs baseline ----
     _gate(summary, tag)
 
 

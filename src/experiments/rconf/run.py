@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 from omegaconf import DictConfig
 
-from src.experiments.r1._r1_common import prepare_r1_data, _device
+from src.ranking.pipeline import prepare_r1_data, _device
 from src.experiments.rconf._rconf_common import (
     train_weighted_model, build_eval_frame, assign_gene_strata,
     stratified_metrics, cell_filter_analysis)
@@ -96,7 +96,7 @@ def main(cfg: DictConfig) -> None:
                      "knn_ndcg5"]].to_string(index=False))
 
         # overall: baseline-model vs conf-weighted-model (the t-weighting lever)
-        from src.experiments.r1._r1_common import _metrics_for_pred
+        from src.ranking.pipeline import _metrics_for_pred
         mb = _metrics_for_pred(ev_base, "model_pred")
         mc = _metrics_for_pred(ev_conf, "model_pred")
         kn = _metrics_for_pred(ev_base, "knn_pred")

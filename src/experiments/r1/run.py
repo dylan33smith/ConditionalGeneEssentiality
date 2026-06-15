@@ -13,7 +13,7 @@ from pathlib import Path
 import pandas as pd
 from omegaconf import DictConfig, OmegaConf
 
-from src.experiments.r1._r1_common import prepare_r1_data, train_r1_arm
+from src.ranking.pipeline import prepare_r1_data, train_r1_arm
 
 log = logging.getLogger(__name__)
 
