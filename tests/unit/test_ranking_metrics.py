@@ -1,11 +1,11 @@
-"""Unit tests for src/evaluation/ranking_metrics.py (R-LOCK-4)."""
+"""Unit tests for src.ranking.eval.contract.py (R-LOCK-4)."""
 from __future__ import annotations
 
 import numpy as np
 import pandas as pd
 import pytest
 
-from src.evaluation.ranking_metrics import (
+from src.ranking.eval import (
     BootstrapMetric,
     cross_gene_within_condition_noise_proxy,
     model_beats_baseline,

@@ -36,7 +36,7 @@ def test_chemistry_null_baseline_runs_on_real_split():
     from src.experiments.r0.analyses import load_fitness
     from src.data.datasets.build_ranking_split import materialize_condition_holdout
     from src.data.datasets.condition_chemistry import load_condition_chemistry_features
-    from src.evaluation.ranking_eval import chemistry_nearest_condition_profile
+    from src.ranking.eval import chemistry_nearest_condition_profile
 
     fit = load_fitness()
     fit = fit[fit["orgId"] == "Caulo"].copy()

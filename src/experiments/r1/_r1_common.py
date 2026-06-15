@@ -29,7 +29,7 @@ from src.data.datasets.ranking_eligibility import (
 from src.data.datasets.condition_chemistry import load_condition_chemistry_features
 from src.experiments.r0.analyses import load_fitness, _condition_key
 from src.ranking.models import AdapterResidualMLP
-from src.evaluation.ranking_eval import (
+from src.ranking.eval import (
     per_gene_correlations, hierarchical_bootstrap_ci, within_gene_retrieval,
     per_organism_breakdown, chemistry_nearest_condition_profile, chemistry_knn_predict)
 
@@ -114,7 +114,7 @@ def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
 
     # Linear inductive-MF baseline — depends only on (train, val, features), so
     # compute ONCE here and reuse across all arms/seeds (it's model-independent).
-    from src.evaluation.ranking_eval import inductive_mf_predict
+    from src.ranking.eval import inductive_mf_predict
     mf_val_pred = inductive_mf_predict(
         train, val, cond_features, rank=32, epochs=20, lr=0.05, weight_col="w_g")
 

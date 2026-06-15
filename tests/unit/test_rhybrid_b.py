@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.evaluation.ranking_eval import (
+from src.ranking.eval import (
     chemistry_knn_predict, chemistry_retrieval_features)
 
 

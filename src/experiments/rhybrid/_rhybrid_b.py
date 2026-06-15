@@ -39,7 +39,7 @@ from src.experiments.r1._r1_common import R1Data, chem_matrix_for_rows, _predict
 from src.experiments.rhybrid._rhybrid_common import (
     train_standalone_model, _zscore_per_gene)
 from src.ranking.models import AdapterResidualMLP
-from src.evaluation.ranking_eval import (
+from src.ranking.eval import (
     chemistry_knn_predict, chemistry_retrieval_features,
     per_gene_correlations, within_gene_retrieval, hierarchical_bootstrap_ci)
 
@@ -340,7 +340,7 @@ def _gate_features(query_df: pd.DataFrame, data: R1Data, *, k: int = 5,
         return out
     q_conds = [c for c in query_df["condition_key"].unique()
                if c in data.cond_features]
-    from src.evaluation.ranking_eval import _cosine_dist_matrix
+    from src.ranking.eval.harness import _cosine_dist_matrix
     tfeat = np.vstack([data.cond_features[c] for c in train_conds])
     train_cond_to_j = {c: j for j, c in enumerate(train_conds)}
 
