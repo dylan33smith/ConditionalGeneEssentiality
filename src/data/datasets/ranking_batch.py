@@ -7,15 +7,15 @@ Three sampler modes share a single model forward signature
     pairwise:  each item is (gene, cond_i, cond_j, sign, weight) — for margin / RankNet.
     listwise:  each item is (gene, [cond_idx], [fit], mask, weight) — for ListMLE / SoftRank.
 
-Pointwise is the locked default for R1, R2 (per RPLAN §2.3); pairwise and
+Pointwise is the locked default for R1, R2 (per ARCHITECTURE.md §2.3); pairwise and
 listwise are tested explicitly in R-LOSS.
 
-Replicate handling (per RPLAN §2.3):
+Replicate handling (per ARCHITECTURE.md §2.3):
   - train: per-replicate rows (each replicate is a noisy observation of the
     same target; don't collapse).
   - val:   mean-pool replicates within (orgId, gene_key, condition_key).
 
-Sign convention (per RPLAN §2.3):
+Sign convention (per ARCHITECTURE.md §2.3):
   - model predicts `fit` (low → essential)
   - pairwise margin sign = sign(fit_i − fit_j)
 """

@@ -74,7 +74,7 @@ def main(cfg: DictConfig) -> None:
     # the gene-sets of any two orgs are disjoint by construction and the
     # Jaccard is identically zero off-diagonal. H-R0-03 requires a homology
     # mapping (analog of S3's 0.85 cosine cutoff) to be testable; that's
-    # out of R0 scope. Tracked in RPLAN.md as deferred.
+    # out of R0 scope. Tracked in ARCHITECTURE.md as deferred.
 
     log.info("[8/12] I: condition discriminability")
     disc = A.condition_discriminability(fit_df)
@@ -125,7 +125,7 @@ def _write_report(cond_per_gene, iqr_df, noise_summary, frontier,
     lines = [
         "# R0 — Data Characterization Report",
         "",
-        "Source: `R0-A_data_characterization`. See `docs/RPLAN.md §5` for spec.",
+        "Source: `R0-A_data_characterization`. See `ARCHITECTURE.md` for spec.",
         "",
         "## Per-organism summary",
         "",

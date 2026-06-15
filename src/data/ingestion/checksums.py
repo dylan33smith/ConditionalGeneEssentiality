@@ -2,7 +2,7 @@
 
 Each run manifest must record `feba_db_sha256`, `workbook_v4_sha256`,
 `embedding_manifest_id`, and `canonical_manifest_id` per the data-contract
-hard gate (REFACTORPLAN §3). Computing SHA-256 on multi-GB files is slow
+hard gate (ARCHITECTURE.md §3). Computing SHA-256 on multi-GB files is slow
 (~30s for feba.db); we cache results in artifacts/checksums_cache.json
 keyed by (path, mtime, size).
 """
