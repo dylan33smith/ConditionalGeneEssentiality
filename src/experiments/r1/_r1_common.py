@@ -109,7 +109,7 @@ def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
         cache_dir=Path("artifacts/cache/r1") / ("_".join(orgs) if orgs else "full"),
     )
     cond_features = load_condition_chemistry_features(orgs=orgs)
-    from src.experiments.tier6._t6_common import load_experiment_fingerprints
+    from src.ranking.data.fingerprints import load_experiment_fingerprints
     fp_bundle = load_experiment_fingerprints()
 
     # Linear inductive-MF baseline — depends only on (train, val, features), so
