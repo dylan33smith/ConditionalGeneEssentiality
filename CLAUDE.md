@@ -18,8 +18,11 @@ python -m src.cli.run_experiment +experiment=R-CONF_confidence_strat
 # in one pinned command (split seed 0, k=5). Run after any change to ranking
 # behavior; it gates against data_contract/ranking/reval_baseline.json.
 python -m src.cli.run_experiment +experiment=R-EVAL_regression                # fast gate (Keio+Caulo+MR1)
-python -m src.cli.run_experiment +experiment=R-EVAL_regression \
-    experiment.tag=full experiment.orgs=null experiment.model_seeds=[0,1,2]    # full 23-org headline
+# full 23-org headline (the replicate-org subset the published ~0.435/0.485 use —
+# NOT orgs=null, which is all organisms and gives different, lower numbers):
+python -m src.cli.run_experiment +experiment=R-EVAL_regression experiment.tag=full \
+    experiment.model_seeds=[0,1,2] \
+    'experiment.orgs=[ANA3,BFirm,Btheta,Burk376,Caulo,Cola,Cup4G11,Dda3937,Ddia6719,DdiaME23,Dino,DvH,Dyella79,HerbieS,Kang,Keio,Korea,Koxy,MR1,Marino,Methanococcus_JJ,Methanococcus_S2,Miya]'
 
 # tests (must stay green before any commit)
 python -m pytest tests/
