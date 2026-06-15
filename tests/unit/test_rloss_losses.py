@@ -6,8 +6,8 @@ import pytest
 import torch
 from scipy.stats import spearmanr
 
-from src.experiments.rloss._losses import LOSSES
-from src.evaluation.ranking_eval import ndcg_at_k
+from src.ranking.losses import LOSSES
+from src.ranking.eval import ndcg_at_k
 
 # Full-list losses optimize the whole ordering; NDCG losses are top-focused
 # (they only rank the stressors, relevance = max(0,-fit) > 0).

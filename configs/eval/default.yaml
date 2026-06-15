@@ -1,5 +1,5 @@
 # @package eval
-# Evaluation policy. Spearman variability threshold pinned in S2 (REFACTORPLAN §7 S2).
+# Evaluation policy. Spearman variability threshold pinned in S2 (ARCHITECTURE.md §7 S2).
 spearman_min_conditions: 5
 spearman_min_variability_method: cross_gene_iqr_p25
 spearman_min_variability_value: null   # filled by S2 output, frozen before any tier

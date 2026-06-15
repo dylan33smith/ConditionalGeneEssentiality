@@ -1,0 +1,23 @@
+# @package _global_
+# R-EVAL — the locked regression check for the ranking-branch cleanup.
+#
+# Reproduces, in one pinned command, the locked-best ranking model
+# (pointwise_huber + multihot_425) vs the chem-kNN baseline on the identical
+# eligible val gene set, at split seed 0, k=5. Reuses the existing R-LOSS
+# training + R1 eval harness (behavior-preserving). Override experiment.tag to
+# switch between the FAST per-step gate and the FULL 23-org headline:
+#
+#   FAST gate (default):  python -m src.cli.run_experiment +experiment=R-EVAL_regression
+#   FULL headline:        python -m src.cli.run_experiment +experiment=R-EVAL_regression \
+#                           experiment.tag=full experiment.orgs=null experiment.model_seeds=[0,1,2]
+
+experiment_id: R-EVAL_regression
+stage_or_tier: R-EVAL
+regime: R
+
+experiment:
+  tag: fast
+  orgs: [Keio, Caulo, MR1]   # fixed small subset for the per-step gate
+  split_seed: 0
+  model_seeds: [0]
+  epochs: 8

@@ -1,11 +1,11 @@
-"""Unit tests for src/evaluation/ranking_eval.py (R-LOCK-4 v2 harness)."""
+"""Unit tests for src.ranking.eval.harness.py (R-LOCK-4 v2 harness)."""
 from __future__ import annotations
 
 import numpy as np
 import pandas as pd
 import pytest
 
-from src.evaluation.ranking_eval import (
+from src.ranking.eval import (
     benjamini_hochberg,
     bootstrap_pvalue_delta,
     chemistry_knn_predict,

@@ -1,5 +1,5 @@
 # @package data
-# Authoritative data inputs (REFACTORPLAN §3).
+# Authoritative data inputs (ARCHITECTURE.md §3).
 canonical_v0_dir: data/derived/canonical/v0
 workbook_v4: data/media_composition_v4.xlsx
 workbook_sheet: Media_Components_ML
