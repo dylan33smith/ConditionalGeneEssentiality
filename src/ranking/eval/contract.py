@@ -28,6 +28,8 @@ import numpy as np
 import pandas as pd
 from scipy.stats import kendalltau, spearmanr
 
+from src.ranking.eval.harness import per_gene_correlations as _harness_per_gene_correlations
+
 log = logging.getLogger(__name__)
 
 
@@ -54,32 +56,19 @@ class BootstrapMetric:
         }
 
 
-def _per_gene_correlations(
-    df: pd.DataFrame, *,
-    fit_col: str, pred_col: str, gene_col: str,
-    eligible_mask: pd.Series | None,
-    corr_fn: Callable[[np.ndarray, np.ndarray], float],
-    min_n: int,
-) -> dict[str, float]:
-    """Compute per-gene correlation (Spearman or Kendall) on eligible genes."""
-    work = df if eligible_mask is None else df[eligible_mask]
-    out: dict[str, float] = {}
-    for gene, sub in work.groupby(gene_col, sort=False):
-        if len(sub) < min_n:
-            continue
-        yt = sub[fit_col].to_numpy()
-        yp = sub[pred_col].to_numpy()
-        # Skip constants — correlation undefined
-        if np.all(yt == yt[0]) or np.all(yp == yp[0]):
-            continue
-        r = corr_fn(yt, yp)
-        if not np.isnan(r):
-            out[str(gene)] = float(r)
-    return out
+# Per-gene correlations are computed by the CANONICAL implementation in
+# harness.py (per_gene_correlations) — same algorithm, single source of truth.
 
 
 def _bootstrap_ci(values: list[float], *, n_boot: int, ci_level: float,
                   seed: int) -> tuple[float, float]:
+    """FLAT bootstrap over genes (resample genes uniformly).
+
+    NOTE: distinct from harness.hierarchical_bootstrap_ci, which resamples
+    orgs→genes for an honest clustered CI. This flat version is retained for the
+    R-LOCK-4 BootstrapMetric helper (operates on a bare value list, no org tag);
+    prefer the hierarchical CI for org-clustered promotion decisions.
+    """
     if not values:
         return float("nan"), float("nan")
     rng = np.random.default_rng(seed)
@@ -111,22 +100,14 @@ def within_gene_rank_metric(
     Requires denominator parity: model & baseline must be scored on the same
     `eligible_mask` so the per-gene sets are identical.
     """
-    if metric == "spearman":
-        def fn(a, b):
-            r, _ = spearmanr(a, b)
-            return r
-    elif metric == "kendall":
-        def fn(a, b):
-            r, _ = kendalltau(a, b)
-            return r
-    else:
+    if metric not in ("spearman", "kendall"):
         raise ValueError(f"metric must be 'spearman' or 'kendall', got {metric!r}")
 
-    per_gene = _per_gene_correlations(
-        df, fit_col=fit_col, pred_col=pred_col, gene_col=gene_col,
-        eligible_mask=eligible_mask, corr_fn=fn, min_n=min_n,
-    )
-    values = list(per_gene.values())
+    # canonical per-gene correlations (same algorithm, single source of truth)
+    pg = _harness_per_gene_correlations(
+        df, metric=metric, fit_col=fit_col, pred_col=pred_col, gene_col=gene_col,
+        eligible_mask=eligible_mask, min_n=min_n)
+    values = pg["value"].tolist() if len(pg) else []
     if not values:
         return BootstrapMetric(float("nan"), float("nan"), float("nan"), 0, n_bootstrap)
     mean_val = float(np.mean(values))
