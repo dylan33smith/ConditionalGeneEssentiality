@@ -33,7 +33,7 @@ def test_condition_chemistry_features_small_org():
 def test_chemistry_null_baseline_runs_on_real_split():
     """Smoke: materialize split + chemistry-null baseline produces finite preds."""
     import warnings; warnings.filterwarnings("ignore")
-    from src.experiments.r0.analyses import load_fitness
+    from src.data.datasets.conditions import load_fitness
     from src.data.datasets.build_ranking_split import materialize_condition_holdout
     from src.data.datasets.condition_chemistry import load_condition_chemistry_features
     from src.ranking.eval import chemistry_nearest_condition_profile

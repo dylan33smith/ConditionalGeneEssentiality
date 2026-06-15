@@ -27,7 +27,7 @@ from src.data.datasets.build_ranking_split import materialize_condition_holdout
 from src.data.datasets.ranking_eligibility import (
     compute_train_weights, val_eligible_genes, load_policy)
 from src.data.datasets.condition_chemistry import load_condition_chemistry_features
-from src.experiments.r0.analyses import load_fitness, _condition_key
+from src.data.datasets.conditions import _condition_key
 from src.ranking.models import AdapterResidualMLP
 from src.ranking.eval import (
     per_gene_correlations, hierarchical_bootstrap_ci, within_gene_retrieval,
@@ -70,7 +70,7 @@ def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
     raw = raw.merge(key_df, on=["orgId", "setName", "seqindex", "media"], how="left")
 
     # normalized condition_key (lowercase media/expDesc + temperature)
-    from src.experiments.r0.analyses import _normalize_string_keys
+    from src.data.datasets.conditions import _normalize_string_keys
     norm = _normalize_string_keys(raw.copy())
     raw["condition_key"] = _condition_key(norm).values
 
