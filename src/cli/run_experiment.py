@@ -27,18 +27,9 @@ log = logging.getLogger(__name__)
 
 
 _HANDLERS = {
-    "S0": "src.experiments.stage0.run:main",
-    "S1": "src.experiments.stage1.run:main",
-    "S2": "src.experiments.stage2.run:main",
-    "S3": "src.experiments.stage3.run:main",
-    "S4": "src.experiments.stage4.run:main",
-    "S5": "src.experiments.stage5.run:main",
-    "T1": "src.experiments.tier1.run:main",
-    "T2": "src.experiments.tier2.run:main",
-    "T3": "src.experiments.tier3.run:main",
-    "T4": "src.experiments.tier4.run:main",
-    "T5": "src.experiments.tier5.run:main",
-    "T6": "src.experiments.tier6.run:main",
+    # Ranking regime (R) — the active objective. The T-regime (S0-S5, T1-T6) was
+    # pruned in the ranking-branch cleanup; its results live in the decision
+    # ledger + SCIENTIFIC_SYNTHESIS (see the pruned→learning index in the docs).
     "R0": "src.experiments.r0.run:main",
     "R1": "src.experiments.r1.run:main",
     "R-LOSS": "src.experiments.rloss.run:main",
