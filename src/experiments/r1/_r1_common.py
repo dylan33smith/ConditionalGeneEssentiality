@@ -28,7 +28,7 @@ from src.data.datasets.ranking_eligibility import (
     compute_train_weights, val_eligible_genes, load_policy)
 from src.data.datasets.condition_chemistry import load_condition_chemistry_features
 from src.experiments.r0.analyses import load_fitness, _condition_key
-from src.experiments.tier5._t5_common import AdapterResidualMLP
+from src.ranking.models import AdapterResidualMLP
 from src.evaluation.ranking_eval import (
     per_gene_correlations, hierarchical_bootstrap_ci, within_gene_retrieval,
     per_organism_breakdown, chemistry_nearest_condition_profile, chemistry_knn_predict)

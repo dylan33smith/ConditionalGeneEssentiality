@@ -38,7 +38,7 @@ import torch.nn as nn
 from src.experiments.r1._r1_common import R1Data, chem_matrix_for_rows, _predict_val
 from src.experiments.rhybrid._rhybrid_common import (
     train_standalone_model, _zscore_per_gene)
-from src.experiments.tier5._t5_common import AdapterResidualMLP
+from src.ranking.models import AdapterResidualMLP
 from src.evaluation.ranking_eval import (
     chemistry_knn_predict, chemistry_retrieval_features,
     per_gene_correlations, within_gene_retrieval, hierarchical_bootstrap_ci)

@@ -15,7 +15,7 @@ import torch
 
 from src.experiments.r1._r1_common import (
     R1Data, chem_matrix_for_rows, _full_eval, _predict_val)
-from src.experiments.tier5._t5_common import AdapterResidualMLP
+from src.ranking.models import AdapterResidualMLP
 from src.experiments.rloss._losses import LOSSES
 from src.evaluation.ranking_eval import within_gene_retrieval
 
