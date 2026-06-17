@@ -3,8 +3,8 @@
 Predicting **conditional gene essentiality** from Tn-seq fitness data using frozen
 ProteomeLM gene embeddings + media-chemistry features. The active objective is
 **within-organism top-k ranking** of a gene's conditions ("find the top stressors
-for this gene"). This file holds durable facts only — see `PLAN.md` for current
-work and `PROGRESS.md` for history.
+for this gene"). This file holds durable facts + the Memory Protocol; see
+`README.md` for the current state and `docs/project_memory/` for working memory.
 
 ## Build / test / run
 
@@ -50,7 +50,9 @@ src/cli/run_experiment.py     Hydra entrypoint + handler dispatch
 configs/experiment/     one yaml per experiment (R0/R1/R-LOSS/R-CONF/R-EVAL)
 data_contract/          frozen handoff artifacts + schemas + the ranking metric contract + R-EVAL baseline
 research_log/           decisions/ (the decision ledger), figures/, SCIENTIFIC_SYNTHESIS.md (canonical learnings)
-ARCHITECTURE.md PLAN.md PROGRESS.md docs/PRUNED_INDEX.md
+README.md               single source of truth for current state (overview + architecture + results)
+docs/project_memory/    progress.md (where we are) · decisions.md (why) · bugs.md (quirks + fixes)
+docs/PRUNED_INDEX.md    what was pruned in the cleanup and where its learning lives
 ```
 
 ## How to add a new ranking test
@@ -88,8 +90,24 @@ eligible val genes, per-seed + seed-mean, tidy CSV + side-by-side vs the gate).
 | Gene embeddings | `data/processed/ProtLM_embeddings_layer8/*.pt` |
 | Feature contract (S4, frozen) | `data_contract/preprocessing/de21504134c84a6c/` |
 
-## Documentation-maintenance rule
+## Memory Protocol (read + write the project memory)
 
-At the end of any task that changes behavior, append an entry to PROGRESS.md and
-update PLAN.md. Edit ARCHITECTURE.md only if component structure or data flow
-changed. Never put in-progress status in CLAUDE.md or ARCHITECTURE.md.
+**Before starting a task,** read `docs/project_memory/progress.md` (where the work
+was left off) — and `docs/project_memory/bugs.md` before debugging or touching data.
+
+**At the end of every session, or whenever we solve a major bug or make a
+structural/scientific decision, you must automatically update the relevant files in
+`docs/project_memory/` to reflect the new state of the project:**
+
+- `progress.md` — update "Where we left off" + append a dated log entry. After any
+  change to ranking behavior, record the `R-EVAL` result. (Append-only log; never
+  rewrite past entries.)
+- `decisions.md` — add/update an entry when an architecture or approach choice is
+  made or changed, with the rationale.
+- `bugs.md` — add an entry whenever a non-obvious bug is solved, with the proven fix.
+- `README.md` — update only when the current-state summary, architecture, data flow,
+  or headline results actually change.
+
+Keep durable facts in CLAUDE.md and README.md; keep in-progress status in
+`docs/project_memory/progress.md`, never in CLAUDE.md. The formal promotion-gate
+record stays in `research_log/decisions/**`.

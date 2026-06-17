@@ -22,7 +22,7 @@ its learning lives, so a deleted module is one hop from its result.
 | `src/{train,training,models,domain}` | early scaffolding / T-regime trainer + architectures + contracts | superseded by `src/ranking/{models,train,pipeline,runner}.py` |
 | `src/data/datasets/{build_model_dataset,dataset_audits}`, `ingestion/load_embeddings` | T-regime data utilities | data provenance kept in `src/data/{ingestion,preprocessing}`; ranking split in `src/data/datasets/build_ranking_split.py` |
 | `configs/experiment/T*.yaml`, `configs/stage/s*.yaml` | T-regime experiment/stage configs | the corresponding decision-ledger entries |
-| `docs/{REFACTORPLAN,RPLAN,PROJECT_TEXTBOOK_T6,TEACHING_BLUEPRINT}.md`, `research_log/STAGE_LEARNINGS.md` | T-regime planning/teaching docs | ranking design folded into `ARCHITECTURE.md`; learnings in the ledger + SYNTHESIS |
+| `docs/{REFACTORPLAN,RPLAN,PROJECT_TEXTBOOK_T6,TEACHING_BLUEPRINT}.md`, `research_log/STAGE_LEARNINGS.md` | T-regime planning/teaching docs | ranking design folded into `README.md`; learnings in the ledger + SYNTHESIS |
 | root `s5_*.parquet`, `testing.ipynb` | stray run outputs / scratch notebook | n/a (transient) |
 
 **Recovery.** `git log --all -- <path>` to see history; the full pre-cleanup tree
