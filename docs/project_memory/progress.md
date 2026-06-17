@@ -7,8 +7,8 @@ The dated log below is append-only (newest first) — never rewrite past entries
 
 ## Where we left off (2026-06-17)
 
-- **Branch:** working on `rankingbatch-wiring` (off `ranking`); `RankingBatch` is
-  now wired into training (commit pending). `ranking` is the trunk.
+- **Branch:** `ranking` (trunk), pushed and in sync with `origin/ranking`.
+  `RankingBatch` is wired into training (merged via `6d3ff05`).
 - **Repo:** cleaned + modular — self-contained `src/ranking/` core, shared runner,
   `R-EVAL` regression gate. Training batches now flow through the `RankingBatch`
   samplers (no hand-rolled batching).
@@ -20,8 +20,8 @@ The dated log below is append-only (newest first) — never rewrite past entries
   **0.4319** / Spearman **0.1522**; chem-kNN NDCG@5 **0.4852** / Spearman **0.2402**
   (chem-kNN bit-exact vs pre-wiring; model within gate tolerance of the prior
   0.4347/0.1509). Fast gate re-set to model 0.4468 / kNN 0.5091.
-- **Open loose ends:** merge `rankingbatch-wiring` → `ranking` (pending user nod);
-  delete the throwaway `ranking-cleanup` branch.
+- **Open loose ends:** none blocking. (Done: RankingBatch merged + pushed;
+  feature/throwaway branches deleted.) Next is the top-k loss experiment below.
 
 ## Next tasks (the top-k objective)
 
