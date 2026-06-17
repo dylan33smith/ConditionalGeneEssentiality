@@ -87,9 +87,17 @@ duplicates — they were **not** merged, because doing so would silently swap a 
 CI for a hierarchical one. Use the hierarchical CI for org-clustered promotion
 decisions.
 
-### `RankingBatch` adopted as the typed contract, sampler-swap deferred
+### `RankingBatch` wired into training (2026-06-17)
 `src/data/datasets/ranking_batch.py` provides pointwise/pairwise/listwise samplers
-for the top-k objective. During cleanup we kept the current training numerically
-identical (the gate stayed bit-exact). **Decision:** actually wiring the samplers
-into training is the *first top-k modeling step* (it will move the numbers by
-design), not part of the behavior-preserving cleanup.
+for the top-k objective. `src/ranking/train.py` now builds batches through them
+(`PointwiseSampler` for pointwise; `ListwiseSampler` for the ranking losses) and
+the hand-rolled `_build_gene_groups`/`_make_batch` was deleted — one tested
+batching path. **Why:** top-focused losses need list/pair-structured batches, and
+this removes a duplication; it is the prerequisite for the top-k loss experiment.
+**Result:** behavior-preserving at headline scale — the locked `pointwise_huber`
+arm moved within gate tolerance (23-org/3-seed: NDCG@5 0.4347→0.4319, Spearman
+0.1509→0.1522; chem-kNN bit-exact). A 3-lens adversarial review confirmed the
+index/mask/loss wiring is correct and the small movement is RNG/batch-composition
+variance (different shuffle stream), not a logic change. `PairwiseSampler` is wired
+as available but the current pairwise losses still derive pairs from the listwise
+[B,L]; switching them to native pairwise batches is a follow-up.

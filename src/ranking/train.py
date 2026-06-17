@@ -1,9 +1,19 @@
-"""R-LOSS gene-batched training. Reuses R1 data-prep, model, and eval harness;
-only the OBJECTIVE changes (multihot encoder + T5-A architecture held constant).
+"""Ranking trainers built on the RankingBatch contract (R-LOCK-3).
 
-Pointwise losses could use row batches, but pairwise/listwise need per-gene
-groups, so we batch by GENE for all losses uniformly: each batch is B genes,
-each padded to L conditions (sampled up to L_cap), with a mask.
+Batching is dispatched by loss family through the tested samplers in
+`src/data/datasets/ranking_batch.py` (single source of truth, no hand-rolled
+batching):
+
+  pointwise (mse/huber) -> PointwiseSampler  : one (gene, condition) per item.
+  ranking (ranknet/lambdarank/listmle/approxndcg) -> ListwiseSampler : a gene's
+      whole condition set, padded to [B, L] with a mask (what the ranking losses
+      consume). PairwiseSampler is available for pairwise-native losses (not yet
+      wired — the current pairwise losses derive pairs from the listwise [B, L]).
+
+The model forward is `(gene_emb, cond_feat) -> scalar`. Each RankingBatch carries
+`gene_idx` (→ embedding rows) and `cond_idx` (→ per-experiment chemistry rows);
+the trainer gathers the features and runs the loss. Multihot encoder + T5-A
+architecture held constant (R1-DEC-001).
 """
 from __future__ import annotations
 
@@ -18,64 +28,86 @@ from src.ranking.pipeline import (
 from src.ranking.models import AdapterResidualMLP
 from src.ranking.losses import LOSSES
 from src.ranking.eval import within_gene_retrieval
+from src.data.datasets.ranking_batch import (
+    PointwiseSampler, ListwiseSampler, collate_pointwise, collate_listwise)
 
 log = logging.getLogger(__name__)
 
 ARM = "multihot_425"          # encoder held constant in R-LOSS (R1-DEC-001)
-POINTWISE = {"pointwise_mse", "pointwise_huber"}   # trained ROW-batched (natural)
+POINTWISE = {"pointwise_mse", "pointwise_huber"}   # row-batched (their natural form)
 
 
 def _device():
     return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
+def _train_arrays(data: R1Data):
+    """Per-train-row arrays for the RankingBatch collates + a per-experiment
+    chemistry matrix. Returns (gene_row, cond_idx, fit, weight, exp_chem):
+      gene_row  row -> embedding row (data.gene_to_row)
+      cond_idx  row -> per-experiment chemistry row (index into exp_chem)
+      fit       row -> raw fitness target
+      weight    row -> R-LOCK-1 per-gene weight w_g
+    """
+    tr = data.train[data.train["gene_key"].isin(data.gene_to_row)].copy()
+    gene_row = tr["gene_key"].map(data.gene_to_row).to_numpy(np.int64)
+    uexp = pd.unique(tr["experiment_id"])
+    exp_chem = chem_matrix_for_rows(ARM, uexp, data)              # [n_uexp, chem_dim]
+    exp_to_i = {e: i for i, e in enumerate(uexp)}
+    cond_idx = tr["experiment_id"].map(exp_to_i).to_numpy(np.int64)
+    fit = tr["fit"].to_numpy(np.float32)
+    weight = tr["w_g"].to_numpy(np.float32)
+    return gene_row, cond_idx, fit, weight, exp_chem
+
+
+def _build_model(data: R1Data, chem_dim: int, dev, lr: float):
+    model = AdapterResidualMLP(
+        gene_dim=data.emb.shape[1], chem_dim=chem_dim, hidden_dim=512,
+        n_blocks=1, dropout=0.1, adapter_hidden=1024, adapter_out=512,
+        adapter_n_hidden_layers=1, adapter_layernorm=False).to(dev)
+    return model, torch.optim.Adam(model.parameters(), lr=lr)
+
+
 def train_arm(loss_name: str, data: R1Data, *, seed: int = 0, epochs: int = 15) -> dict:
-    """Dispatch: pointwise losses train ROW-batched (their natural/best form, =
-    the R1 control); pairwise/listwise train GENE-batched (required). Each
-    objective gets its best training rather than a handicapped matched regime."""
+    """Dispatch: pointwise losses train ROW-batched (PointwiseSampler);
+    pairwise/listwise train GENE/LIST-batched (ListwiseSampler). Each objective
+    gets its natural batch structure."""
     if loss_name in POINTWISE:
-        return _train_pointwise_rowbatched(loss_name, data, seed=seed, epochs=8)
-    return _train_rloss_genebatched(loss_name, data, seed=seed, epochs=epochs)
+        return _train_pointwise(loss_name, data, seed=seed, epochs=8)
+    return _train_listwise(loss_name, data, seed=seed, epochs=epochs)
 
 
-def _train_pointwise_rowbatched(loss_name, data, *, seed=0, epochs=8,
-                                lr=1e-3, batch_size=8192, huber_delta=1.0):
-    """Row-batched pointwise training (MSE or Huber), matching R1's regime."""
+def _train_pointwise(loss_name, data, *, seed=0, epochs=8,
+                     lr=1e-3, batch_size=8192, huber_delta=1.0):
+    """Row-batched pointwise training (MSE or Huber) via PointwiseSampler."""
     torch.manual_seed(seed); np.random.seed(seed)
     dev = _device()
-    tr = data.train[data.train["gene_key"].isin(data.gene_to_row)].copy()
-    g_row = tr["gene_key"].map(data.gene_to_row).to_numpy()
-    y = tr["fit"].to_numpy(np.float32); w = tr["w_g"].to_numpy(np.float32)
-    uexp = pd.unique(tr["experiment_id"])
-    exp_chem = chem_matrix_for_rows(ARM, uexp, data)
-    exp_to_i = {e: i for i, e in enumerate(uexp)}
-    row_exp = tr["experiment_id"].map(exp_to_i).to_numpy()
+    gene_row, cond_idx, fit, weight, exp_chem = _train_arrays(data)
 
     emb_t = torch.tensor(data.emb, dtype=torch.float32, device=dev)
     exp_chem_t = torch.tensor(exp_chem, dtype=torch.float32, device=dev)
-    g_row_t = torch.tensor(g_row, dtype=torch.long, device=dev)
-    row_exp_t = torch.tensor(row_exp, dtype=torch.long, device=dev)
-    y_t = torch.tensor(y, device=dev); w_t = torch.tensor(w, device=dev)
 
-    model = AdapterResidualMLP(
-        gene_dim=data.emb.shape[1], chem_dim=exp_chem.shape[1], hidden_dim=512,
-        n_blocks=1, dropout=0.1, adapter_hidden=1024, adapter_out=512,
-        adapter_n_hidden_layers=1, adapter_layernorm=False).to(dev)
-    opt = torch.optim.Adam(model.parameters(), lr=lr)
-    n = len(y); best, best_state = -2.0, None
+    model, opt = _build_model(data, exp_chem.shape[1], dev, lr)
+    n = len(fit)
+    sampler = PointwiseSampler(n_rows=n, seed=seed, shuffle=True)
+    best, best_state = -2.0, None
     for ep in range(epochs):
-        model.train(); perm = torch.randperm(n, device=dev)
+        model.train()
+        order = list(iter(sampler))                       # epoch-advancing shuffle
         for i in range(0, n, batch_size):
-            idx = perm[i:i + batch_size]
-            pred = model(emb_t[g_row_t[idx]], exp_chem_t[row_exp_t[idx]]).squeeze(-1)
-            err = pred - y_t[idx]
+            b = collate_pointwise(order[i:i + batch_size], gene_idx=gene_row,
+                                  cond_idx=cond_idx, fit=fit, weight=weight)
+            pred = model(emb_t[b.gene_idx.to(dev)],
+                         exp_chem_t[b.cond_idx.to(dev)]).squeeze(-1)
+            y = b.fit.to(dev); w = b.weight.to(dev)
+            err = pred - y
             if loss_name == "pointwise_huber":
                 a = err.abs()
                 pl = torch.where(a <= huber_delta, 0.5 * a ** 2,
                                  huber_delta * (a - 0.5 * huber_delta))
             else:
                 pl = err ** 2
-            loss = (w_t[idx] * pl).sum() / w_t[idx].sum().clamp_min(1e-6)
+            loss = (w * pl).sum() / w.sum().clamp_min(1e-6)
             opt.zero_grad(); loss.backward(); opt.step()
         m = _val_ndcg5(model, data, dev)
         log.info("    [%s seed=%d] epoch %d  val NDCG@5=%.4f", loss_name, seed, ep, m)
@@ -87,90 +119,39 @@ def _train_pointwise_rowbatched(loss_name, data, *, seed=0, epochs=8,
     return _full_eval(model, data, ARM, dev, seed=seed, best_spear=best)
 
 
-def _build_gene_groups(data: R1Data):
-    """Return per-gene arrays needed for batched training.
-
-    genes: list of (emb_row, w_g, exp_idx_array, fit_array) for each train gene
-    with an embedding. exp_idx indexes into a per-experiment chemistry matrix.
-    """
-    tr = data.train[data.train["gene_key"].isin(data.gene_to_row)].copy()
-    uexp = pd.unique(tr["experiment_id"])
-    exp_chem = chem_matrix_for_rows(ARM, uexp, data)              # [n_uexp, 425]
-    exp_to_i = {e: i for i, e in enumerate(uexp)}
-    tr["_exp_i"] = tr["experiment_id"].map(exp_to_i).to_numpy()
-    tr["_grow"] = tr["gene_key"].map(data.gene_to_row).to_numpy()
-
-    genes = []
-    for _gk, g in tr.groupby("gene_key", sort=False):
-        genes.append((
-            int(g["_grow"].iloc[0]),
-            float(g["w_g"].iloc[0]),
-            g["_exp_i"].to_numpy(np.int64),
-            g["fit"].to_numpy(np.float32),
-        ))
-    return genes, exp_chem
-
-
-def _make_batch(genes, idxs, L_cap, rng):
-    """Pad a set of genes to [B, L] tensors (numpy)."""
-    rows = [genes[i] for i in idxs]
-    lengths = [min(len(r[2]), L_cap) for r in rows]
-    L = max(lengths)
-    B = len(rows)
-    exp_idx = np.zeros((B, L), np.int64)
-    fit = np.zeros((B, L), np.float32)
-    mask = np.zeros((B, L), bool)
-    grow = np.zeros(B, np.int64)
-    w = np.zeros(B, np.float32)
-    for b, (gr, wg, ei, ff) in enumerate(rows):
-        n = len(ei)
-        if n > L_cap:
-            sel = rng.choice(n, size=L_cap, replace=False)
-            ei, ff, n = ei[sel], ff[sel], L_cap
-        exp_idx[b, :n] = ei
-        fit[b, :n] = ff
-        mask[b, :n] = True
-        grow[b] = gr
-        w[b] = wg
-    return grow, exp_idx, fit, mask, w
-
-
-def _train_rloss_genebatched(loss_name: str, data: R1Data, *, seed: int = 0,
+def _train_listwise(loss_name: str, data: R1Data, *, seed: int = 0,
                     epochs: int = 15, lr: float = 2e-3, batch_genes: int = 128,
-                    L_cap: int = 64) -> dict:
+                    max_list_len: int = 64) -> dict:
+    """Gene/list-batched training via ListwiseSampler: each gene's condition set
+    padded to [B, L] with a mask; the ranking loss consumes (scores, fit, w, mask)."""
     torch.manual_seed(seed); np.random.seed(seed)
-    dev = _device(); rng = np.random.default_rng(seed)
+    dev = _device()
     loss_fn = LOSSES[loss_name]
-
-    genes, exp_chem = _build_gene_groups(data)
-    emb_t = torch.tensor(data.emb, dtype=torch.float32, device=dev)
-    exp_chem_t = torch.tensor(exp_chem, dtype=torch.float32, device=dev)
+    gene_row, cond_idx, fit, weight, exp_chem = _train_arrays(data)
     chem_dim = exp_chem.shape[1]
 
-    model = AdapterResidualMLP(
-        gene_dim=data.emb.shape[1], chem_dim=chem_dim, hidden_dim=512,
-        n_blocks=1, dropout=0.1, adapter_hidden=1024, adapter_out=512,
-        adapter_n_hidden_layers=1, adapter_layernorm=False).to(dev)
-    opt = torch.optim.Adam(model.parameters(), lr=lr)
+    emb_t = torch.tensor(data.emb, dtype=torch.float32, device=dev)
+    exp_chem_t = torch.tensor(exp_chem, dtype=torch.float32, device=dev)
 
-    n_genes = len(genes)
+    model, opt = _build_model(data, chem_dim, dev, lr)
+    sampler = ListwiseSampler(gene_idx=gene_row, seed=seed, min_gene_size=2,
+                              max_list_len=max_list_len)
     best_metric, best_state = -2.0, None
     for ep in range(epochs):
         model.train()
-        order = rng.permutation(n_genes)
-        for i in range(0, n_genes, batch_genes):
-            idxs = order[i:i + batch_genes]
-            grow, exp_idx, fit, mask, w = _make_batch(genes, idxs, L_cap, rng)
-            B, L = exp_idx.shape
-            grow_t = torch.tensor(grow, device=dev)
-            exp_t = torch.tensor(exp_idx, device=dev)
-            fit_t = torch.tensor(fit, device=dev)
-            mask_t = torch.tensor(mask, device=dev)
-            w_t = torch.tensor(w, device=dev)
-            ge = emb_t[grow_t].unsqueeze(1).expand(B, L, data.emb.shape[1]).reshape(B * L, -1)
-            ch = exp_chem_t[exp_t].reshape(B * L, chem_dim)
+        lists = list(iter(sampler))                       # one row-array per gene
+        for i in range(0, len(lists), batch_genes):
+            b = collate_listwise(lists[i:i + batch_genes], gene_idx=gene_row,
+                                 cond_idx=cond_idx, fit=fit, weight=weight)
+            B, L = b.gene_idx.shape
+            # padded slots carry idx -1 → clamp to a real row (row 0) and rely on
+            # the mask to zero their loss contribution (never use negative indexing)
+            gi = b.gene_idx.clamp_min(0).to(dev)
+            ci = b.cond_idx.clamp_min(0).to(dev)
+            ge = emb_t[gi].reshape(B * L, -1)
+            ch = exp_chem_t[ci].reshape(B * L, chem_dim)
             scores = model(ge, ch).squeeze(-1).reshape(B, L)
-            loss = loss_fn(scores, fit_t, w_t, mask_t)
+            loss = loss_fn(scores, b.fit.to(dev), b.weight.to(dev), b.mask.to(dev))
             opt.zero_grad(); loss.backward(); opt.step()
         metric = _val_ndcg5(model, data, dev)
         log.info("    [%s seed=%d] epoch %d  val NDCG@5=%.4f", loss_name, seed, ep, metric)
