@@ -48,5 +48,77 @@
       "precision_at_5": 0.40381062355658204,
       "n_genes": 9152.0
     }
+  },
+  "full": {
+    "tag": "full",
+    "orgs": [
+      "ANA3",
+      "BFirm",
+      "Btheta",
+      "Burk376",
+      "Caulo",
+      "Cola",
+      "Cup4G11",
+      "Dda3937",
+      "Ddia6719",
+      "DdiaME23",
+      "Dino",
+      "DvH",
+      "Dyella79",
+      "HerbieS",
+      "Kang",
+      "Keio",
+      "Korea",
+      "Koxy",
+      "MR1",
+      "Marino",
+      "Methanococcus_JJ",
+      "Methanococcus_S2",
+      "Miya"
+    ],
+    "split_seed": 0,
+    "model_seeds": [
+      0,
+      1,
+      2
+    ],
+    "epochs": 8,
+    "locked_loss": "pointwise_huber",
+    "model": {
+      "spearman": 0.15090949310194057,
+      "kendall": 0.10955961009590141,
+      "ndcg_at_1": 0.3198236917629739,
+      "ndcg_at_3": 0.38211364000268727,
+      "ndcg_at_5": 0.4346558235744545,
+      "precision_at_5": 0.4031503695625833,
+      "n_genes": 39356.0
+    },
+    "chem_knn": {
+      "spearman": 0.24018795403295493,
+      "kendall": 0.1782807722495209,
+      "ndcg_at_1": 0.37490641738515,
+      "ndcg_at_3": 0.43447106614392433,
+      "ndcg_at_5": 0.4852056416660268,
+      "precision_at_5": 0.43415381419743476,
+      "n_genes": 39356.0
+    },
+    "linear_mf": {
+      "spearman": 0.1426209230776969,
+      "kendall": 0.10311709273811315,
+      "ndcg_at_1": 0.3174930500199694,
+      "ndcg_at_3": 0.37544669000677505,
+      "ndcg_at_5": 0.4289868052015972,
+      "precision_at_5": 0.3939658306070519,
+      "n_genes": 39356.0
+    },
+    "chem_null": {
+      "spearman": 0.023467938720511977,
+      "kendall": 0.01754043228959567,
+      "ndcg_at_1": 0.2398677107192204,
+      "ndcg_at_3": 0.29094921238003124,
+      "ndcg_at_5": 0.3433539276426068,
+      "precision_at_5": 0.34477332917899983,
+      "n_genes": 39356.0
+    }
   }
 }

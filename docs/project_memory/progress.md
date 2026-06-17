@@ -13,14 +13,13 @@ The dated log below is append-only (newest first) — never rewrite past entries
 - **Data:** recovered byte-for-byte after the `data` symlink incident (canonical
   parquet rebuilt from `feba.db`, sha256 matches the manifest). `data` is now an
   untracked, gitignored machine-local symlink. See `bugs.md`.
-- **Headline anchor (in progress / just completed):** the corrected 23-org / 3-seed
-  `R-EVAL` is confirming the published numbers — seed-2 showed model NDCG@5 **0.4345**
-  / chem-kNN **0.4852** (right on ~0.435/0.485). When it finishes it writes the
-  `full` entry into `data_contract/ranking/reval_baseline.json`.
-- **Open loose ends:** (1) commit the `.gitignore /data/`→`/data` fix (it was left
-  uncommitted) — being handled now; (2) delete the merged throwaway branch
-  `ranking-cleanup` once this session's worktree is freed; (3) write the `full`
-  baseline entry once the headline run lands.
+- **Headline anchor — CONFIRMED (23-org, 3-seed):** model NDCG@5 **0.4347** /
+  Spearman **0.1509**; chem-kNN NDCG@5 **0.4852** / Spearman **0.2402** — matches
+  the published ~0.435/0.485 on the cleaned code. Written as the `full` entry in
+  `data_contract/ranking/reval_baseline.json` (alongside the `fast` per-step gate).
+- **Open loose ends:** delete the merged throwaway branch `ranking-cleanup` once
+  this session's worktree is freed. (Resolved: `.gitignore /data` fix committed;
+  full baseline written.)
 
 ## Next tasks (the top-k objective)
 
