@@ -26,6 +26,10 @@ clobbering the real `data` link.
 bytes + rows). The rebuild reproduced sha256 `9b981201…` exactly.
 **Lesson:** never `git add -A` when a `data` symlink is present; check
 `git status` for an unexpected `data` entry before committing.
+**Related gotcha:** switching branches in a worktree can DELETE the gitignored
+`data` symlink (if a branch in the checkout's history tracked `data`, git removes
+it on checkout) → `FileNotFoundError` on the parquet. Fix: recreate it —
+`ln -sfn /home/ds85/projects/GeneEssentiality/data data` (the real data root).
 
 ### `orgs=null` ≠ the 23-org headline
 `experiment.orgs=null` means **all** organisms (~107k eligible genes) and gives

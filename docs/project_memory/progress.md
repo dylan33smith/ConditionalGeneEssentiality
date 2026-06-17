@@ -7,32 +7,29 @@ The dated log below is append-only (newest first) — never rewrite past entries
 
 ## Where we left off (2026-06-17)
 
-- **Branch:** `ranking` (trunk), pushed and in sync with `origin/ranking`.
+- **Branch:** working on `rankingbatch-wiring` (off `ranking`); `RankingBatch` is
+  now wired into training (commit pending). `ranking` is the trunk.
 - **Repo:** cleaned + modular — self-contained `src/ranking/` core, shared runner,
-  bit-exact `R-EVAL` regression gate. Tests green (~125 ranking tests).
+  `R-EVAL` regression gate. Training batches now flow through the `RankingBatch`
+  samplers (no hand-rolled batching).
 - **Data:** recovered byte-for-byte after the `data` symlink incident (canonical
-  parquet rebuilt from `feba.db`, sha256 matches the manifest). `data` is now an
-  untracked, gitignored machine-local symlink. See `bugs.md`.
-- **Headline anchor — CONFIRMED (23-org, 3-seed):** model NDCG@5 **0.4347** /
-  Spearman **0.1509**; chem-kNN NDCG@5 **0.4852** / Spearman **0.2402** — matches
-  the published ~0.435/0.485 on the cleaned code. Written as the `full` entry in
-  `data_contract/ranking/reval_baseline.json` (alongside the `fast` per-step gate).
-- **Open loose ends:** delete the merged throwaway branch `ranking-cleanup` once
-  this session's worktree is freed. (Resolved: `.gitignore /data` fix committed;
-  full baseline written.)
+  parquet rebuilt from `feba.db`, sha256 matches the manifest). `data` is an
+  untracked, gitignored machine-local symlink (must be recreated per worktree —
+  a branch checkout can drop it). See `bugs.md`.
+- **Baseline (re-set for the RankingBatch wiring, 23-org/3-seed):** model NDCG@5
+  **0.4319** / Spearman **0.1522**; chem-kNN NDCG@5 **0.4852** / Spearman **0.2402**
+  (chem-kNN bit-exact vs pre-wiring; model within gate tolerance of the prior
+  0.4347/0.1509). Fast gate re-set to model 0.4468 / kNN 0.5091.
+- **Open loose ends:** merge `rankingbatch-wiring` → `ranking` (pending user nod);
+  delete the throwaway `ranking-cleanup` branch.
 
 ## Next tasks (the top-k objective)
 
-1. **Wire `RankingBatch` into training** — the `src/data/datasets/ranking_batch.py`
-   samplers (pointwise/pairwise/listwise) are built + tested but not yet used by the
-   trainers. Adopt them in `src/ranking/train.py`. **This will move the numbers by
-   design** (different batch composition) — re-baseline `R-EVAL` and report
-   before/after; it's a modeling change, not a regression.
-2. **Top-k loss experiment** — use the runner to compare top-focused losses
+1. **Top-k loss experiment** — use the runner to compare top-focused losses
    (lambdarank / approxndcg, already in `src/ranking/losses`) and list-truncated
    variants; judge on NDCG@5 + precision@5 vs the chem-kNN gate. A new arm = one
    `ArmSpec`.
-3. **Cold-gene diagnostic (optional)** — quantify how far chem-kNN degrades on
+2. **Cold-gene diagnostic (optional)** — quantify how far chem-kNN degrades on
    unseen genes (the one regime a global model could help), to bound the value of
    further modeling.
 
@@ -43,6 +40,19 @@ The dated log below is append-only (newest first) — never rewrite past entries
 ---
 
 ## Log
+
+### 2026-06-17 — Wire `RankingBatch` into training (first top-k step)
+Replaced the hand-rolled batching in `src/ranking/train.py` with the tested
+`RankingBatch` samplers (`PointwiseSampler` for pointwise; `ListwiseSampler` for
+the ranking losses); deleted `_build_gene_groups`/`_make_batch`. Loss interfaces
+unchanged. **R-EVAL result:** 23-org/3-seed locked `pointwise_huber` arm moved
+NDCG@5 0.4347→**0.4319** (Δ−0.0028, within tol), Spearman 0.1509→**0.1522**;
+chem-kNN bit-exact (0.4852/0.2402). Fast single-seed gate moved more (NDCG@5
+0.4516→0.4468) — seed noise from the different shuffle stream. 3-lens adversarial
+review CLEAN (index/mask/loss correct; movement is RNG variance, not a bug).
+`reval_baseline.json` re-set to the new numbers (fast + full). pytest 70 (ranking
+core) green. Note: a branch checkout dropped the gitignored `data` symlink in the
+worktree — recreate it (`ln -sfn <real data root> data`) per `bugs.md`.
 
 ### 2026-06-17 — `data` symlink incident + byte-exact recovery
 While running the 23-org headline anchor, the `data` link resolved to a self-loop
