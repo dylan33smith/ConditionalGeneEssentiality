@@ -1,0 +1,26 @@
+# @package _global_
+# R-TOPK — top-k loss experiment (PLAN item 1, post-RankingBatch wiring).
+#
+# Question: now that training uses the RankingBatch listwise samplers, can a
+# TOP-FOCUSED loss move NDCG@5 toward the chem-kNN gate (~0.485)? Compares the
+# pointwise baseline + the existing top-focused ranking losses + new
+# list-truncated NDCG@5 variants (lambdarank_top5 / approxndcg_top5). Judged on
+# NDCG@5 + precision@5 vs the gate (R-LOCK-4). Reuses the R-LOSS handler/runner.
+
+experiment_id: R-TOPK_loss
+stage_or_tier: R-LOSS
+regime: R
+
+experiment:
+  hypothesis: H-R-TOPK-01      # a top-k-truncated loss beats the chem-kNN gate on NDCG@5
+  arms:
+    - loss: pointwise_huber    # locked baseline reference
+    - loss: lambdarank         # top-focused (NDCG-weighted pairwise)
+    - loss: approxndcg         # smooth NDCG surrogate
+    - loss: lambdarank_top5    # NEW: ΔNDCG truncated to top-5
+    - loss: approxndcg_top5    # NEW: NDCG@5 surrogate
+  seeds: [0, 1, 2]
+  epochs: 15
+  orgs: [ANA3, BFirm, Btheta, Burk376, Caulo, Cola, Cup4G11, Dda3937, Ddia6719,
+         DdiaME23, Dino, DvH, Dyella79, HerbieS, Kang, Keio, Korea, Koxy, MR1,
+         Marino, Methanococcus_JJ, Methanococcus_S2, Miya]

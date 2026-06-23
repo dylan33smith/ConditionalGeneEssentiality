@@ -14,7 +14,10 @@ from src.ranking.losses.family import (
     lambdarank,
     listmle,
     approxndcg,
+    lambdarank_top5,
+    approxndcg_top5,
 )
 
 __all__ = ["LOSSES", "pointwise_mse", "pointwise_huber", "pairwise_ranknet",
-           "lambdarank", "listmle", "approxndcg"]
+           "lambdarank", "listmle", "approxndcg",
+           "lambdarank_top5", "approxndcg_top5"]

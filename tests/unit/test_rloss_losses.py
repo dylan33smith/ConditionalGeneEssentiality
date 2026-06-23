@@ -66,6 +66,25 @@ def test_optimizing_recovers_ordering(name):
         assert min(nd) > 0.9, f"{name}: per-gene NDCG@3 {nd} not all > 0.9"
 
 
+def test_topk_truncation_engages_on_long_lists():
+    """On a gene with >k conditions, the top-5 variants must (a) be finite, (b)
+    differ from their untruncated counterparts (truncation actually engages), and
+    (c) still prefer a stressor-first ordering."""
+    torch.manual_seed(0)
+    L = 12
+    fit = torch.linspace(-3, 3, L).unsqueeze(0)           # 1 gene, 12 conditions
+    mask = torch.ones(1, L, dtype=torch.bool)
+    w = torch.ones(1)
+    scores = torch.randn(1, L)
+    for base, top in (("lambdarank", "lambdarank_top5"), ("approxndcg", "approxndcg_top5")):
+        lt = LOSSES[top](scores, fit, w, mask).item()
+        lb = LOSSES[base](scores, fit, w, mask).item()
+        assert np.isfinite(lt), f"{top} not finite"
+        assert abs(lt - lb) > 1e-6, f"{top} identical to {base} on a 12-cond gene (no truncation?)"
+        # perfect ordering should beat inverted under the top-k loss
+        assert LOSSES[top](fit.clone(), fit, w, mask).item() < LOSSES[top](-fit.clone(), fit, w, mask).item()
+
+
 def test_mse_zero_at_perfect():
     fit, mask, w = _batch()
     assert LOSSES["pointwise_mse"](fit.clone(), fit, w, mask).item() == pytest.approx(0.0, abs=1e-6)
