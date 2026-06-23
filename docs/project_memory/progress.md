@@ -5,41 +5,80 @@ The dated log below is append-only (newest first) — never rewrite past entries
 
 ---
 
-## Where we left off (2026-06-17)
+## Where we left off (2026-06-18)
 
-- **Branch:** `ranking` (trunk), pushed and in sync with `origin/ranking`.
-  `RankingBatch` is wired into training (merged via `6d3ff05`).
+- **Branch:** `topk-loss` (off `ranking` at `c416ecf`). Holds the top-k loss
+  variants + the R-AUG experiment + their decisions/memory. **Not yet merged** to
+  `ranking` — awaiting the go-ahead (adds new loss code + the R-AUG handler).
 - **Repo:** cleaned + modular — self-contained `src/ranking/` core, shared runner,
-  `R-EVAL` regression gate. Training batches now flow through the `RankingBatch`
-  samplers (no hand-rolled batching).
-- **Data:** recovered byte-for-byte after the `data` symlink incident (canonical
-  parquet rebuilt from `feba.db`, sha256 matches the manifest). `data` is an
-  untracked, gitignored machine-local symlink (must be recreated per worktree —
-  a branch checkout can drop it). See `bugs.md`.
-- **Baseline (re-set for the RankingBatch wiring, 23-org/3-seed):** model NDCG@5
-  **0.4319** / Spearman **0.1522**; chem-kNN NDCG@5 **0.4852** / Spearman **0.2402**
-  (chem-kNN bit-exact vs pre-wiring; model within gate tolerance of the prior
-  0.4347/0.1509). Fast gate re-set to model 0.4468 / kNN 0.5091.
-- **Open loose ends:** none blocking. (Done: RankingBatch merged + pushed;
-  feature/throwaway branches deleted.) Next is the top-k loss experiment below.
+  `R-EVAL` regression gate. Training flows through the `RankingBatch` samplers.
+- **Data:** byte-for-byte canonical parquet from `feba.db`. `data` is an untracked,
+  gitignored machine-local symlink (recreate per worktree — a checkout can drop
+  it). 48 organisms total; 23 have a reliable replicate noise floor (the headline
+  eval subset); all 48 have ProteomeLM-L8 embeddings. See `bugs.md`.
+- **Baseline (23-org/3-seed):** model NDCG@5 **0.4319** / Spearman **0.1522**;
+  chem-kNN gate NDCG@5 **0.4852** / Spearman **0.2402**. Fast gate model 0.4468 /
+  kNN 0.5091.
+- **Two experiments just landed (both NEGATIVE — the gate stands):**
+  - **R-TOPK** (R-TOPK-DEC-001): top-k-truncated NDCG losses do NOT beat the gate
+    and fall *below* pointwise_huber (lambdarank_top5 0.4239, approxndcg_top5
+    0.3695). Objective axis closed.
+  - **R-AUG** (R-AUG-DEC-001): training the model on all 48 orgs (eval still 23,
+    gate bit-identical) made it **worse** — NDCG@5 0.4319→**0.4166** (Δ−0.0152),
+    Spearman 0.1522→0.1270, disjoint across all 3 seeds. **Negative transfer.**
+    The model→gate gap is NOT a data-volume problem; it is structural.
+- **Open loose ends:** (1) merge `topk-loss` → `ranking` + push (needs nod);
+  (2) the cold-gene diagnostic is the designated next experiment.
 
-## Next tasks (the top-k objective)
+## Next tasks
 
-1. **Top-k loss experiment** — use the runner to compare top-focused losses
-   (lambdarank / approxndcg, already in `src/ranking/losses`) and list-truncated
-   variants; judge on NDCG@5 + precision@5 vs the chem-kNN gate. A new arm = one
-   `ArmSpec`.
-2. **Cold-gene diagnostic (optional)** — quantify how far chem-kNN degrades on
-   unseen genes (the one regime a global model could help), to bound the value of
-   further modeling.
+1. **Cold-gene diagnostic** — `materialize_cold_gene` already exists. Quantify how
+   far chem-kNN degrades on held-out *whole genes* (the one regime a global model
+   could win, since kNN has no within-gene history to retrieve). This is now the
+   only open lever after objective (R-LOSS/R-TOPK), encoder/capacity (R1), hybrids
+   (R-HYBRID), and training-org volume (R-AUG) all failed to beat the gate.
+2. **Merge `topk-loss` → `ranking`** (top-k losses + R-AUG handler + decisions),
+   then delete the feature branch.
 
 ### Lower-priority follow-ups
-- Migrate `r1/run.py` and `rconf/run.py` onto the shared runner (reval + rloss
+- Migrate `r1/run.py` and `rconf/run.py` onto the shared runner (reval/rloss/raug
   already are).
+- External Tn-seq datasets (MtbTnDB, A. baumannii — see 2026-06-18 survey):
+  shelved. R-AUG's negative transfer makes more-distant organisms a worse bet for
+  the within-org headline; revisit only if the cold-gene regime shows promise.
 
 ---
 
 ## Log
+
+### 2026-06-18 — R-AUG: train-organism augmentation (NEGATIVE — negative transfer)
+Tested whether training the global model on all 48 embedded organisms (eval still
+the locked 23, gate held bit-identical) narrows the model→chem-kNN gap. It does
+the opposite: aug_48org NDCG@5 **0.4166** vs base_23org **0.4319** (Δ**−0.0152**),
+Spearman 0.1522→0.1270, with every aug seed below every base seed (disjoint). The
+chem-kNN gate is bit-identical across arms (drift 0.000000), so the A/B is clean.
+**Negative transfer:** the extra organisms' conditional structure doesn't transfer
+(cf. T-regime ≈ random) and pulls the shared weights off the eval orgs. The
+model→gate gap is structural, not a training-data-volume problem. Closes the "add
+more organisms / external Tn-seq datasets" line for the within-org headline.
+Decision: `research_log/decisions/raug/R-AUG-DEC-001.md`. **Implementation:** added
+`R1Data.baseline_train` + `prepare_r_aug_data` (model trains on the union, val +
+eligibility + ALL baselines stay locked to the 23 eval orgs) + the `R-AUG` handler
+/ config. Reproduce: `+experiment=R-AUG_train_org_augmentation` (artifacts in
+`artifacts/runs/raug/`). Context: a 2026-06-18 web survey of external Tn-seq data
+(MtbTnDB, A. baumannii, Sphingobium SYK-6, Nichols E.coli) — shelved by this
+result.
+
+### 2026-06-17 — R-TOPK: top-k-truncated losses (NEGATIVE — objective axis closed)
+Post-RankingBatch, retested whether a loss that truncates NDCG gain to the top-5
+(matching the metric exactly) beats the gate. New losses `lambdarank_top5` +
+`approxndcg_top5` added to the registry (+ unit test). 5 arms × 3 seeds × 23 orgs:
+no loss beats the gate (0.4852); pointwise_huber stays best (0.4319), and the
+truncated variants fall BELOW their untruncated forms (lambdarank_top5 0.4239,
+approxndcg_top5 0.3695). Found+fixed an approxndcg_top5 training freeze (top-k gate
+reused the score temperature → vanishing gradient; fixed with `gate_temp=2.0`).
+Decision: `research_log/decisions/rloss/R-TOPK-DEC-001.md`. Reproduce:
+`+experiment=R-TOPK_loss`.
 
 ### 2026-06-17 — Wire `RankingBatch` into training (first top-k step)
 Replaced the hand-rolled batching in `src/ranking/train.py` with the tested

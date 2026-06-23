@@ -39,8 +39,29 @@ Morgan/RDKit/MACCS fingerprints did not beat the multihot chemistry encoder
 (R1-DEC-001). Among objectives, Huber slightly beats MSE (robust to fit outliers)
 and the ranking losses (RankNet/LambdaRank/ListMLE/ApproxNDCG) did **not** beat
 the gate (R-LOSS-DEC-001). **Decision:** carry `pointwise_huber + multihot_425` as
-the locked base. The ranking losses are **kept** as the substrate for the top-k
-objective (they target the top of the list, which is the next experiment).
+the locked base. The ranking losses are **kept** in the registry as a tested
+substrate, but the objective axis is now closed (see R-TOPK below).
+
+### The objective axis is closed — even top-k-direct losses lose (R-TOPK)
+Post-RankingBatch, added NDCG@5-truncated losses (`lambdarank_top5`,
+`approxndcg_top5`) that optimize *exactly* the promotion metric. They still do not
+beat the gate and land **below** plain pointwise_huber (0.4239 / 0.3695 vs 0.4319;
+gate 0.4852). **Decision:** keep pointwise_huber; stop pursuing the loss/objective
+as the lever. The gap is structural (local vs global), not a surrogate-choice
+problem. (R-TOPK-DEC-001.)
+
+### More training organisms HURT — negative transfer (R-AUG)
+Training the global model on all 48 feba organisms (eval held to the locked 23,
+chem-kNN gate bit-identical) made it **worse**, not better: NDCG@5 0.4319→0.4166
+(Δ−0.0152), Spearman 0.1522→0.1270, disjoint across all 3 seeds. **Decision:** do
+NOT augment training with more organisms for the within-org headline; keep the
+23-org training set. Rationale: the conditional signal does not transfer across
+organisms (cf. T-regime ≈ random), so pooling heterogeneous orgs pulls the shared
+weights off the eval orgs — classic negative transfer. This closes the
+training-data-VOLUME axis and, by extension, shelves the external-Tn-seq-dataset
+idea (more-distant organisms would only worsen the transfer) for this objective.
+The **cold-gene** regime (where chem-kNN has no within-gene history to retrieve)
+is the one remaining place a global model could win. (R-AUG-DEC-001.)
 
 ### Eligibility / metrics protocol (R-LOCK series)
 - **R-LOCK-1:** rank only genes whose fitness has real spread (`tail_g = p95−p5`
