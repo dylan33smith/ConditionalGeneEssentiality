@@ -54,9 +54,20 @@ class R1Data:
     eligible_val_genes: set
     fp_bundle: dict               # experiment fingerprint bundle (morgan/rdkit/maccs)
     mf_val_pred: "object" = None  # cached linear inductive-MF val predictions (Series)
+    baseline_train: "object" = None  # train rows the BASELINES score on. None → use
+                                  # .train. R-AUG sets this to the locked eval-org
+                                  # train so the chem-kNN gate stays bit-exact while
+                                  # .train (the MODEL's input) is augmented with more
+                                  # organisms — see prepare_r_aug_data.
 
 
-def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
+def _load_canonical(orgs: list[str] | None) -> pd.DataFrame:
+    """Load + filter canonical fitness and attach experiment_id + condition_key.
+
+    The shared front-half of prepare_r1_data, factored out so R-AUG can process
+    extra training organisms through the EXACT same path (same experiment_id /
+    condition_key derivation) before the split.
+    """
     raw = pd.read_parquet("data/derived/canonical/v0/fitness_experiment_long.parquet",
                           columns=_FIT_COLS)
     if orgs is not None:
@@ -73,6 +84,11 @@ def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
     from src.data.datasets.conditions import _normalize_string_keys
     norm = _normalize_string_keys(raw.copy())
     raw["condition_key"] = _condition_key(norm).values
+    return raw
+
+
+def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
+    raw = _load_canonical(orgs)
 
     # R-LOCK-2 split
     split = materialize_condition_holdout(raw, seed=seed)
@@ -120,6 +136,66 @@ def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
 
     return R1Data(train, val, val_raw, emb, gene_to_row, multihot, exp_to_row,
                   cond_features, elig_val, fp_bundle, mf_val_pred)
+
+
+def prepare_r_aug_data(eval_orgs: list[str], extra_orgs: list[str], *,
+                       seed: int = 0) -> R1Data:
+    """R-AUG: train the MODEL on (eval_orgs ∪ extra_orgs) while keeping the
+    evaluation locked to `eval_orgs`.
+
+    The val set, eligibility, and EVERY baseline (chem-kNN gate, chem-NULL,
+    linear-MF) are produced exactly as `prepare_r1_data(eval_orgs, seed)` would —
+    so the gate and the eligible-val denominator are bit-identical to the locked
+    23-org run. Only `.train` (the model's input) and the feature stores
+    (`.emb`/`.gene_to_row`, `.multihot`/`.exp_to_row`) are augmented with the
+    extra organisms, which contribute ENTIRELY to training (no val rows, no
+    influence on the baselines). `.baseline_train` carries the locked eval-org
+    train that the baselines score on.
+
+    This makes R-AUG a clean controlled A/B: identical denominator + identical
+    gate, the single manipulated variable being how many organisms the global
+    model trains on. chem-kNN is per-organism-local, so its number is unchanged;
+    only the global model can use the extra data.
+
+    NOTE: extra orgs are processed in isolation (their own split-free load +
+    per-org weights) precisely because `materialize_condition_holdout` draws from
+    one shared RNG in sorted-org order — folding extra orgs into a single split
+    would shift the eval orgs' holdout. Building the eval object first guarantees
+    the locked split is untouched.
+    """
+    import hashlib
+
+    data = prepare_r1_data(eval_orgs, seed=seed)
+    data.baseline_train = data.train               # baselines score on locked train
+
+    # extra orgs → all rows train; same experiment_id/condition_key derivation,
+    # same R-LOCK-1 per-org weighting policy (computed on extra rows alone == the
+    # per-org result, since the policy is per-organism).
+    extra = _load_canonical(extra_orgs)
+    policy = load_policy()
+    _, gene_to_w = compute_train_weights(extra, policy=policy)
+    extra["w_g"] = extra["gene_key"].map(gene_to_w).fillna(0.0)
+    extra["partition"] = "train"
+    aug_train = pd.concat(
+        [data.baseline_train, extra[data.baseline_train.columns]], ignore_index=True)
+
+    # embeddings + multihot extended to the union (model needs extra-org features;
+    # eval-org val genes/experiments remain present and correctly keyed)
+    union = sorted(set(eval_orgs) | set(extra_orgs))
+    emb, gene_to_row = _load_concatenated_embeddings(union, EMB_DIR)
+    exp_ids = sorted(set(aug_train["experiment_id"]) | set(data.val["experiment_id"]))
+    cache_key = "aug_" + hashlib.md5("|".join(union).encode()).hexdigest()[:12]
+    multihot, exp_to_row, _ = build_or_load_experiment_multihot(
+        chemistry_parquet_path=S4_DIR / "experiment_chemistry.parquet",
+        canonical_vocab_json_path=S4_DIR / "canonical_id_vocab.json",
+        target_experiment_ids=exp_ids,
+        cache_dir=Path("artifacts/cache/r1") / cache_key,
+    )
+
+    data.train = aug_train
+    data.emb, data.gene_to_row = emb, gene_to_row
+    data.multihot, data.exp_to_row = multihot, exp_to_row
+    return data
 
 
 # ---------------------------------------------------------------------------
@@ -292,8 +368,10 @@ def _full_eval(model, data: R1Data, arm: str, dev, *, seed: int, best_spear: flo
     v = _predict_val(model, data, arm, dev)
     elig = v[v["eligible"]].rename(columns={"pred": "model_pred"}).copy()
 
-    # Baseline predictions on the eligible val rows
-    tr = data.train
+    # Baseline predictions on the eligible val rows. Scored on baseline_train (the
+    # locked eval-org train) when set, so the chem-kNN gate is bit-exact even when
+    # data.train is augmented with extra organisms for the MODEL only (R-AUG).
+    tr = data.baseline_train if data.baseline_train is not None else data.train
     elig["null_pred"] = chemistry_nearest_condition_profile(tr, elig, data.cond_features).values
     elig["knn_pred"] = chemistry_knn_predict(tr, elig, data.cond_features, k=5).values
     # linear inductive-MF: precomputed once in prepare_r1_data (model-independent)

@@ -1,0 +1,30 @@
+# @package _global_
+# R-AUG — train-organism augmentation.
+#
+# Question: the headline trains+evaluates on the 23 replicate organisms only, so
+# the other ~25 feba organisms (incl. some of the largest: Putida, psRCH2, the
+# pseudo* set, WCS417, Phaeo, Pedo557 …) contribute ZERO training rows. Does
+# training the global model on ALL embedded organisms — while evaluating on the
+# same locked 23 against the same chem-kNN gate — narrow the model→gate gap?
+#
+# This is the one lever that helps ONLY the global model: chem-kNN is
+# per-organism-local and gains nothing from extra training organisms, so its gate
+# number is identical across the two arms. A null result is the strongest possible
+# confirmation that the bottleneck is structural (no transferable signal), not
+# training-data volume; a positive result promotes external data (MtbTnDB,
+# A. baumannii) to worth-the-integration-cost.
+
+experiment_id: R-AUG_train_org_augmentation
+stage_or_tier: R-AUG
+regime: R
+
+experiment:
+  hypothesis: H-R-AUG-01     # training on more organisms narrows the model→chem-kNN gap
+  # locked 23-organism replicate subset = the evaluation denominator + gate
+  eval_orgs: [ANA3, BFirm, Btheta, Burk376, Caulo, Cola, Cup4G11, Dda3937,
+              Ddia6719, DdiaME23, Dino, DvH, Dyella79, HerbieS, Kang, Keio,
+              Korea, Koxy, MR1, Marino, Methanococcus_JJ, Methanococcus_S2, Miya]
+  extra_orgs: auto           # auto = all embedded organisms minus eval_orgs (the other 25)
+  model_seeds: [0, 1, 2]
+  split_seed: 0
+  epochs: 8

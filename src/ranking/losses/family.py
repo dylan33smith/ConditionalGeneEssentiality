@@ -178,6 +178,75 @@ def approxndcg(scores, fit, w, mask, temp: float = 0.5):
     return (w * per_gene).sum() / w.sum().clamp_min(1e-6)
 
 
+# ---------------------------------------------------------------------------
+# Top-k (list-truncated) variants — focus the loss on the top-k of each gene's
+# ranking, where "find the top stressors" lives. Both directly target NDCG@k
+# (k matches the eval metric, k=5): LambdaRank with the ΔNDCG truncated to the
+# top-k positions, and ApproxNDCG normalized by IDCG@k with a smooth top-k gate.
+# ---------------------------------------------------------------------------
+
+def lambdarank_topk(scores, fit, w, mask, sigma: float = 1.0, k: int = 5):
+    """LambdaRank where the |ΔNDCG| weight uses NDCG@k: discounts beyond rank k
+    are zeroed (current order) and the ideal DCG is truncated to the top-k, so
+    only swaps affecting the top-k positions are emphasized."""
+    B, L = scores.shape
+    s_diff, valid, _ = _pair_terms(scores, fit, mask)
+    rel = _relevance(fit)
+    gain = (2.0 ** rel - 1.0)
+    masked_score = scores.masked_fill(~mask, _NEG_INF * -1)
+    order = torch.argsort(masked_score, dim=1)
+    ranks = torch.empty_like(order)
+    ar = torch.arange(L, device=scores.device).expand(B, L)
+    ranks.scatter_(1, order, ar)
+    topk = (ranks < k).float()                                 # @k truncation
+    disc = _dcg_discount(ranks) * mask.float() * topk
+    ideal_gain, _ = torch.sort(gain.masked_fill(~mask, 0.0), dim=1, descending=True)
+    pos = torch.arange(L, device=scores.device).expand(B, L)
+    ideal_disc = _dcg_discount(pos) * (pos < k).float()
+    idcg = (ideal_gain * ideal_disc).sum(1).clamp_min(1e-6)
+    gi = gain.unsqueeze(2); gj = gain.unsqueeze(1)
+    di = disc.unsqueeze(2); dj = disc.unsqueeze(1)
+    delta_ndcg = ((gi - gj) * (di - dj)).abs() / idcg.view(B, 1, 1)
+    loss_pair = F.softplus(s_diff * sigma) * delta_ndcg * valid.float()
+    per_gene = loss_pair.sum((1, 2)) / valid.float().sum((1, 2)).clamp_min(1.0)
+    return (w * per_gene).sum() / w.sum().clamp_min(1e-6)
+
+
+def approxndcg_topk(scores, fit, w, mask, temp: float = 0.5, k: int = 5,
+                    gate_temp: float = 2.0):
+    """ApproxNDCG@k: smooth NDCG normalized by IDCG@k, with the DCG gated to the
+    predicted top-k (a smooth sigmoid on the approximate rank). Loss = 1 - NDCG@k.
+
+    `temp` controls the rank approximation (sharp); `gate_temp` controls the
+    top-k membership gate (softer, so gradient flows near the boundary — a sharp
+    gate at `temp=0.5` vanishes the gradient, freezing training)."""
+    B, L = scores.shape
+    rel = _relevance(fit)
+    gain = (2.0 ** rel - 1.0) * mask.float()
+    si = scores.unsqueeze(2); sj = scores.unsqueeze(1)
+    mm = (mask.unsqueeze(2) & mask.unsqueeze(1)).float()
+    before = torch.sigmoid((si - sj) / temp) * mm
+    eye = torch.eye(L, device=scores.device).unsqueeze(0)
+    approx_rank = (before * (1 - eye)).sum(2)                  # [B, L], 0-indexed
+    disc = 1.0 / torch.log2(approx_rank + 2.0)
+    topk_gate = torch.sigmoid((k - 0.5 - approx_rank) / gate_temp)  # soft in-top-k
+    dcg = (gain * disc * topk_gate * mask.float()).sum(1)
+    ideal_gain, _ = torch.sort(gain, dim=1, descending=True)
+    pos = torch.arange(L, device=scores.device).float()
+    ideal_disc = (1.0 / torch.log2(pos + 2.0)) * (pos < k).float()
+    idcg = (ideal_gain * ideal_disc).sum(1).clamp_min(1e-6)
+    per_gene = 1.0 - dcg / idcg
+    return (w * per_gene).sum() / w.sum().clamp_min(1e-6)
+
+
+def lambdarank_top5(scores, fit, w, mask):
+    return lambdarank_topk(scores, fit, w, mask, k=5)
+
+
+def approxndcg_top5(scores, fit, w, mask):
+    return approxndcg_topk(scores, fit, w, mask, k=5)
+
+
 LOSSES = {
     "pointwise_mse": pointwise_mse,
     "pointwise_huber": pointwise_huber,
@@ -185,4 +254,6 @@ LOSSES = {
     "lambdarank": lambdarank,
     "listmle": listmle,
     "approxndcg": approxndcg,
+    "lambdarank_top5": lambdarank_top5,     # top-k (NDCG@5) variants
+    "approxndcg_top5": approxndcg_top5,
 }
