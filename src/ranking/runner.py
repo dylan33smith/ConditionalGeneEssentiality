@@ -30,9 +30,12 @@ from src.ranking.train import train_arm
 
 log = logging.getLogger(__name__)
 
-# the single metric schema every ranking result reports
-METRIC_KEYS = ("spearman", "kendall", "ndcg_at_1", "ndcg_at_3", "ndcg_at_5",
-               "precision_at_5", "n_genes")
+# the single metric schema every ranking result reports. The Spearman CI bounds
+# are the harness's hierarchical (org->gene) bootstrap (computed per method in
+# _metrics_for_pred); carrying them here surfaces them in the CSV + report so a
+# model-vs-gate disjoint-CI check is possible (e.g. the R-COLD confirmatory step).
+METRIC_KEYS = ("spearman", "spearman_ci_low", "spearman_ci_high", "kendall",
+               "ndcg_at_1", "ndcg_at_3", "ndcg_at_5", "precision_at_5", "n_genes")
 # methods always scored side-by-side (denominator parity)
 METHODS = ("model", "chem_knn", "linear_mf", "chem_null")
 GATE = "chem_knn"   # the baseline to beat (R1-DEC-001)
@@ -101,7 +104,29 @@ def standardized_report(results: list[dict], *, out_dir: str | Path, tag: str,
                  r["name"], m["spearman"], m["ndcg_at_5"], m["precision_at_5"], verdict)
     log.info("    gate(%s) NDCG@5=%.4f Spearman=%.4f", gate,
              results[0]["agg"][gate]["ndcg_at_5"], results[0]["agg"][gate]["spearman"])
+
+    # Spearman hierarchical-bootstrap CI: model vs gate, with a disjointness check.
+    # (For multi-seed runs these bounds are the mean of the per-seed CIs — a summary
+    # band, not a pooled-across-seeds CI; a pooled-prediction bootstrap is stronger.)
+    log.info("    %-16s  Spearman [95%% CI]      vs gate(%s) [95%% CI]   disjoint?", "arm", gate)
+    for r in results:
+        m, g = r["agg"]["model"], r["agg"][gate]
+        disjoint = _ci_disjoint(m, g)
+        flag = "—" if disjoint is None else ("YES" if disjoint else "no (overlap)")
+        log.info("    %-16s  %.4f [%.4f, %.4f]   %.4f [%.4f, %.4f]   %s",
+                 r["name"], m["spearman"], m["spearman_ci_low"], m["spearman_ci_high"],
+                 g["spearman"], g["spearman_ci_low"], g["spearman_ci_high"], flag)
     return df
+
+
+def _ci_disjoint(a: dict, b: dict) -> bool | None:
+    """True if a and b have non-overlapping Spearman 95% CIs (in either direction).
+    None when a CI is unavailable (NaN bound, e.g. an inapplicable baseline)."""
+    lo_a, hi_a = a.get("spearman_ci_low"), a.get("spearman_ci_high")
+    lo_b, hi_b = b.get("spearman_ci_low"), b.get("spearman_ci_high")
+    if any(x is None or x != x for x in (lo_a, hi_a, lo_b, hi_b)):  # NaN-safe
+        return None
+    return hi_a < lo_b or hi_b < lo_a
 
 
 def run_experiment(specs: list[ArmSpec], *, orgs=None, split_seed: int = 0,

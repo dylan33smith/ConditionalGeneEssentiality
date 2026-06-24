@@ -293,9 +293,13 @@ available predictor.
 **Scope / honesty.** chem-NULL is a *weaker* gate than chem-kNN, so the +0.030
 here is **not** a promotion against the locked R1 gate and changes no headline
 number. The effect is modest and the regime is genuinely harder (every method's
-NDCG@5 is ~0.27 vs ~0.43 warm). Confidence currently rests on per-seed
-disjointness; a hierarchical (org→gene) bootstrap CI on the pooled cold-gene Δ is
-the pending confirmatory step.
+NDCG@5 is ~0.27 vs ~0.43 warm). Confidence: per-seed disjointness AND the
+hierarchical (org→gene) bootstrap **Spearman CI is disjoint on the full 23-org
+set** — model 0.0735 [0.0523, 0.1034] vs chem-NULL 0.0359 [0.0230, 0.0514] (the
+runner now surfaces these CIs + a disjointness flag). Caveats: the margin is thin,
+the fast 3-org set is NOT disjoint (CIs overlap — needs the full org panel), and
+the harness bootstraps only Spearman, so NDCG@5 (the headline metric) still lacks
+a CI. Extending the bootstrap to NDCG@5 is the last confirmatory gap.
 
 **What it re-opens.** The inductive **cold-start-over-genes** objective is now the
 live lever — the one place the global model leads. Encoder/capacity (R1) and

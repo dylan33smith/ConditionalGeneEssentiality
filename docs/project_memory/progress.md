@@ -35,11 +35,15 @@ The dated log below is append-only (newest first) — never rewrite past entries
 
 ## Next tasks
 
-1. **Commit + merge `cold-gene` → `ranking`** (R-COLD handler + pipeline changes +
-   decision/memory), then push. Run `R-EVAL` first (already confirmed bit-exact).
-2. **Hierarchical-bootstrap CI on the cold-gene Δ** (model − chem-NULL, pooled
-   org→gene) — attach honest disjoint-CI confidence to the +0.030 before any
-   external claim. The harness computes the CI; the runner aggregation drops it.
+1. **DONE — committed on `ranking`** (`0db7f1a` R-COLD; CI surfacing in a
+   follow-up commit). R-EVAL bit-exact (0.4468/0.5091). **Not yet pushed** —
+   awaiting the nod.
+2. **Bootstrap CI on the cold-gene Δ** — DONE for Spearman: the runner now
+   surfaces the harness's hierarchical org→gene CI + a model-vs-gate disjointness
+   flag. Full 23-org Spearman is **disjoint** (model 0.0735 [0.0523, 0.1034] vs
+   chem-NULL 0.0359 [0.0230, 0.0514], thin margin); the fast 3-org set OVERLAPS
+   (needs the full panel). REMAINING: extend the bootstrap to NDCG@5 — the
+   headline metric still has no CI.
 3. **Re-open encoder/capacity + training-org volume IN THE COLD-GENE REGIME.**
    R-AUG's negative transfer was measured warm-only; more-diverse organisms may
    HELP inductive (cold-start-over-genes) generalization even though they hurt the
@@ -56,6 +60,19 @@ The dated log below is append-only (newest first) — never rewrite past entries
 ---
 
 ## Log
+
+### 2026-06-24 — Runner: surface the hierarchical-bootstrap Spearman CI (R-COLD confirmatory)
+The runner computed the harness's hierarchical (org→gene) Spearman CI per method
+but dropped it (not in `METRIC_KEYS`). Added `spearman_ci_low/high` to the schema
+(now in the CSV) and a model-vs-gate **disjointness flag** in `standardized_report`
+(`_ci_disjoint`). This delivers the R-COLD confirmatory step: full 23-org cold-gene
+Spearman is **CI-disjoint** (model 0.0735 [0.0523, 0.1034] vs chem-NULL 0.0359
+[0.0230, 0.0514], thin margin), upgrading confidence from per-seed point estimates
+to disjoint 95% CIs. The fast 3-org set OVERLAPS (0.1155 [0.0614, 0.1938] vs 0.0813
+[0.0269, 0.1564]) — CI-significance needs the full org panel. Caveats: multi-seed
+bounds are the mean of per-seed CIs (a summary band, not a pooled bootstrap), and
+the harness bootstraps only Spearman — NDCG@5 (the headline metric) still has no CI
+(the last confirmatory gap). Additive schema change; R-EVAL value-gate unaffected.
 
 ### 2026-06-23 — R-COLD: cold-gene diagnostic (FIRST POSITIVE — embedding generalizes)
 Built + ran the designated cold-gene (inductive-over-genes) diagnostic. The

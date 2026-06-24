@@ -107,13 +107,21 @@ same magnitude as the headline.
     (the only applicable baseline on cold genes), a WEAKER bar than chem-kNN; the
     +0.030 here is not comparable to the ΔNDCG@5 ≳ 0.026-vs-chem-kNN promotion
     rule. No headline number changes.
-  - Confidence rests on per-seed disjointness (3/3, tight spread). A formal
-    hierarchical (org→gene) bootstrap CI on the pooled cold-gene predictions is
-    the recommended confirmatory step before any external claim — the harness
-    computes it; the runner aggregation currently drops it.
+  - Confidence: per-seed disjointness (3/3, tight spread) AND the hierarchical
+    (org→gene) bootstrap Spearman CI is now disjoint on the full 23-org set —
+    model 0.0735 **[0.0523, 0.1034]** vs chem-NULL 0.0359 **[0.0230, 0.0514]**
+    (model lower bound clears the gate upper bound, though the margin is thin).
+    The runner now surfaces these CIs + a disjointness flag (previously dropped).
+    NOTE the fast 3-org set is NOT disjoint (model 0.1155 [0.0614, 0.1938] vs
+    0.0813 [0.0269, 0.1564] — overlap): the CI-significance needs the full org
+    panel. REMAINING: the harness bootstraps only Spearman; NDCG@5 (the headline
+    metric) has no CI yet — a per-metric bootstrap on the NDCG@5 Δ is the last
+    confirmatory gap.
 - recommended next work:
-  1. Hierarchical-bootstrap CI on the cold-gene model vs chem-NULL deltas (pooled),
-     to attach honest disjoint-CI confidence to the +0.030.
+  1. DONE for Spearman — the runner now surfaces the hierarchical bootstrap CI and
+     a model-vs-gate disjointness flag (full 23-org: disjoint YES; fast 3-org:
+     overlap). REMAINING: extend the bootstrap to NDCG@5 (the headline metric has
+     no CI yet) for a disjoint-CI claim on NDCG, not just Spearman.
   2. Re-open the encoder/capacity and training-org-volume axes IN THE COLD-GENE
      REGIME (R-AUG's negative transfer was measured warm; diverse organisms may
      help inductive generalization). 
