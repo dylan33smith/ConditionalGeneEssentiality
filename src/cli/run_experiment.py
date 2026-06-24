@@ -36,6 +36,7 @@ _HANDLERS = {
     "R-CONF": "src.experiments.rconf.run:main",
     "R-EVAL": "src.experiments.reval.run:main",
     "R-AUG": "src.experiments.raug.run:main",
+    "R-COLD": "src.experiments.rcold.run:main",
 }
 
 

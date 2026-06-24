@@ -61,23 +61,27 @@ def _agg(comps: list[dict], method: str) -> dict:
     return {k: float(np.mean([c[method][k] for c in comps])) for k in METRIC_KEYS}
 
 
-def run_arm(spec: ArmSpec, data, *, model_seeds=(0,)) -> dict:
+def run_arm(spec: ArmSpec, data, *, model_seeds=(0,), gate: str = GATE) -> dict:
     """Train one arm across seeds on prepared data; return per-seed + seed-mean
-    comparisons (model + baselines)."""
+    comparisons (model + baselines). `gate` selects the baseline-to-beat for the
+    logged side-by-side (default chem-kNN; the cold_gene diagnostic uses chem-NULL,
+    since chem-kNN can't score a held-out gene)."""
     comps = []
     for s in model_seeds:
         c = _train_one(spec, data, s)
         comps.append(c)
         log.info("    [%s seed=%d] model NDCG@5=%.4f Spear=%.4f | %s NDCG@5=%.4f",
                  spec.name, s, c["model"]["ndcg_at_5"], c["model"]["spearman"],
-                 GATE, c[GATE]["ndcg_at_5"])
+                 gate, c[gate]["ndcg_at_5"])
     return {"name": spec.name, "spec": spec, "per_seed": comps,
             "agg": {m: _agg(comps, m) for m in METHODS}, "n_seeds": len(model_seeds)}
 
 
-def standardized_report(results: list[dict], *, out_dir: str | Path, tag: str) -> pd.DataFrame:
+def standardized_report(results: list[dict], *, out_dir: str | Path, tag: str,
+                        gate: str = GATE) -> pd.DataFrame:
     """Tidy CSV (one row per arm×method, full metric schema) + a side-by-side log
-    of each arm's model vs the chem-kNN gate. Returns the long DataFrame."""
+    of each arm's model vs the gate baseline. Returns the long DataFrame. `gate`
+    defaults to chem-kNN; the cold_gene diagnostic passes chem-NULL."""
     out = Path(out_dir); out.mkdir(parents=True, exist_ok=True)
     rows = []
     for r in results:
@@ -87,16 +91,16 @@ def standardized_report(results: list[dict], *, out_dir: str | Path, tag: str) -
     df = pd.DataFrame(rows)
     df.to_csv(out / f"{tag}_metrics.csv", index=False)
 
-    log.info("STANDARDIZED REPORT [%s] — model vs chem-kNN gate (seed-mean):", tag)
+    log.info("STANDARDIZED REPORT [%s] — model vs %s gate (seed-mean):", tag, gate)
     log.info("    %-16s %9s %8s %8s   %-14s", "arm", "Spearman", "NDCG@5", "prec@5", "vs gate NDCG@5")
     for r in results:
-        m, g = r["agg"]["model"], r["agg"][GATE]
+        m, g = r["agg"]["model"], r["agg"][gate]
         d = m["ndcg_at_5"] - g["ndcg_at_5"]
         verdict = "BEATS gate" if d > 0 else f"{d:+.4f}"
         log.info("    %-16s %9.4f %8.4f %8.4f   %-14s",
                  r["name"], m["spearman"], m["ndcg_at_5"], m["precision_at_5"], verdict)
-    log.info("    gate(chem-kNN) NDCG@5=%.4f Spearman=%.4f",
-             results[0]["agg"][GATE]["ndcg_at_5"], results[0]["agg"][GATE]["spearman"])
+    log.info("    gate(%s) NDCG@5=%.4f Spearman=%.4f", gate,
+             results[0]["agg"][gate]["ndcg_at_5"], results[0]["agg"][gate]["spearman"])
     return df
 
 

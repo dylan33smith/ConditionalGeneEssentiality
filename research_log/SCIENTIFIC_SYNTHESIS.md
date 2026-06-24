@@ -253,3 +253,52 @@ not a target. chem-kNN vanishes on cold genes, so the split measures the
 memorization (warm, kNN-dominated) vs transferable generalization (cold,
 global-only). Expected to be poor (consistent with T-stage); valuable for the
 paper's "is this just memorization?" question; optional to run.
+
+## 8. Q: On cold genes, does the embedding generalize? — YES (R-COLD-DEC-001, 2026-06-23)
+
+Ran the diagnostic. The expectation above ("expected to be poor, consistent with
+T-stage") was **half right and half wrong**, and the distinction matters:
+
+- chem-kNN **does** vanish on cold genes — coverage **0.0000** (no own-gene
+  history to retrieve), linear-MF likewise unlearnable. Confirmed. So chem-NULL
+  (the population condition profile, gene-identity-free) is the only applicable
+  baseline → the gate.
+- But the global model is **not** poor relative to that gate — it **beats** it.
+  23-org/3-seed, n=11,761 eligible cold val genes:
+
+  | method | within-gene Spearman | NDCG@5 | coverage |
+  |---|---|---|---|
+  | chem-kNN / linear-MF | — | — | **0% (inapplicable)** |
+  | chem-NULL (gate) | 0.0359 | 0.2447 | 100% |
+  | **model (frozen emb + chem)** | **0.0735** | **0.2748** | 100% |
+  | **Δ (model − chem-NULL)** | **+0.0376** | **+0.0301** | — |
+
+  Per-seed model NDCG@5 [0.2732, 0.2746, 0.2765] is disjoint above the constant
+  gate 0.2447. Fast (Keio+Caulo+MR1) reproduces the sign/magnitude (+0.0271).
+
+**Why the T-stage prior didn't apply.** T-stage measured cross-ORGANISM transfer
+(≈ 0.045) — generalizing to genes in a *held-out organism*. Cold-gene is
+cross-GENE transfer *within known organisms*: the embedding places an unseen gene
+among the organism's seen genes, and the per-organism chemistry→fitness structure
+is shared. That is a much easier ask than cross-organism, and the embedding clears
+it.
+
+**The corrected central claim.** The warm-split negative is a **memorization
+gap**, not an "embeddings carry no signal" result. The frozen ProteomeLM embedding
+*does* encode transferable gene-specific conditional-response signal — it is simply
+outgunned by per-gene memorization (chem-kNN) wherever a gene's own history exists.
+Remove that history (cold genes) and the learned/global component is the best
+available predictor.
+
+**Scope / honesty.** chem-NULL is a *weaker* gate than chem-kNN, so the +0.030
+here is **not** a promotion against the locked R1 gate and changes no headline
+number. The effect is modest and the regime is genuinely harder (every method's
+NDCG@5 is ~0.27 vs ~0.43 warm). Confidence currently rests on per-seed
+disjointness; a hierarchical (org→gene) bootstrap CI on the pooled cold-gene Δ is
+the pending confirmatory step.
+
+**What it re-opens.** The inductive **cold-start-over-genes** objective is now the
+live lever — the one place the global model leads. Encoder/capacity (R1) and
+training-org volume (R-AUG, whose negative transfer was measured *warm-only*) are
+worth re-testing *in this regime*; diverse/external organisms (MtbTnDB,
+A. baumannii) are un-shelved as cold-gene candidates. See R-COLD-DEC-001.

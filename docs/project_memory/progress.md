@@ -5,51 +5,82 @@ The dated log below is append-only (newest first) — never rewrite past entries
 
 ---
 
-## Where we left off (2026-06-18)
+## Where we left off (2026-06-23)
 
-- **Branch:** `topk-loss` (off `ranking` at `c416ecf`). Holds the top-k loss
-  variants + the R-AUG experiment + their decisions/memory. **Not yet merged** to
-  `ranking` — awaiting the go-ahead (adds new loss code + the R-AUG handler).
+- **Branch:** `ranking`. The R-COLD cold-gene diagnostic (handler +
+  `prepare_cold_gene_data` + config + decision/memory) is **committed directly on
+  `ranking`** (the work landed here, not on the stale `cold-gene` placeholder
+  branch, which held a divergent uncommitted draft in its worktree). The earlier
+  `topk-loss` branch is already merged + pushed at `b935485`.
 - **Repo:** cleaned + modular — self-contained `src/ranking/` core, shared runner,
   `R-EVAL` regression gate. Training flows through the `RankingBatch` samplers.
 - **Data:** byte-for-byte canonical parquet from `feba.db`. `data` is an untracked,
   gitignored machine-local symlink (recreate per worktree — a checkout can drop
   it). 48 organisms total; 23 have a reliable replicate noise floor (the headline
   eval subset); all 48 have ProteomeLM-L8 embeddings. See `bugs.md`.
-- **Baseline (23-org/3-seed):** model NDCG@5 **0.4319** / Spearman **0.1522**;
-  chem-kNN gate NDCG@5 **0.4852** / Spearman **0.2402**. Fast gate model 0.4468 /
-  kNN 0.5091.
-- **Two experiments just landed (both NEGATIVE — the gate stands):**
-  - **R-TOPK** (R-TOPK-DEC-001): top-k-truncated NDCG losses do NOT beat the gate
-    and fall *below* pointwise_huber (lambdarank_top5 0.4239, approxndcg_top5
-    0.3695). Objective axis closed.
-  - **R-AUG** (R-AUG-DEC-001): training the model on all 48 orgs (eval still 23,
-    gate bit-identical) made it **worse** — NDCG@5 0.4319→**0.4166** (Δ−0.0152),
-    Spearman 0.1522→0.1270, disjoint across all 3 seeds. **Negative transfer.**
-    The model→gate gap is NOT a data-volume problem; it is structural.
-- **Open loose ends:** (1) merge `topk-loss` → `ranking` + push (needs nod);
-  (2) the cold-gene diagnostic is the designated next experiment.
+- **Warm-split baseline (23-org/3-seed):** model NDCG@5 **0.4319** / Spearman
+  **0.1522**; chem-kNN gate NDCG@5 **0.4852** / Spearman **0.2402**. Fast gate
+  model 0.4468 / kNN 0.5091 (R-EVAL still bit-exact after the R-COLD changes).
+- **R-COLD just landed — FIRST POSITIVE (R-COLD-DEC-001):** on the cold_gene split
+  (whole genes held out → chem-kNN coverage **0.0000**, linear-MF inapplicable, so
+  **chem-NULL is the gate**), the model BEATS chem-NULL on genes it never trained
+  on: 23-org/3-seed NDCG@5 **0.2748 vs 0.2447** (Δ**+0.0301**), Spearman **0.0735
+  vs 0.0359** (Δ**+0.0376**), n=11,761, disjoint across all 3 seeds. **The
+  embedding carries transferable gene-specific signal.** This reframes the warm
+  negative as a MEMORIZATION gap (kNN retrieves a gene's own history), not an
+  "embeddings are useless" result. NOT a promotion vs the locked chem-kNN gate —
+  chem-NULL is a weaker bar; no headline number changes.
+- **Prior axes (all NEGATIVE on the warm split):** R-TOPK (objective), R-AUG
+  (training-org volume → negative transfer), R1 (encoder/capacity), R-HYBRID.
 
 ## Next tasks
 
-1. **Cold-gene diagnostic** — `materialize_cold_gene` already exists. Quantify how
-   far chem-kNN degrades on held-out *whole genes* (the one regime a global model
-   could win, since kNN has no within-gene history to retrieve). This is now the
-   only open lever after objective (R-LOSS/R-TOPK), encoder/capacity (R1), hybrids
-   (R-HYBRID), and training-org volume (R-AUG) all failed to beat the gate.
-2. **Merge `topk-loss` → `ranking`** (top-k losses + R-AUG handler + decisions),
-   then delete the feature branch.
+1. **Commit + merge `cold-gene` → `ranking`** (R-COLD handler + pipeline changes +
+   decision/memory), then push. Run `R-EVAL` first (already confirmed bit-exact).
+2. **Hierarchical-bootstrap CI on the cold-gene Δ** (model − chem-NULL, pooled
+   org→gene) — attach honest disjoint-CI confidence to the +0.030 before any
+   external claim. The harness computes the CI; the runner aggregation drops it.
+3. **Re-open encoder/capacity + training-org volume IN THE COLD-GENE REGIME.**
+   R-AUG's negative transfer was measured warm-only; more-diverse organisms may
+   HELP inductive (cold-start-over-genes) generalization even though they hurt the
+   warm headline. This is the live lever now.
 
 ### Lower-priority follow-ups
 - Migrate `r1/run.py` and `rconf/run.py` onto the shared runner (reval/rloss/raug
   already are).
 - External Tn-seq datasets (MtbTnDB, A. baumannii — see 2026-06-18 survey):
-  shelved. R-AUG's negative transfer makes more-distant organisms a worse bet for
-  the within-org headline; revisit only if the cold-gene regime shows promise.
+  un-shelved as a COLD-GENE candidate. R-AUG closed them for the warm headline, but
+  the cold-gene positive makes more-distant organisms worth revisiting for the
+  inductive regime.
 
 ---
 
 ## Log
+
+### 2026-06-23 — R-COLD: cold-gene diagnostic (FIRST POSITIVE — embedding generalizes)
+Built + ran the designated cold-gene (inductive-over-genes) diagnostic. The
+primary split is transductive over genes, so chem-kNN wins by retrieving a gene's
+OWN history; the cold_gene split holds out WHOLE genes (zero train rows), which
+makes chem-kNN structurally inapplicable (**coverage 0.0000**) and linear-MF
+unlearnable (no per-gene latent), leaving **chem-NULL** (population condition
+profile, gene-identity-free) as the only applicable baseline → the gate. **Result
+(23-org/3-seed, n=11,761):** model NDCG@5 **0.2748** vs chem-NULL **0.2447**
+(Δ**+0.0301**), Spearman **0.0735** vs **0.0359** (Δ**+0.0376**), with every model
+seed [0.2732, 0.2746, 0.2765] disjoint above the gate. Fast gate (Keio+Caulo+MR1):
+model 0.2905 vs 0.2633 (Δ+0.0271), same sign/magnitude. **The frozen ProteomeLM
+embedding carries transferable gene-specific conditional-response signal** — the
+first positive global-model result. Reframes the warm-split negative as a
+MEMORIZATION gap, not an embedding-value gap. NOT a promotion vs the locked
+chem-kNN gate (chem-NULL is a weaker bar; no headline number moves). Decision:
+`research_log/decisions/rcold/R-COLD-DEC-001.md`. **Implementation:** parameterized
+`prepare_r1_data` (split_fn / compute_mf / parity_pred_cols) + thin
+`prepare_cold_gene_data`; `R1Data.parity_pred_cols` restricts denominator parity to
+{model, chem-NULL}; coverage diagnostics + an all-NaN-baseline guard in
+`_metrics_for_pred` (inapplicable baseline → NaN, not a row-order artifact);
+configurable gate in the runner; `R-COLD` handler + `R-COLD_cold_gene.yaml` + CLI
+registration + a unit test. **R-EVAL fast gate bit-exact after the change** (model
+0.4468 / chem-kNN 0.5091); unit tests 125 passed. Reproduce:
+`+experiment=R-COLD_cold_gene` (artifacts in `artifacts/runs/rcold/`).
 
 ### 2026-06-18 — R-AUG: train-organism augmentation (NEGATIVE — negative transfer)
 Tested whether training the global model on all 48 embedded organisms (eval still

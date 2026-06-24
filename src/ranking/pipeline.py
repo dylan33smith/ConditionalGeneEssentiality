@@ -23,7 +23,8 @@ from torch import nn
 from src.data.datasets.build_s5_dataset import (
     _load_concatenated_embeddings, build_or_load_experiment_multihot)
 from src.data.preprocessing.build_experiment_chemistry import experiment_uid
-from src.data.datasets.build_ranking_split import materialize_condition_holdout
+from src.data.datasets.build_ranking_split import (
+    materialize_condition_holdout, materialize_cold_gene)
 from src.data.datasets.ranking_eligibility import (
     compute_train_weights, val_eligible_genes, load_policy)
 from src.data.datasets.condition_chemistry import load_condition_chemistry_features
@@ -59,6 +60,14 @@ class R1Data:
                                   # train so the chem-kNN gate stays bit-exact while
                                   # .train (the MODEL's input) is augmented with more
                                   # organisms — see prepare_r_aug_data.
+    parity_pred_cols: "object" = None  # prediction columns that must ALL be non-NaN to
+                                  # enter the denominator-parity common set. None → the
+                                  # default 4 (model+knn+null+mf), preserving the primary
+                                  # split's behavior bit-exactly. The cold_gene diagnostic
+                                  # sets ["model_pred","null_pred"] because chem-kNN and
+                                  # inductive-MF are STRUCTURALLY inapplicable to a held-out
+                                  # whole gene (no own-gene train history / no learned
+                                  # per-gene latent) — see prepare_cold_gene_data.
 
 
 def _load_canonical(orgs: list[str] | None) -> pd.DataFrame:
@@ -87,11 +96,22 @@ def _load_canonical(orgs: list[str] | None) -> pd.DataFrame:
     return raw
 
 
-def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
+def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0,
+                    split_fn=materialize_condition_holdout,
+                    compute_mf: bool = True,
+                    parity_pred_cols: list[str] | None = None) -> R1Data:
+    """Prepare the ranking dataset (split + eligibility + features + baselines).
+
+    Defaults reproduce the PRIMARY within-org condition-holdout split bit-for-bit.
+    `split_fn` swaps in a diagnostic split (e.g. materialize_cold_gene);
+    `compute_mf=False` skips the linear inductive-MF baseline (inapplicable when a
+    baseline can't be defined for the split — e.g. cold genes have no per-gene
+    latent); `parity_pred_cols` overrides the denominator-parity method set.
+    """
     raw = _load_canonical(orgs)
 
-    # R-LOCK-2 split
-    split = materialize_condition_holdout(raw, seed=seed)
+    # R-LOCK-2 split (or a diagnostic split via split_fn)
+    split = split_fn(raw, seed=seed)
     raw = raw.loc[split.partition.index]
     raw["partition"] = split.partition.values
     train = raw[raw["partition"] == "train"].copy()
@@ -130,12 +150,38 @@ def prepare_r1_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
 
     # Linear inductive-MF baseline — depends only on (train, val, features), so
     # compute ONCE here and reuse across all arms/seeds (it's model-independent).
-    from src.ranking.eval import inductive_mf_predict
-    mf_val_pred = inductive_mf_predict(
-        train, val, cond_features, rank=32, epochs=20, lr=0.05, weight_col="w_g")
+    # Skipped when inapplicable (compute_mf=False): a held-out whole gene has no
+    # free per-gene latent U[g], so MF cannot predict for it.
+    if compute_mf:
+        from src.ranking.eval import inductive_mf_predict
+        mf_val_pred = inductive_mf_predict(
+            train, val, cond_features, rank=32, epochs=20, lr=0.05, weight_col="w_g")
+    else:
+        mf_val_pred = None
 
-    return R1Data(train, val, val_raw, emb, gene_to_row, multihot, exp_to_row,
+    data = R1Data(train, val, val_raw, emb, gene_to_row, multihot, exp_to_row,
                   cond_features, elig_val, fp_bundle, mf_val_pred)
+    data.parity_pred_cols = parity_pred_cols
+    return data
+
+
+def prepare_cold_gene_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
+    """DIAGNOSTIC: hold out WHOLE genes per org (inductive-over-genes test).
+
+    The one regime where a global embedding model could beat the per-gene
+    retrieval baselines: chem-kNN predicts a gene's held-out conditions from that
+    gene's OWN train conditions, and inductive-MF needs a learned per-gene latent —
+    both are STRUCTURALLY blind to a gene with zero training rows (coverage → 0).
+    chem-NULL (the population condition-profile: train-gene-mean fit at the nearest
+    train condition, gene-identity-free) is the only non-model baseline that still
+    applies, so it becomes the gate. The scientific question: does the frozen
+    ProteomeLM embedding carry gene-specific conditional-response signal beyond the
+    population average, on genes the model never saw?
+    """
+    return prepare_r1_data(orgs, seed=seed,
+                           split_fn=materialize_cold_gene,
+                           compute_mf=False,
+                           parity_pred_cols=["model_pred", "null_pred"])
 
 
 def prepare_r_aug_data(eval_orgs: list[str], extra_orgs: list[str], *,
@@ -348,6 +394,18 @@ def _metrics_for_pred(df: pd.DataFrame, pred_col: str) -> dict:
     for denominator parity).
     """
     d = df.rename(columns={pred_col: "pred"})
+    # A baseline with zero coverage on these rows (every pred NaN) is INAPPLICABLE
+    # — report NaN, not a number. Otherwise within_gene_retrieval would "rank" the
+    # all-NaN column by arbitrary row order and emit a meaningless non-NaN NDCG
+    # (this is exactly what chem-kNN/MF look like on the cold_gene split).
+    if not d["pred"].notna().any():
+        nan_out = {"spearman": float("nan"), "spearman_ci_low": float("nan"),
+                   "spearman_ci_high": float("nan"), "kendall": float("nan"),
+                   "n_genes": 0}
+        for k in (1, 3, 5):
+            nan_out[f"ndcg_at_{k}"] = float("nan")
+            nan_out[f"precision_at_{k}"] = float("nan")
+        return nan_out
     pg_sp = per_gene_correlations(d, metric="spearman", pred_col="pred")
     pg_kd = per_gene_correlations(d, metric="kendall", pred_col="pred")
     sp_ci = hierarchical_bootstrap_ci(pg_sp, n_bootstrap=300)
@@ -380,9 +438,13 @@ def _full_eval(model, data: R1Data, arm: str, dev, *, seed: int, best_spear: flo
     else:
         elig["mf_pred"] = np.nan
 
-    # COMMON gene set: rows where ALL methods produce a prediction
-    # (denominator parity — scored on identical genes).
-    common = elig.dropna(subset=["model_pred", "null_pred", "knn_pred", "mf_pred"]).copy()
+    # COMMON gene set: rows where every PARITY method produces a prediction
+    # (denominator parity — scored on identical genes). The default is all four;
+    # the cold_gene diagnostic restricts parity to {model, chem-NULL} because
+    # chem-kNN and inductive-MF are structurally inapplicable to held-out whole
+    # genes (their coverage is reported below to make that explicit).
+    parity_cols = data.parity_pred_cols or ["model_pred", "null_pred", "knn_pred", "mf_pred"]
+    common = elig.dropna(subset=parity_cols).copy()
 
     model_m = _metrics_for_pred(common, "model_pred")
     null_m = _metrics_for_pred(common, "null_pred")
@@ -410,6 +472,12 @@ def _full_eval(model, data: R1Data, arm: str, dev, *, seed: int, best_spear: flo
         "null_spearman": null_m["spearman"], "null_ndcg_at_5": null_m["ndcg_at_5"],
         "beats_knn_spearman": bool(model_m["spearman"] > knn_m["spearman"]),
         "beats_knn_ndcg5": bool(model_m["ndcg_at_5"] > knn_m["ndcg_at_5"]),
+        # baseline coverage on the eligible val genes (fraction with a non-NaN
+        # prediction). On the cold_gene split chem-kNN/MF coverage → ~0, which is
+        # the whole point: only model + chem-NULL can score a held-out gene.
+        "knn_coverage": float(elig["knn_pred"].notna().mean()) if len(elig) else float("nan"),
+        "mf_coverage": float(elig["mf_pred"].notna().mean()) if len(elig) else float("nan"),
+        "null_coverage": float(elig["null_pred"].notna().mean()) if len(elig) else float("nan"),
     }
     return {"flat": flat, "comparison": {"model": model_m, "chem_knn": knn_m,
                                          "linear_mf": mf_m, "chem_null": null_m},

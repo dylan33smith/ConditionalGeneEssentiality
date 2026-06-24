@@ -9,6 +9,28 @@ this file is the distilled, fast-to-read "why."
 
 ## Scientific / modeling decisions
 
+### Cold-gene diagnostic: the warm negative is a MEMORIZATION gap (R-COLD-DEC-001)
+On the primary (condition-holdout) split, every learned model loses to chem-kNN —
+but that split is transductive over genes, so chem-kNN wins by retrieving each
+gene's OWN history. The `cold_gene` split holds out whole genes (zero train rows),
+making chem-kNN structurally inapplicable (coverage 0.0000) and linear-MF
+unlearnable, leaving chem-NULL (population condition profile) as the gate. There
+the global model BEATS chem-NULL on genes it never trained on (23-org/3-seed:
+NDCG@5 0.2748 vs 0.2447, Spearman 0.0735 vs 0.0359, disjoint across 3 seeds).
+**Why it matters:** this reframes the project's central finding — the warm-split
+negative (R1/R-LOSS/R-TOPK/R-HYBRID/R-AUG) is memorization-dominance, NOT
+"embeddings carry no signal." The frozen ProteomeLM embedding DOES carry
+transferable gene-specific conditional-response signal; it is just outgunned by
+per-gene memorization wherever the gene's own history is available. **Caveat:** the
+gate here is chem-NULL (weaker than chem-kNN), so this is not a promotion vs the
+locked gate and no headline number changes; confidence rests on per-seed
+disjointness (formal hierarchical-bootstrap CI is the pending confirmatory step).
+This makes the inductive (cold-start-over-genes) objective the live lever, and
+un-shelves diverse/external training data for THAT regime (R-AUG's negative
+transfer was warm-only). Implementation: parameterized `prepare_r1_data`
+(split_fn/compute_mf/parity_pred_cols) + `prepare_cold_gene_data`; the primary path
+is bit-exact (R-EVAL unchanged).
+
 ### Reframed from cross-organism regression (T) to within-organism ranking (R)
 The original objective predicted a gene's continuous fitness across **held-out
 organisms** (the "T-regime"). RMSE optimized fine, but the meaningful quantity —

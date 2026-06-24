@@ -14,11 +14,12 @@ project. Deep history, rationale, and AI working-memory live in modular files
 ## Current state (June 2026)
 
 - **Branch:** `ranking` is the trunk (clean, post-cleanup). Develop here.
-- **Status:** the modeling exploration is complete; the codebase has been
-  reorganized into a clean, modular `src/ranking/` core with a shared runner and
-  a bit-exact regression gate. **Next up: the top-k ranking objective** (see
-  [docs/project_memory/progress.md](docs/project_memory/progress.md) and the
-  Next-tasks section there).
+- **Status:** clean modular `src/ranking/` core with a shared runner and a
+  bit-exact regression gate. The warm-split exploration is complete (all global-
+  model levers lost to chem-kNN); the **cold-gene diagnostic (R-COLD) is the first
+  positive** and points the way. **Next up: the inductive cold-start-over-genes
+  objective** (see [docs/project_memory/progress.md](docs/project_memory/progress.md)
+  and the Next-tasks section there).
 - **Headline result (23 replicate orgs, 3 seeds):** a chemistry-similarity kNN
   is the strong baseline; learned global models do not beat it.
 
@@ -33,7 +34,19 @@ project. Deep history, rationale, and AI working-memory live in modular files
 **Central finding:** the within-org task is **memorization-dominated** — the
 signal is local and gene-idiosyncratic, so a global model averages it away while
 the kNN lookup preserves it. The negative is *noise-robust* (holds at every
-measurement-confidence stratum). Full narrative:
+measurement-confidence stratum).
+
+**Refinement (2026-06-23, R-COLD-DEC-001):** that gap is specifically a
+*memorization* gap, not an "embeddings carry nothing" gap. On the **cold-gene**
+split (whole genes held out), chem-kNN is structurally inapplicable — it has no
+own-gene history to retrieve (coverage 0%) — so the only baseline left is chem-NULL
+(the population profile). There the global model **beats** chem-NULL on genes it
+never trained on: NDCG@5 **0.275 vs 0.245** (Δ+0.030), Spearman **0.074 vs 0.036**,
+disjoint across 3 seeds (n=11,761). So the frozen embedding *does* carry
+transferable gene-specific signal; it is just outgunned by per-gene memorization
+wherever a gene's own history is available. This is not a promotion vs the locked
+chem-kNN gate (chem-NULL is a weaker bar); it makes the **inductive
+cold-start-over-genes** objective the live lever. Full narrative:
 [research_log/SCIENTIFIC_SYNTHESIS.md](research_log/SCIENTIFIC_SYNTHESIS.md).
 
 ---

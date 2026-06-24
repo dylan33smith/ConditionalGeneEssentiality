@@ -96,6 +96,33 @@ def test_cold_gene_holds_out_whole_genes(synthetic_fit):
     assert val_genes.isdisjoint(train_genes), "cold-gene split leaked a gene into both"
 
 
+def test_cold_gene_breaks_knn_keeps_null(synthetic_fit):
+    """The cold-gene diagnostic's premise: holding out whole genes makes the
+    per-gene retrieval baseline (chem-kNN) structurally unable to score (a held-out
+    gene has no own-gene train history → coverage 0), while the population
+    condition-profile (chem-NULL) still scores every cold val row → it is the gate.
+    """
+    from src.ranking.eval import (
+        chemistry_knn_predict, chemistry_nearest_condition_profile)
+
+    split = materialize_cold_gene(synthetic_fit, fraction=0.3, seed=0)
+    df = synthetic_fit.loc[split.partition.index].copy()
+    df["partition"] = split.partition.values
+    df["condition_key"] = split.condition_key.values
+    train = df[df["partition"] == "train"]
+    val = df[df["partition"] == "val"]
+    rng = np.random.default_rng(0)
+    cond_features = {c: rng.normal(size=8).astype("float32")
+                     for c in df["condition_key"].unique()}
+
+    knn = chemistry_knn_predict(train, val, cond_features, k=5)
+    null = chemistry_nearest_condition_profile(train, val, cond_features)
+    # chem-kNN: zero coverage — no held-out gene has its own train history
+    assert float(knn.notna().mean()) == 0.0
+    # chem-NULL: full coverage — population profile is gene-identity-free
+    assert float(null.notna().mean()) == 1.0
+
+
 def test_cell_holdout_runs(synthetic_fit):
     split = materialize_cell_holdout(synthetic_fit, fraction=0.20, seed=0)
     assert split.stats["n_val_cells"] > 0

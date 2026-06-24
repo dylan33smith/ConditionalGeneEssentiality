@@ -1,0 +1,32 @@
+# @package _global_
+# R-COLD — the cold-gene (inductive-over-genes) diagnostic.
+#
+# The primary split is transductive over genes: every val gene also has TRAIN
+# rows, so chem-kNN retrieves a gene's OWN history and stands as the unbeaten
+# gate. cold_gene holds out WHOLE genes per org (zero train rows), which breaks
+# the per-gene retrieval baselines by construction — chem-kNN coverage → ~0 and
+# inductive-MF has no learnable per-gene latent. The population condition-profile
+# (chem-NULL) is the only non-model baseline that survives, so it is the gate.
+#
+# This is the ONE regime a frozen-embedding global model could win, after
+# objective (R-LOSS/R-TOPK), encoder/capacity (R1), hybrids (R-HYBRID) and
+# training-org volume (R-AUG) all failed to beat chem-kNN on the warm split. The
+# question: does the ProteomeLM embedding carry gene-specific conditional-response
+# signal beyond the population average, on genes never seen in training?
+#
+#   FAST   : python -m src.cli.run_experiment +experiment=R-COLD_cold_gene
+#   FULL   : python -m src.cli.run_experiment +experiment=R-COLD_cold_gene \
+#              experiment.tag=full experiment.model_seeds=[0,1,2] \
+#              'experiment.orgs=[ANA3,BFirm,Btheta,Burk376,Caulo,Cola,Cup4G11,Dda3937,Ddia6719,DdiaME23,Dino,DvH,Dyella79,HerbieS,Kang,Keio,Korea,Koxy,MR1,Marino,Methanococcus_JJ,Methanococcus_S2,Miya]'
+
+experiment_id: R-COLD_cold_gene
+stage_or_tier: R-COLD
+regime: R
+
+experiment:
+  hypothesis: H-R-COLD-01    # the embedding beats the population baseline on unseen genes
+  tag: fast
+  orgs: [Keio, Caulo, MR1]   # fixed small subset for the fast diagnostic
+  split_seed: 0
+  model_seeds: [0]
+  epochs: 8
