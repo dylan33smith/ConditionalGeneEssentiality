@@ -5,7 +5,8 @@ A new test is declarative: build one or more `ArmSpec`s and call
 seeds, and emits the STANDARDIZED comparison — the model plus the
 split-specific baselines (chem-kNN gate, chem-NULL, linear-MF) on the identical
 eligible val gene set (denominator parity), with one metric schema everywhere
-(within-gene Spearman/Kendall + NDCG@1/3/5 + precision@5), per-seed and
+(NDCG@5 PRIMARY + NDCG@1/3 + precision@5, then within-gene Spearman/Kendall —
+NDCG@5 and Spearman each with a hierarchical-bootstrap CI), per-seed and
 seed-averaged, written to a tidy CSV and logged side-by-side vs the gate.
 
 Example (a 2-arm loss comparison):
@@ -30,12 +31,17 @@ from src.ranking.train import train_arm
 
 log = logging.getLogger(__name__)
 
-# the single metric schema every ranking result reports. The Spearman CI bounds
-# are the harness's hierarchical (org->gene) bootstrap (computed per method in
-# _metrics_for_pred); carrying them here surfaces them in the CSV + report so a
-# model-vs-gate disjoint-CI check is possible (e.g. the R-COLD confirmatory step).
-METRIC_KEYS = ("spearman", "spearman_ci_low", "spearman_ci_high", "kendall",
-               "ndcg_at_1", "ndcg_at_3", "ndcg_at_5", "precision_at_5", "n_genes")
+# the single metric schema every ranking result reports. NDCG@5 is the PRIMARY
+# metric project-wide (retrieval / "top stressors"); within-gene Spearman is the
+# secondary completeness metric — the order here reflects that. Both headline
+# metrics carry the harness's hierarchical (org->gene) bootstrap CI (computed per
+# method in _metrics_for_pred); carrying the bounds here surfaces them in the CSV +
+# report so a model-vs-gate disjoint-CI check is possible on EITHER metric
+# (NDCG@5 first; e.g. the R-COLD confirmatory step).
+METRIC_KEYS = ("ndcg_at_5", "ndcg_at_5_ci_low", "ndcg_at_5_ci_high",
+               "ndcg_at_1", "ndcg_at_3", "precision_at_5",
+               "spearman", "spearman_ci_low", "spearman_ci_high",
+               "kendall", "n_genes")
 # methods always scored side-by-side (denominator parity)
 METHODS = ("model", "chem_knn", "linear_mf", "chem_null")
 GATE = "chem_knn"   # the baseline to beat (R1-DEC-001)
@@ -94,36 +100,41 @@ def standardized_report(results: list[dict], *, out_dir: str | Path, tag: str,
     df = pd.DataFrame(rows)
     df.to_csv(out / f"{tag}_metrics.csv", index=False)
 
+    # NDCG@5 is PRIMARY — it leads the table; Spearman is the secondary column.
     log.info("STANDARDIZED REPORT [%s] — model vs %s gate (seed-mean):", tag, gate)
-    log.info("    %-16s %9s %8s %8s   %-14s", "arm", "Spearman", "NDCG@5", "prec@5", "vs gate NDCG@5")
+    log.info("    %-16s %8s %9s %8s   %-14s", "arm", "NDCG@5", "Spearman", "prec@5", "vs gate NDCG@5")
     for r in results:
         m, g = r["agg"]["model"], r["agg"][gate]
         d = m["ndcg_at_5"] - g["ndcg_at_5"]
         verdict = "BEATS gate" if d > 0 else f"{d:+.4f}"
-        log.info("    %-16s %9.4f %8.4f %8.4f   %-14s",
-                 r["name"], m["spearman"], m["ndcg_at_5"], m["precision_at_5"], verdict)
+        log.info("    %-16s %8.4f %9.4f %8.4f   %-14s",
+                 r["name"], m["ndcg_at_5"], m["spearman"], m["precision_at_5"], verdict)
     log.info("    gate(%s) NDCG@5=%.4f Spearman=%.4f", gate,
              results[0]["agg"][gate]["ndcg_at_5"], results[0]["agg"][gate]["spearman"])
 
-    # Spearman hierarchical-bootstrap CI: model vs gate, with a disjointness check.
+    # Hierarchical-bootstrap CI: model vs gate, with a disjointness check, on BOTH
+    # headline metrics — NDCG@5 PRIMARY (the promotion metric), Spearman secondary.
     # (For multi-seed runs these bounds are the mean of the per-seed CIs — a summary
     # band, not a pooled-across-seeds CI; a pooled-prediction bootstrap is stronger.)
-    log.info("    %-16s  Spearman [95%% CI]      vs gate(%s) [95%% CI]   disjoint?", "arm", gate)
-    for r in results:
-        m, g = r["agg"]["model"], r["agg"][gate]
-        disjoint = _ci_disjoint(m, g)
-        flag = "—" if disjoint is None else ("YES" if disjoint else "no (overlap)")
-        log.info("    %-16s  %.4f [%.4f, %.4f]   %.4f [%.4f, %.4f]   %s",
-                 r["name"], m["spearman"], m["spearman_ci_low"], m["spearman_ci_high"],
-                 g["spearman"], g["spearman_ci_low"], g["spearman_ci_high"], flag)
+    for metric, label in (("ndcg_at_5", "NDCG@5  "), ("spearman", "Spearman")):
+        log.info("    %-16s  %s [95%% CI]      vs gate(%s) [95%% CI]   disjoint?",
+                 "arm", label, gate)
+        for r in results:
+            m, g = r["agg"]["model"], r["agg"][gate]
+            disjoint = _ci_disjoint(m, g, metric)
+            flag = "—" if disjoint is None else ("YES" if disjoint else "no (overlap)")
+            log.info("    %-16s  %.4f [%.4f, %.4f]   %.4f [%.4f, %.4f]   %s",
+                     r["name"], m[metric], m[f"{metric}_ci_low"], m[f"{metric}_ci_high"],
+                     g[metric], g[f"{metric}_ci_low"], g[f"{metric}_ci_high"], flag)
     return df
 
 
-def _ci_disjoint(a: dict, b: dict) -> bool | None:
-    """True if a and b have non-overlapping Spearman 95% CIs (in either direction).
-    None when a CI is unavailable (NaN bound, e.g. an inapplicable baseline)."""
-    lo_a, hi_a = a.get("spearman_ci_low"), a.get("spearman_ci_high")
-    lo_b, hi_b = b.get("spearman_ci_low"), b.get("spearman_ci_high")
+def _ci_disjoint(a: dict, b: dict, metric: str = "ndcg_at_5") -> bool | None:
+    """True if a and b have non-overlapping 95% CIs for `metric` (either direction).
+    `metric` defaults to NDCG@5 (the primary metric). None when a CI is unavailable
+    (NaN bound, e.g. an inapplicable baseline)."""
+    lo_a, hi_a = a.get(f"{metric}_ci_low"), a.get(f"{metric}_ci_high")
+    lo_b, hi_b = b.get(f"{metric}_ci_low"), b.get(f"{metric}_ci_high")
     if any(x is None or x != x for x in (lo_a, hi_a, lo_b, hi_b)):  # NaN-safe
         return None
     return hi_a < lo_b or hi_b < lo_a

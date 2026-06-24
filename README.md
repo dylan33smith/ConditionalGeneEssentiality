@@ -23,13 +23,15 @@ project. Deep history, rationale, and AI working-memory live in modular files
 - **Headline result (23 replicate orgs, 3 seeds):** a chemistry-similarity kNN
   is the strong baseline; learned global models do not beat it.
 
-| method | within-gene Spearman | NDCG@5 | what it is |
+NDCG@5 is the **primary** metric (leftmost); within-gene Spearman is secondary.
+
+| method | NDCG@5 (primary) | within-gene Spearman | what it is |
 |---|---|---|---|
-| chem-NULL | ~0.02 | ~0.31 | population condition profile (no gene specificity) |
-| deep model (frozen emb + chem) | ~0.13 | ~0.42 | the intended model (R1) |
-| linear-MF (learned latents) | ~0.14 | ~0.43 | a learned, fitness-aware gene rep |
-| **chem-kNN — the gate** | **~0.24** | **~0.485** | the gene's OWN history, chemistry lookup |
-| replicate ceiling | ~0.39 | ~0.66 | biological-replicate agreement (the achievable max) |
+| chem-NULL | ~0.31 | ~0.02 | population condition profile (no gene specificity) |
+| deep model (frozen emb + chem) | ~0.42 | ~0.13 | the intended model (R1) |
+| linear-MF (learned latents) | ~0.43 | ~0.14 | a learned, fitness-aware gene rep |
+| **chem-kNN — the gate** | **~0.485** | **~0.24** | the gene's OWN history, chemistry lookup |
+| replicate ceiling | ~0.66 | ~0.39 | biological-replicate agreement (the achievable max) |
 
 **Central finding:** the within-org task is **memorization-dominated** — the
 signal is local and gene-idiosyncratic, so a global model averages it away while
@@ -42,9 +44,12 @@ split (whole genes held out), chem-kNN is structurally inapplicable — it has n
 own-gene history to retrieve (coverage 0%) — so the only baseline left is chem-NULL
 (the population profile). There the global model **beats** chem-NULL on genes it
 never trained on: NDCG@5 **0.275 vs 0.245** (Δ+0.030), Spearman **0.074 vs 0.036**,
-disjoint across 3 seeds (n=11,761). So the frozen embedding *does* carry
-transferable gene-specific signal; it is just outgunned by per-gene memorization
-wherever a gene's own history is available. This is not a promotion vs the locked
+with point estimates disjoint across all 3 seeds (n=11,761). Caveat on strength:
+the **primary-metric (NDCG@5) bootstrap CIs OVERLAP** (0.275 [0.242, 0.318] vs
+0.245 [0.212, 0.282]) — only the secondary Spearman CI is disjoint — so this is a
+directionally robust *lead*, not a CI-confirmed win. Still, the frozen embedding
+*does* carry transferable gene-specific signal; it is just outgunned by per-gene
+memorization wherever a gene's own history is available. This is not a promotion vs the locked
 chem-kNN gate (chem-NULL is a weaker bar); it makes the **inductive
 cold-start-over-genes** objective the live lever. Full narrative:
 [research_log/SCIENTIFIC_SYNTHESIS.md](research_log/SCIENTIFIC_SYNTHESIS.md).
@@ -164,7 +169,7 @@ standardized report (CSV + side-by-side vs gate)             [src/ranking/runner
 |---|---|---|
 | Split | within-org condition-holdout, frac 0.20, seed 0 | the realistic "novel conditions, known organism" setting (cold columns) |
 | Eligibility | rank genes with spread `tail_g = p95−p5` over a per-org threshold; train weight `w_g` | ranking flat genes is meaningless; weight by discriminability |
-| Metrics | within-gene Spearman + NDCG@5 (k=5); hierarchical org→gene bootstrap; BH-FDR | NDCG matches "top stressors"; clustered CI is honest |
+| Metrics | **NDCG@5 (k=5) primary** + within-gene Spearman (secondary); both with hierarchical org→gene bootstrap CI; BH-FDR | NDCG matches "top stressors" so it outranks Spearman everywhere; clustered CI is honest |
 | Gate | chem-kNN; promote at ΔNDCG@5 ≳ 0.026 + disjoint CIs | a learned model must beat gene-specific lookup to add value |
 | Model | AdapterResidualMLP (adapter over frozen ProteomeLM-L8 ⊕ chemistry) | first real gain over frozen-only; more capacity doesn't help |
 | Encoder | 425-d multihot chemistry | fingerprints did not beat it |

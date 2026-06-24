@@ -25,10 +25,13 @@ metrics:
       Non-stressors (fit >= 0) get relevance 0. Model ranks conditions by
       PREDICTED fit ascending (most-essential first); NDCG@k / precision@k score
       whether the predicted top-k are the truly most-stressful conditions.
-  full_list_coprimary:                    # family B — completeness / anti-gaming
+  full_list_secondary:                    # family B — completeness / anti-gaming
     names: [within_gene_spearman_mean, within_gene_kendall_mean]
-  # Promotion priority: a model must NOT regress family B, and is PROMOTED on
-  # family A (retrieval) — the metric the application cares about. See promotion.
+  # METRIC PRIMACY (project-wide rule): NDCG@5 > within-gene Spearman ALWAYS.
+  # family A (retrieval) is PRIMARY — reported first, gated/promoted on, and CIs +
+  # verdicts lead with it. family B (Spearman/Kendall) is SECONDARY (completeness /
+  # anti-gaming): a model must NOT regress it, but it never outranks NDCG@5.
+  metric_primacy: ndcg_at_5 > within_gene_spearman_mean
   reporting: both families on every run, per-organism (below) and pooled.
 
 aggregation: mean                         # global mean across eligible val genes

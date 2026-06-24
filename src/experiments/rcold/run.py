@@ -33,7 +33,7 @@ from omegaconf import DictConfig
 
 from src.ranking.pipeline import prepare_cold_gene_data
 from src.ranking.eval import chemistry_knn_predict
-from src.ranking.runner import ArmSpec, run_arm, standardized_report
+from src.ranking.runner import ArmSpec, run_arm, standardized_report, _ci_disjoint
 
 log = logging.getLogger(__name__)
 OUT = Path("artifacts/runs/rcold")
@@ -80,13 +80,23 @@ def main(cfg: DictConfig) -> None:
     m, g = res["agg"]["model"], res["agg"][GATE]
     d_ndcg = m["ndcg_at_5"] - g["ndcg_at_5"]
     d_spear = m["spearman"] - g["spearman"]
+    nd_disjoint = _ci_disjoint(m, g, "ndcg_at_5")
+    sp_disjoint = _ci_disjoint(m, g, "spearman")
     log.info("-" * 72)
     log.info("R-COLD result (seed-mean over %d seed(s), n_genes=%d):",
              len(model_seeds), int(m["n_genes"]))
-    log.info("    model     : NDCG@5=%.4f  Spearman=%.4f", m["ndcg_at_5"], m["spearman"])
-    log.info("    chem-NULL : NDCG@5=%.4f  Spearman=%.4f", g["ndcg_at_5"], g["spearman"])
-    log.info("    Δ(model-null): NDCG@5=%+.4f  Spearman=%+.4f", d_ndcg, d_spear)
-    verdict = ("model BEATS the population baseline on unseen genes"
-               if d_ndcg > 0 else "model does NOT beat the population baseline")
+    # NDCG@5 is the PRIMARY metric — report it first, with its CI + disjointness.
+    log.info("    NDCG@5 (PRIMARY): model %.4f [%.4f, %.4f]  vs chem-NULL %.4f [%.4f, %.4f]",
+             m["ndcg_at_5"], m["ndcg_at_5_ci_low"], m["ndcg_at_5_ci_high"],
+             g["ndcg_at_5"], g["ndcg_at_5_ci_low"], g["ndcg_at_5_ci_high"])
+    log.info("        Δ=%+.4f  CI-disjoint? %s", d_ndcg,
+             "—" if nd_disjoint is None else ("YES" if nd_disjoint else "no (overlap)"))
+    log.info("    Spearman (secondary): model %.4f [%.4f, %.4f]  vs chem-NULL %.4f [%.4f, %.4f]",
+             m["spearman"], m["spearman_ci_low"], m["spearman_ci_high"],
+             g["spearman"], g["spearman_ci_low"], g["spearman_ci_high"])
+    log.info("        Δ=%+.4f  CI-disjoint? %s", d_spear,
+             "—" if sp_disjoint is None else ("YES" if sp_disjoint else "no (overlap)"))
+    verdict = ("model BEATS the population baseline on unseen genes (NDCG@5)"
+               if d_ndcg > 0 else "model does NOT beat the population baseline (NDCG@5)")
     log.info("    verdict: %s", verdict)
     log.info("R-COLD done — see %s/%s_metrics.csv", OUT, tag)

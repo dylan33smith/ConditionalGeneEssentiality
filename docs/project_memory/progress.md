@@ -38,12 +38,14 @@ The dated log below is append-only (newest first) — never rewrite past entries
 1. **DONE — committed on `ranking`** (`0db7f1a` R-COLD; CI surfacing in a
    follow-up commit). R-EVAL bit-exact (0.4468/0.5091). **Not yet pushed** —
    awaiting the nod.
-2. **Bootstrap CI on the cold-gene Δ** — DONE for Spearman: the runner now
-   surfaces the harness's hierarchical org→gene CI + a model-vs-gate disjointness
-   flag. Full 23-org Spearman is **disjoint** (model 0.0735 [0.0523, 0.1034] vs
-   chem-NULL 0.0359 [0.0230, 0.0514], thin margin); the fast 3-org set OVERLAPS
-   (needs the full panel). REMAINING: extend the bootstrap to NDCG@5 — the
-   headline metric still has no CI.
+2. **Bootstrap CI on the cold-gene Δ** — DONE for BOTH metrics (NDCG@5 primary +
+   Spearman). Honest result: **NDCG@5 CIs OVERLAP** (model 0.2748 [0.2424, 0.3179]
+   vs chem-NULL 0.2447 [0.2118, 0.2823]) — the +0.030 is NOT CI-significant on the
+   primary metric; only the secondary Spearman is disjoint (0.0735 [0.0523, 0.1034]
+   vs 0.0359 [0.0230, 0.0514]). So the cold-gene win is directional (3/3 seeds) +
+   Spearman-CI-disjoint, but not NDCG@5-CI-disjoint. REMAINING: a paired/pooled
+   bootstrap on the per-gene NDCG@5 **Δ** (cancels shared per-gene variance, more
+   powerful than two marginal CIs) to firm up the primary-metric claim.
 3. **Re-open encoder/capacity + training-org volume IN THE COLD-GENE REGIME.**
    R-AUG's negative transfer was measured warm-only; more-diverse organisms may
    HELP inductive (cold-start-over-genes) generalization even though they hurt the
@@ -60,6 +62,22 @@ The dated log below is append-only (newest first) — never rewrite past entries
 ---
 
 ## Log
+
+### 2026-06-24 — NDCG@5 made PRIMARY project-wide + NDCG@5 CI (CORRECTS the Spearman-only read)
+Per project-lead direction, NDCG@5 is now held above within-gene Spearman
+*everywhere* (CLAUDE.md "Primary metric", metric_contract `metric_primacy`,
+README/reval/runner all report NDCG first). Substantive fix: the harness only ever
+bootstrapped Spearman, so the prior "confirmatory" entry below judged disjointness
+on Spearman alone. Added a hierarchical (org→gene) bootstrap CI for **NDCG@5** in
+`_metrics_for_pred` (ndcg_at_5 point value unchanged → R-EVAL bit-exact: 0.4468 /
+0.5091) and made the runner/handler lead CIs + the disjointness verdict with NDCG@5.
+**Corrected result (full 23-org):** on the PRIMARY metric the model vs chem-NULL
+**NDCG@5 CIs OVERLAP** — 0.2748 [0.2424, 0.3179] vs 0.2447 [0.2118, 0.2823] — so the
++0.030 is a consistent point-estimate win (3/3 seeds disjoint) but NOT
+CI-significant; only the secondary Spearman is disjoint. Lesson: NDCG@5's per-gene
+variance gives it a wider CI than Spearman, so a Spearman-only confidence read
+overstates significance — exactly why NDCG@5 is primary. Next: paired/pooled
+bootstrap on the per-gene NDCG@5 Δ (cancels shared variance) to firm it up.
 
 ### 2026-06-24 — Runner: surface the hierarchical-bootstrap Spearman CI (R-COLD confirmatory)
 The runner computed the harness's hierarchical (org→gene) Spearman CI per method

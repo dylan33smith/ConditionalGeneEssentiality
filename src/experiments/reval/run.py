@@ -62,10 +62,11 @@ def main(cfg: DictConfig) -> None:
 
     log.info("RESULT (mean over %d seed(s), %d common eligible val genes):",
              len(model_seeds), int(agg["model"]["n_genes"]))
-    log.info("    %-12s %9s %8s %8s", "method", "Spearman", "NDCG@1", "NDCG@5")
+    # NDCG@5 PRIMARY (leads), then NDCG@1, then Spearman (secondary completeness).
+    log.info("    %-12s %8s %8s %9s", "method", "NDCG@5", "NDCG@1", "Spearman")
     for m in METHODS:
-        log.info("    %-12s %9.4f %8.4f %8.4f",
-                 m, agg[m]["spearman"], agg[m]["ndcg_at_1"], agg[m]["ndcg_at_5"])
+        log.info("    %-12s %8.4f %8.4f %9.4f",
+                 m, agg[m]["ndcg_at_5"], agg[m]["ndcg_at_1"], agg[m]["spearman"])
     log.info("    gap (kNN - model) NDCG@5 = %.4f",
              agg["chem_knn"]["ndcg_at_5"] - agg["model"]["ndcg_at_5"])
 

@@ -88,10 +88,14 @@ same magnitude as the headline.
    a large effect.
 
 ### Decision
-- decision_outcome: **accept H-R-COLD-01 (diagnostic).** The frozen ProteomeLM
-  embedding carries transferable, gene-specific conditional-response signal: on
-  held-out whole genes the global model beats the only applicable baseline
-  (chem-NULL) by ΔNDCG@5 ≈ +0.030 / ΔSpearman ≈ +0.038, disjoint across 3 seeds.
+- decision_outcome: **accept H-R-COLD-01 (diagnostic, directional).** The frozen
+  ProteomeLM embedding carries transferable, gene-specific conditional-response
+  signal: on held-out whole genes the global model beats the only applicable
+  baseline (chem-NULL) by ΔNDCG@5 ≈ +0.030 / ΔSpearman ≈ +0.038, with point
+  estimates disjoint across all 3 seeds. STRENGTH CAVEAT (see Confidence): the
+  PRIMARY-metric (NDCG@5) bootstrap CIs OVERLAP — the result is directionally
+  robust and Spearman-CI-disjoint, but not yet CI-significant on NDCG@5. Treat as
+  a strong lead to pursue, not a closed/confirmed win.
 - rationale:
   1. It reframes the project's central finding. The warm-split negative
      (R1/R-LOSS/R-TOPK/R-HYBRID/R-AUG) is a memorization-dominance result, not an
@@ -107,21 +111,29 @@ same magnitude as the headline.
     (the only applicable baseline on cold genes), a WEAKER bar than chem-kNN; the
     +0.030 here is not comparable to the ΔNDCG@5 ≳ 0.026-vs-chem-kNN promotion
     rule. No headline number changes.
-  - Confidence: per-seed disjointness (3/3, tight spread) AND the hierarchical
-    (org→gene) bootstrap Spearman CI is now disjoint on the full 23-org set —
-    model 0.0735 **[0.0523, 0.1034]** vs chem-NULL 0.0359 **[0.0230, 0.0514]**
-    (model lower bound clears the gate upper bound, though the margin is thin).
-    The runner now surfaces these CIs + a disjointness flag (previously dropped).
-    NOTE the fast 3-org set is NOT disjoint (model 0.1155 [0.0614, 0.1938] vs
-    0.0813 [0.0269, 0.1564] — overlap): the CI-significance needs the full org
-    panel. REMAINING: the harness bootstraps only Spearman; NDCG@5 (the headline
-    metric) has no CI yet — a per-metric bootstrap on the NDCG@5 Δ is the last
-    confirmatory gap.
+  - Confidence (full 23-org bootstrap CI, both metrics now computed):
+
+    | metric | model [95% CI] | chem-NULL [95% CI] | disjoint? |
+    |---|---|---|---|
+    | **NDCG@5 (PRIMARY)** | 0.2748 [0.2424, 0.3179] | 0.2447 [0.2118, 0.2823] | **NO (overlap)** |
+    | Spearman (secondary) | 0.0735 [0.0523, 0.1034] | 0.0359 [0.0230, 0.0514] | YES |
+
+    HONEST READ: on the **primary** metric (NDCG@5) the model and chem-NULL CIs
+    **OVERLAP** — the +0.0301 is a consistent point-estimate win (disjoint across
+    all 3 seeds) but is NOT CI-significant. Only the secondary Spearman is
+    CI-disjoint (NDCG@5's per-gene variance gives it a wider CI). The fast 3-org
+    set is overlap on BOTH metrics. So the cold-gene positive is **directionally
+    robust (3/3 seeds) and Spearman-CI-disjoint, but does not clear a strict
+    disjoint-CI bar on the primary metric.** An earlier note here claimed the win
+    was CI-confirmed on the strength of Spearman alone — that was corrected once
+    NDCG@5 got its own CI (exactly why NDCG@5 is held primary).
 - recommended next work:
-  1. DONE for Spearman — the runner now surfaces the hierarchical bootstrap CI and
-     a model-vs-gate disjointness flag (full 23-org: disjoint YES; fast 3-org:
-     overlap). REMAINING: extend the bootstrap to NDCG@5 (the headline metric has
-     no CI yet) for a disjoint-CI claim on NDCG, not just Spearman.
+  1. DONE — the runner now bootstraps + surfaces the hierarchical (org→gene) CI for
+     BOTH NDCG@5 (primary) and Spearman, with a model-vs-gate disjointness flag.
+     Result: NDCG@5 CIs OVERLAP (not significant), Spearman disjoint. To firm up
+     the primary-metric claim, a paired/pooled bootstrap on the per-gene NDCG@5
+     **Δ** (model − chem-NULL) — which cancels shared per-gene variance and is more
+     powerful than comparing two marginal CIs — is the right next test.
   2. Re-open the encoder/capacity and training-org-volume axes IN THE COLD-GENE
      REGIME (R-AUG's negative transfer was measured warm; diverse organisms may
      help inductive generalization). 

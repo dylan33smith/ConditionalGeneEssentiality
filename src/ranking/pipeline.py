@@ -388,10 +388,15 @@ def _val_spearman(model, data: R1Data, arm: str, dev) -> float:
 
 
 def _metrics_for_pred(df: pd.DataFrame, pred_col: str) -> dict:
-    """Spearman/Kendall + NDCG@k + precision@k for one prediction column.
+    """NDCG@k + precision@k (retrieval-primary) + Spearman/Kendall (completeness)
+    for one prediction column, each with the hierarchical (org→gene) bootstrap CI
+    for the headline metrics.
 
-    All on the SAME rows passed in (caller restricts to the common gene set
-    for denominator parity).
+    NDCG@5 is the PRIMARY metric project-wide (top-of-list agreement = "find the
+    top stressors"); within-gene Spearman is the secondary completeness metric.
+    Both the headline NDCG@5 and Spearman carry a hierarchical bootstrap CI.
+    All on the SAME rows passed in (caller restricts to the common gene set for
+    denominator parity).
     """
     d = df.rename(columns={pred_col: "pred"})
     # A baseline with zero coverage on these rows (every pred NaN) is INAPPLICABLE
@@ -399,18 +404,31 @@ def _metrics_for_pred(df: pd.DataFrame, pred_col: str) -> dict:
     # all-NaN column by arbitrary row order and emit a meaningless non-NaN NDCG
     # (this is exactly what chem-kNN/MF look like on the cold_gene split).
     if not d["pred"].notna().any():
-        nan_out = {"spearman": float("nan"), "spearman_ci_low": float("nan"),
+        nan_out = {"ndcg_at_5": float("nan"), "ndcg_at_5_ci_low": float("nan"),
+                   "ndcg_at_5_ci_high": float("nan"),
+                   "spearman": float("nan"), "spearman_ci_low": float("nan"),
                    "spearman_ci_high": float("nan"), "kendall": float("nan"),
                    "n_genes": 0}
         for k in (1, 3, 5):
             nan_out[f"ndcg_at_{k}"] = float("nan")
             nan_out[f"precision_at_{k}"] = float("nan")
         return nan_out
+    ret = within_gene_retrieval(d, k_values=(1, 3, 5), pred_col="pred")
+    # PRIMARY: NDCG@5 with hierarchical (org→gene) bootstrap CI (the headline metric
+    # gets the same honest clustered CI Spearman has). `mean` == the plain per-gene
+    # mean, so the NDCG@5 point value is unchanged (regression-safe).
+    nd5_ci = (hierarchical_bootstrap_ci(ret.rename(columns={"ndcg_at_5": "value"}),
+                                        n_bootstrap=300)
+              if len(ret) else {"mean": float("nan"), "ci_low": float("nan"),
+                                "ci_high": float("nan")})
     pg_sp = per_gene_correlations(d, metric="spearman", pred_col="pred")
     pg_kd = per_gene_correlations(d, metric="kendall", pred_col="pred")
     sp_ci = hierarchical_bootstrap_ci(pg_sp, n_bootstrap=300)
-    ret = within_gene_retrieval(d, k_values=(1, 3, 5), pred_col="pred")
     out = {
+        # primary (retrieval)
+        "ndcg_at_5": nd5_ci["mean"],
+        "ndcg_at_5_ci_low": nd5_ci["ci_low"], "ndcg_at_5_ci_high": nd5_ci["ci_high"],
+        # secondary (completeness)
         "spearman": sp_ci["mean"],
         "spearman_ci_low": sp_ci["ci_low"], "spearman_ci_high": sp_ci["ci_high"],
         "kendall": float(pg_kd["value"].mean()) if len(pg_kd) else float("nan"),

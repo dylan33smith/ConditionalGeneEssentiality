@@ -76,7 +76,11 @@ eligible val genes, per-seed + seed-mean, tidy CSV + side-by-side vs the gate).
   eligible val gene set.
 - **The gate.** chem-kNN (NDCG@5 ~0.485) is the baseline a learned model must beat;
   promotion needs ΔNDCG@5 ≳ 0.026 with disjoint hierarchical-bootstrap CIs.
-- **Co-primary metrics.** within-gene Spearman + NDCG@5 (k=5).
+- **Primary metric: NDCG@5 (k=5).** NDCG@5 is held above within-gene Spearman
+  *everywhere* in this project (top-of-list agreement = "find the top stressors" is
+  the objective; Spearman is the secondary, full-list completeness metric). Report
+  NDCG@5 first, gate/promote on NDCG@5, and lead CIs/verdicts with it. Both NDCG@5
+  and Spearman carry a hierarchical (org→gene) bootstrap CI.
 - **Regression discipline.** After any change to ranking behavior, run `R-EVAL`;
   if a number moves beyond tolerance, stop and investigate (do not "absorb" it).
 - **Tests green** before any commit.

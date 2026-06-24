@@ -293,13 +293,23 @@ available predictor.
 **Scope / honesty.** chem-NULL is a *weaker* gate than chem-kNN, so the +0.030
 here is **not** a promotion against the locked R1 gate and changes no headline
 number. The effect is modest and the regime is genuinely harder (every method's
-NDCG@5 is ~0.27 vs ~0.43 warm). Confidence: per-seed disjointness AND the
-hierarchical (org→gene) bootstrap **Spearman CI is disjoint on the full 23-org
-set** — model 0.0735 [0.0523, 0.1034] vs chem-NULL 0.0359 [0.0230, 0.0514] (the
-runner now surfaces these CIs + a disjointness flag). Caveats: the margin is thin,
-the fast 3-org set is NOT disjoint (CIs overlap — needs the full org panel), and
-the harness bootstraps only Spearman, so NDCG@5 (the headline metric) still lacks
-a CI. Extending the bootstrap to NDCG@5 is the last confirmatory gap.
+NDCG@5 is ~0.27 vs ~0.43 warm). **Confidence (full 23-org hierarchical org→gene
+bootstrap CI, both metrics):**
+
+| metric | model [95% CI] | chem-NULL [95% CI] | disjoint? |
+|---|---|---|---|
+| **NDCG@5 (PRIMARY)** | 0.2748 [0.2424, 0.3179] | 0.2447 [0.2118, 0.2823] | **NO (overlap)** |
+| Spearman (secondary) | 0.0735 [0.0523, 0.1034] | 0.0359 [0.0230, 0.0514] | YES |
+
+On the **primary** metric (NDCG@5) the CIs **overlap** — the +0.030 is a consistent
+point-estimate win (disjoint across all 3 seeds) but NOT CI-significant; only the
+secondary Spearman is CI-disjoint (NDCG@5 has higher per-gene variance → wider CI).
+The fast 3-org set overlaps on both. So the cold-gene positive is **directionally
+robust and Spearman-CI-disjoint, but does not clear a strict disjoint-CI bar on the
+primary metric.** (Methodological note: this corrected an earlier "CI-confirmed"
+read taken from Spearman alone — precisely why NDCG@5 is held primary.) A
+paired/pooled bootstrap on the per-gene NDCG@5 Δ (model − chem-NULL), which cancels
+shared per-gene variance, is the more powerful next test.
 
 **What it re-opens.** The inductive **cold-start-over-genes** objective is now the
 live lever — the one place the global model leads. Encoder/capacity (R1) and
