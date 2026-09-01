@@ -20,6 +20,9 @@ from src.ranking.eval.harness import (
     precision_at_k,
     within_gene_retrieval,
     retrieval_noise_floor,
+    paired_hierarchical_bootstrap_ci,
+    nearest_train_condition_distance,
+    similarity_stratified_report,
     per_gene_correlations,
     hierarchical_bootstrap_ci,
     benjamini_hochberg,
@@ -42,6 +45,8 @@ from src.ranking.eval.contract import (
 
 __all__ = [
     "ndcg_at_k", "precision_at_k", "within_gene_retrieval", "retrieval_noise_floor",
+    "paired_hierarchical_bootstrap_ci",
+    "nearest_train_condition_distance", "similarity_stratified_report",
     "per_gene_correlations", "hierarchical_bootstrap_ci", "benjamini_hochberg",
     "bootstrap_pvalue_delta", "chemistry_nearest_condition_profile",
     "chemistry_knn_predict", "chemistry_retrieval_features", "inductive_mf_predict",

@@ -31,6 +31,39 @@ bytes + rows). The rebuild reproduced sha256 `9b981201…` exactly.
 it on checkout) → `FileNotFoundError` on the parquet. Fix: recreate it —
 `ln -sfn /home/ds85/projects/GeneEssentiality/data data` (the real data root).
 
+### Entire data ROOT vanished mid-session → recovered by re-downloading the live Fitness Browser (CRITICAL)
+**Symptom (2026-07-06):** the whole external data root `/home/ds85/projects/GeneEssentiality/`
+disappeared during a session — `feba.db`, the canonical parquet, and the embeddings all
+unreachable (the `data` symlink was intact but its target directory was gone). No copy existed
+under `/home/ds85` or the `/data` xfs mount.
+**Root cause:** unknown — the sibling project directory the `data` symlink points at was
+deleted/moved off the machine (more severe than the earlier symlink-clobber incident; this was the
+target, not the link).
+**Recovery (raw fitness data):** re-downloaded the live DB with a browser UA (LBL blocks default
+curl UA with 403):
+```bash
+mkdir -p /home/ds85/projects/GeneEssentiality/data/raw && cd $_
+UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36"
+curl -L -A "$UA" -C - --retry 8 -o feba.db  https://fit.genomics.lbl.gov/cgi_data/feba.db   # 9.08 GB, range-resumable
+curl -L -A "$UA" -C - --retry 8 -o aaseqs   https://fit.genomics.lbl.gov/cgi_data/aaseqs
+```
+Pinned Figshare releases (stable/citable) are alternatives: Nov 2020 (id 13172087), June/Nov 2021
+(5134840 / 16913530) — each ships `db.tar.gz` (feba.db + aaseqs).
+**IMPORTANT — the re-downloaded DB is a NEWER release, not a byte-match.** Live db = **62 organisms /
+9,532 experiments / 33.8M GeneFitness rows**, sha256 `b6627137…`; the project's pinned db was 48 orgs /
+7,552 exps / 27.4M rows, sha256 `627f2097…`. So the canonical parquet will NOT byte-reproduce, and all
+headline numbers (0.432/0.485 etc.) must be **re-derived + the R-EVAL gate re-pinned** on the new release
+before they're treated as current.
+**Still missing after the raw restore (NOT on the Fitness Browser):**
+1. `data/media_composition.xlsx` (project sidecar; sha `b694685a…`) — required by
+   `build_canonical_v0.py`; not found anywhere. Rebuild of the media columns is blocked until it's
+   located/recreated.
+2. `data/processed/ProtLM_embeddings_layer8/*.pt` — regenerate from `aaseqs` via the ProteomeLM
+   encoder pipeline.
+**Lesson:** the data root is a single point of failure. Consider a checksummed backup of `feba.db` +
+`media_composition.xlsx` + the embeddings on the `/data` xfs mount (988 GB free), and keep the
+build-manifest sha256s (`docs/canonical_build_manifest_v0.json`) as the integrity oracle.
+
 ### `orgs=null` ≠ the 23-org headline
 `experiment.orgs=null` means **all** organisms (~107k eligible genes) and gives
 different, *lower* numbers (~0.38/0.43). The published ~0.435/0.485 are on the **23
@@ -91,6 +124,25 @@ Under condition-holdout the val conditions are 100% cold, so a per-condition
 train-mean baseline returns NaN for all val rows. The split-specific baselines
 (chem-NULL = nearest-condition profile, chem-kNN, inductive-MF) replace it; vanilla
 MF only applies to the `cell_holdout` diagnostic, not the primary split.
+
+### feba.db `Cofit` is TARGET LEAKAGE on the cold-gene split — never use it as a gene–gene edge
+**What it is:** `feba.db` ships a precomputed `Cofit` table = Pearson correlation
+between gene fitness *profiles*, computed over **all** experiments (split-blind).
+**Why it leaks (cold-gene / condition-holdout):** the `cold_gene` split holds out
+*whole genes*, but a `Cofit` correlation spans the held-out val conditions, so a cold
+gene's top co-fitness neighbor's train profile reconstructs that gene's **own held-out
+answer key**. Smoking gun (round-2 evolutionary-search verification, Keio/Caulo/MR1):
+cofit-only NDCG@5 ≈ **0.73–0.75**, which *exceeds even the warm chem-kNN gate (~0.485)*
+— physically impossible without a leak; the rank-1 cofit-neighbor's train profile
+correlates with the val gene's TRUE held-out profile at median r ≈ 0.56 (63% of genes
+> 0.5). Inverted ablation confirms it (cofit-only > any fusion that includes it).
+**Rule:** never read `feba.db Cofit` (or any all-experiment co-fitness matrix) into a
+cold-gene or condition-holdout method. Co-fitness must be **recomputed train-only**
+(gene fitness vectors over TRAIN conditions only). On the cold-gene split a train-only
+co-fitness edge is *undefined* (a held-out gene has zero train rows to correlate), so
+the **frozen embedding is the only leakage-free gene–gene edge source there** — which
+is also why the honest gene-axis methods (GENE-NW) reduce to the R-COLD embedding
+signal rather than adding new information.
 
 ---
 

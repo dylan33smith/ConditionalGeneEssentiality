@@ -28,8 +28,8 @@ log = logging.getLogger(__name__)
 
 _HANDLERS = {
     # Ranking regime (R) — the active objective. The T-regime (S0-S5, T1-T6) was
-    # pruned in the ranking-branch cleanup; its results live in the decision
-    # ledger + SCIENTIFIC_SYNTHESIS (see the pruned→learning index in the docs).
+    # pruned in the ranking-branch cleanup; its results live in docs/memory.md
+    # (grep the date) and the originals in archive_docs/.
     "R0": "src.experiments.r0.run:main",
     "R1": "src.experiments.r1.run:main",
     "R-LOSS": "src.experiments.rloss.run:main",

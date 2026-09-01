@@ -1,0 +1,41 @@
+# @package _global_
+# P-EVL-external-orgs — external validation on organisms that informed NO design decision.
+#
+# WHY THIS EXISTS. Every locked choice in this project -- the split protocol
+# (R-LOCK-2), the eligibility rule (R-LOCK-1), the metric contract (R-LOCK-4), the
+# chemistry encoder (R1), the loss (R-LOSS/R-TOPK), the promotion gate -- was made
+# while looking at the SAME 23 replicate organisms. That is the standard way a
+# benchmark quietly overfits its own design: no single decision is unprincipled, but
+# the panel has seen them all.
+#
+# The 62-organism release contains 39 further organisms that informed no decision.
+# Running the locked pipeline on them UNCHANGED is a genuine external replication:
+# if the ordering (chem_null < model ~ linear_mf < chem_knn) reproduces on organisms
+# that never touched a design choice, the finding is a property of the data rather
+# than of the panel it was developed on.
+#
+# HONEST SCOPE. These organisms come from the same database and the same assay
+# platform (Fitness Browser / RB-TnSeq), so this controls for BENCHMARK-DESIGN
+# overfitting, NOT for platform or protocol effects. A genuinely independent dataset
+# (MtbTnDB, A. baumannii) remains future work and should be described as such.
+#
+#   python -m src.cli.run_experiment +experiment=P-EVL_external_orgs
+
+experiment_id: P-EVL_external_orgs
+stage_or_tier: R-EVAL
+regime: R
+
+experiment:
+  tag: external
+  # all 62 release organisms MINUS the 23 that every design decision was locked on
+  orgs: [Bifido, Brev2, Burkholderia_OAS925, Bvulgatus_CL09T03C04, CL21,
+         Lysobacter_OAE881, Magneto, Mucilaginibacter_YX36, MycoTube, PS, PV4,
+         Pedo557, Phaeo, Ponti, Putida, RPal_CGA009, RalstoniaBSBF1503,
+         RalstoniaGMI1000, RalstoniaPSI07, RalstoniaUW163, SB2B, Smeli, SynE,
+         SyringaeB728a, SyringaeB728a_mexBdelta, Variovorax_OAS795, WCS417, Xantho,
+         acidovorax_3H11, azobra, psRCH2, pseudo13_GW456_L13, pseudo1_N1B4,
+         pseudo3_N2E3, pseudo5_N2C3_1, pseudo6_N2E2, rhodanobacter_10B01,
+         rhodanobacter_R12, rhodanobacter_T8]
+  split_seed: 0
+  model_seeds: [0, 1, 2]
+  epochs: 8

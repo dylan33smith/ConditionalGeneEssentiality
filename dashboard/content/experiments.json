@@ -1,0 +1,785 @@
+[
+ {
+  "analysis": "The failure has a precise mechanism, stated in synthesis \u00a71. Pointwise RMSE/MAE is dominated by each gene's baseline fitness level (the \"gene-mean\"). A regression model can score decent RMSE by fitting (a) gene means and (b) the population condition effect \u2014 which conditions hurt MOST genes \u2014 while learning NOTHING about the gene x condition interaction, which is the actual biological signal (\"which conditions stress THIS gene\"). The project later confirmed the population effect is worthless for ranking: the chem-NULL baseline (population condition profile, gene-identity-free) scores ~0 within-gene Spearman. So optimizing MSE/MAE across ~54k rows optimizes the wrong quantity for the ranking objective.\n\nTwo reasons are specific to the cross-ORGANISM setting: (1) Homology distance (S1 diagnostic, H-HOMO-01 at 1.6 sigma): a held-out organism's genes lie far from any training gene in ProteomeLM embedding space, so the model has no nearby anchor to place them. (2) Fitness-blindness of the embedding: ProteomeLM encodes sequence/structure/proteome-context, not how a gene responds to stressors; cross-org compounds this with distribution shift. Evidence for (2): ProteomeLM beat raw ESM-C by only ~0.006 RMSE (T5-C), so even the proteome-contextual machinery added almost no conditional signal.\n\nThe T1/T4/T5 ledger entries corroborate the \"RMSE was fine but sub-threshold and metric-conflicted\" picture: across the entire T1-T5 sweep every arm sat at RMSE ~0.50-0.52 with sub-threshold gaps, MSE and Huber conflicted on RMSE vs MAE, and only one intervention (T5-A adapter dim-reduction) produced any statistically robust gain \u2014 and it was still 20% of the RMSE threshold. None of this moved the within-gene ranking, which is why the project pivoted to the R-regime (within-organism, ranking metric).",
+  "caveats": "The 0.045 Spearman and the ~0.43 replicate noise floor are quoted from the SCIENTIFIC_SYNTHESIS narrative (\u00a71), not from a committed metrics artifact reproduced in this dashboard pass \u2014 hence verification=ledger. Later synthesis (\u00a73) reports a slightly different replicate ceiling (Spearman ~0.39 / NDCG@5 ~0.66) for the WITHIN-organism task; \u00a71's ~0.43 is the cross-organism-context noise floor. The ~0.045 is described as \"statistically indistinguishable from random,\" not a precisely CI-bounded estimate. The T1/T4/T5 ledger RMSE/MAE tables use the multi_org_balanced split and report co-primary RMSE/MAE only; the within-gene Spearman for the cross-org regime is carried in the synthesis, not tabulated per-arm in those three decision files. NDCG@5 was NOT a T-regime metric \u2014 the T-regime pre-dates the R-regime metric change (RMSE -> per-gene ranking), so no NDCG@5 number exists for cross-org. The gate values referenced for reader orientation (chem-kNN NDCG@5 0.485, replicate ceiling 0.66) belong to the later within-organism R-regime, not to this T-regime experiment.",
+  "family": "cross_organism",
+  "how_tested": "DATA. Tn-seq gene-fitness measurements across a large multi-organism bacterial/archaeal panel (48 organisms were re-encoded in T5; the training split drew from the full org pool). Each row is one (gene, experimental condition) pair with a continuous fitness score. Inputs per row: a frozen ProteomeLM-L layer-8 gene embedding (1152-dim, mean-pooled, sequence-derived, proteome-contextualized, never fine-tuned) concatenated with a media-chemistry encoding of the condition.\n\nSPLIT (the key design). Cross-ORGANISM holdout, i.e. leave-genomes-out: the canonical split protocol was `multi_org_balanced` (locked in `data_contract/splits/locked_protocol.yaml`). Whole organisms were held out for validation so that held-out orgs are NOT in train (leakage/split-overlap guardrails explicitly passed \"by construction\" in T1-DEC-001). The reported per-organism validation set covered 4 val organisms (ANA3, BFirm, pseudo3_N2E3, SyringaeB728a_mexBdelta in the T1 breakdown). All preprocessing (chemistry vocab, scalers, eligibility thresholds) was fit on train rows only; unseen val categories mapped to explicit <UNK>. Feature contract frozen at artifact de21504134c84a6c.\n\nOBJECTIVE / WHAT WAS RUN. Pointwise regression on the raw continuous fitness score. The pre-registered co-primary metrics were RMSE and MAE (S2-locked thresholds RMSE=0.0212, MAE=0.005). The loss was mean squared error (MSE); T4-A explicitly tested Huber (delta 0.5/1.0/1.5) vs MSE and T4-B tested per-experiment z-scored targets vs raw \u2014 MSE + raw targets were retained. Model families swept across tiers: a shallow concat-linear MLP (T1, hidden 256), a 2-layer ResidualMLP (hidden 512, T3), plus encoder/layer/embedding ablations (T5). Training config throughout: 3 seeds {0,1,2}, 8 epochs, constant lr=1e-3, weight_decay=1e-4, batch_size=8192; cross-seed std reported; seed-0 bootstrap CIs (1000 row-resamples).\n\nBASELINES / CONTROLS in the T-regime. The learned models were required to beat the locked S2 best-non-global baseline (embedding-NN, RMSE 0.5884 on multi_org_balanced) \u2014 which they did by ~0.07 RMSE. Ablation controls established the embedding was not the fixable lever: T5-B (PLM layer 0/4/8/12/18) and T5-C (ProteomeLM layer-8 vs raw ESM-C 600M) \u2014 ProteomeLM beat raw ESM-C by only ~0.006 RMSE.\n\nTHE DIAGNOSTIC THAT MATTERED. Beyond the co-primary RMSE/MAE, the project computed the biologically meaningful quantity: the within-GENE ranking of a gene's conditions (within-gene Spearman), compared against a replicate noise floor (~0.43 Spearman, the agreement between biological replicates = achievable ceiling). This is what exposed the failure. A supporting mechanism-check (run later, in the R-regime) confirmed the population/cross-gene condition profile carries essentially no within-gene signal: the chem-NULL baseline (predict the population condition profile, no gene specificity) scores ~0 within-gene Spearman. The homology cause was quantified in S1 (H-HOMO-01, 1.6 sigma: held-out-org genes far from any train gene in embedding space), and T1 reported a homology-bin RMSE breakdown (val rows binned by cosine to nearest train gene) confirming error grows with homology distance (RMSE ~0.40 at cosine <0.5 rising to ~0.55 at cosine >0.85).",
+  "hypothesis": "Foundational bet: a frozen, proteome-contextualized, sequence-derived protein embedding (ProteomeLM) combined with a media-chemistry encoding contains enough information to predict conditional gene essentiality, and this generalizes across organisms. Concretely for this experiment: train pointwise MSE/MAE regression on fitness for a pool of organisms, hold entire genomes out, and predict held-out organisms' gene x condition fitness \u2014 expecting both good error metrics AND a biologically meaningful within-gene ordering of conditions.",
+  "id": "cross_org",
+  "meaning": "This is the pivotal negative that reframed the entire project. It cleanly separated two problems that RMSE conflates: predicting the LEVEL of fitness (easy, gene-mean-dominated, achieved) versus predicting the within-gene conditional ORDERING (the real, hard, biologically useful problem). Cross-organism transfer of the ordering is ~0 \u2014 frozen protein embeddings carry no transferable conditional-response information across genomes, for two reasons (homology distance + a fitness-blind embedding). The consequences: (1) the generalization claim was narrowed from cross-organism to WITHIN-organism (predict a known organism's genes under novel condition combinations); (2) the primary metric was changed from RMSE to per-gene ranking (within-gene Spearman + NDCG@k), the quantity a biologist actually uses. Everything in the later R-regime \u2014 the chem-kNN strong baseline, the memorization-dominated finding, the cold-gene diagnostic \u2014 descends from this result. It also set the durable lesson that a low RMSE can entirely hide a useless model when the target is heavy-tailed and gene-mean-dominated.",
+  "name": "Cross-organism fitness regression (T-regime)",
+  "results": [
+   {
+    "label": "Within-gene Spearman (cross-organism holdout, the diagnostic that mattered)",
+    "number": "\u2248 0.045",
+    "plain_explanation": "This is the headline failure. Spearman rank correlation runs -1 to +1; 0 means the model's ordering of a gene's conditions is no better than random, +1 is perfect. At ~0.045 the model has essentially NO ability to say which conditions stress a given gene most \u2014 it is statistically indistinguishable from random guessing. Bad, and it is the biologically meaningful quantity (a biologist wants the ranking, not the raw score). Crucially, RMSE/MAE looked fine at the same time, which is exactly the trap: good error metrics hid a useless ranking."
+   },
+   {
+    "label": "Replicate noise floor / achievable ceiling (within-gene Spearman, cross-org context)",
+    "number": "\u2248 0.43",
+    "plain_explanation": "The ceiling of what is even achievable: two biological replicates of the SAME experiment only agree at ~0.43 within-gene Spearman, because the target is intrinsically noisy. So the honest scale runs 0 (random) to ~0.43 (as good as a repeat of the experiment). The model landed at ~0.045 \u2014 near the floor, nowhere near the ceiling. This reframes the ~0.045 as unambiguously a failure, not a hard-target artifact: a repeat experiment does ~10x better."
+   },
+   {
+    "label": "Model RMSE on multi_org_balanced (representative locked model, T4/T5 sweep)",
+    "number": "\u2248 0.50 (e.g. MSE 0.5022 \u00b1 0.0013; T5 adapter best 0.4991 \u00b1 0.0011)",
+    "plain_explanation": "RMSE is prediction error on the raw fitness score (lower is better, same units as fitness). Around 0.50 it was 'acceptable' and beat the locked non-global baseline (embedding-NN at 0.5884) by ~0.07. This is the 'fine' half of the story \u2014 the error metric the model was TRAINED on looked healthy. The problem is RMSE is dominated by each gene's baseline fitness level (the gene-mean), so a low RMSE is achievable while the gene x condition interaction \u2014 the actual signal \u2014 is learned not at all."
+   },
+   {
+    "label": "MAE on multi_org_balanced (representative locked model)",
+    "number": "\u2248 0.28 (e.g. MSE arm 0.2799 \u00b1 0.0008; raw-target arm 0.2798)",
+    "plain_explanation": "Mean absolute error on raw fitness, lower is better. ~0.28 was likewise 'fine' and stable across seeds. Together with RMSE ~0.50 it completes the picture: both pointwise error co-primaries were satisfactory, yet the within-gene ranking was random \u2014 the two are measuring different things."
+   },
+   {
+    "label": "ProteomeLM layer-8 vs raw ESM-C 600M advantage (T5-C, evidence for the fitness-blind cause)",
+    "number": "RMSE ~0.0060 (plm_layer8 0.5030 vs esmc_only 0.5090)",
+    "plain_explanation": "This tiny gap is the evidence for cause #2. Swapping the full proteome-contextual ProteomeLM embedding for a raw per-protein ESM-C embedding barely changed error (~0.006 RMSE, ~28% of the promotion threshold). Interpretation: even the sophisticated proteome-context machinery added almost no CONDITIONAL signal \u2014 the embedding encodes sequence/structure, not how a gene responds to stressors. A near-zero contribution from the 'smart' part of the embedding is consistent with the ranking being random."
+   },
+   {
+    "label": "Best T-regime intervention gain (T5-A adapter_1024_proj, dimension-reduction adapter)",
+    "number": "RMSE -0.0043, MAE -0.0025 (0.4991 vs 0.5034; disjoint bootstrap CIs)",
+    "plain_explanation": "The single statistically robust improvement found in the entire T2-T5 architecture sweep \u2014 and it was still only ~20% of the RMSE promotion threshold and ~50% of the MAE threshold. A directional win, not a paradigm shift. It illustrates that no amount of encoder/architecture tuning within the frozen-embedding + pointwise-regression + cross-org frame moved the needle on the real problem; the ranking stayed ~random regardless."
+   },
+   {
+    "label": "Homology cause strength (S1 diagnostic, H-HOMO-01)",
+    "number": "1.6\u03c3",
+    "plain_explanation": "Quantifies cause #1 (homology distance). Held-out organisms' genes sit far from any training gene in embedding space, a ~1.6-sigma effect, so the model has no nearby anchor to place them. T1's homology-bin RMSE breakdown corroborates it: error rises monotonically with cosine distance to the nearest train gene (RMSE ~0.40 for the closest bin, cosine <0.5, up to ~0.55 for the farthest, cosine >0.85). This is why cross-ORGANISM specifically fails harder than the later cross-GENE-within-organism (cold-gene) regime, where the embedding does generalize."
+   }
+  ],
+  "source_files": [
+   "research_log/SCIENTIFIC_SYNTHESIS.md",
+   "research_log/decisions/tier1/T1-DEC-001.md",
+   "research_log/decisions/tier4/T4-DEC-001.md",
+   "research_log/decisions/tier5/T5-DEC-001.md",
+   "research_log/decisions/stage1/S1-DEC-001.md",
+   "docs/project_memory/progress.md"
+  ],
+  "verification": "ledger"
+ },
+ {
+  "id": "rlock_setup",
+  "name": "The within-organism test harness (split \u00b7 eligibility \u00b7 metric \u00b7 baselines \u00b7 gate)",
+  "family": "infrastructure",
+  "hypothesis": "A single locked within-organism test harness \u2014 a cold-condition holdout split, a spread-based eligibility filter, a retrieval-first metric with hierarchical confidence intervals, three matched baselines, and a replicate ceiling \u2014 is a valid and sufficient lens to judge whether ANY learned model earns promotion for the \"find a gene's top stressor conditions\" task. Concretely: hold out 20% of each organism's conditions (which are chemically disjoint from train, so the task is genuine composition not recall); score only genes that vary enough to be rankable (tail_g over a per-org noise-scaled threshold); score the model and every baseline on the identical eligible val genes; and promote only if the model beats the chem-kNN gate by an effect-size margin with disjoint org\u2192gene bootstrap CIs.",
+  "how_tested": "This is the shared test harness every within-organism ranking experiment runs through, defined across four locked decisions (R-LOCK-1 through R-LOCK-4, 2026-05-24 to 2026-05-25) and implemented in src/ranking/eval/harness.py. WHAT DATA: Tn-seq fitness values (\"fit\") for genes across growth conditions, per organism; a condition is keyed as condition_key = (expDesc, media, temperature). Population characterization spanned 48 organisms, 182,447 (org, gene) pairs, ~7,500 experiment assays, ~4,200 distinct conditions; the reliable-replicate headline subset is 23 orgs. THE SPLIT (R-LOCK-2): within each organism, hold out 20% of the DISTINCT conditions (fraction-based because org sizes span 17x), seed 0, with floor 3 / cap 30 held-out conditions per org. Holdout is at the CONDITION level, not the assay (expName) level \u2014 every replicate assay of a held-out condition goes to val together (hold_out_together) so no replicate of a val condition leaks into train. Held out at the condition level, val conditions turn out to be 100% chemically disjoint from train (\"cold columns\"; verified 0/78 overlap), so the model must COMPOSE gene embedding x condition chemistry rather than recall the exact condition \u2014 this is the deployment-relevant \"novel conditions within a known organism\" claim. Splits are stratified by expGroup where feasible; seeds 0/1/2 for multi-seed checks; Keio is the dev subset. THE ELIGIBILITY FILTER (R-LOCK-1): only rank genes that actually vary across conditions. Spread is measured as tail_g = p95 - p5 of a gene's fit across its conditions (NOT IQR \u2014 a gene essential in only 3-5 of 100 conditions has IQR ~ 0 yet is the single most rankable gene, so IQR would discard exactly the best targets). A gene is eligible if tail_g exceeds a PER-ORG threshold tail_min_org = max(0.20, 0.80 x (1 - r_replicate_org)), where r_replicate_org is that org's replicate reproducibility \u2014 noisier orgs (which span 5.4x, replicate Spearman 0.16 to 0.89) demand a higher spread bar. Val is HARD-filtered on this (m_min_val = 5 conditions; Spearman is undefined on constant fit). Train genes are all kept but WEIGHTED by w_g = clip((tail_g - tail_min_org)/(p75_org - tail_min_org),0,1) x min(m_g/m_min,1), so low-spread genes contribute little but still anchor the \"predict near-flat for non-conditional genes\" variance prior. DENOMINATOR PARITY: the model and every baseline are scored on the IDENTICAL eligible val gene set (min 5 conditions/gene, non-constant). THE THREE BASELINES (all in harness.py, split-specific for the cold-column primary split): (1) chem-NULL = chemistry_nearest_condition_profile \u2014 for a held-out condition c, find its chemically-nearest TRAIN condition c' by cosine distance on condition features and predict every gene's fit at c as the train-gene MEAN fit at c'; gene-blind population profile, the floor a real model must clear. (2) chem-kNN = chemistry_knn_predict (k=5) \u2014 predict gene g's fit at cold condition c from g's OWN train fit at its k chemically-nearest train conditions; it uses the gene's warm history bridged by chemistry and is the competitive gate. (3) linear inductive-MF = inductive_mf_predict \u2014 a bilinear model Fit[g,c] = U[g]\u00b7(W\u00b7x[c]) + b[g] with free per-gene latents U (genes are warm), a chemistry-feature column map W\u00b7x[c] that places COLD conditions via their features, and per-gene bias b, trained by (w_g-weighted) MSE; isolates whether the deep model's nonlinearity beats a linear feature-MF. THE REPLICATE NOISE FLOOR / ORACLE (R-LOCK-4, retrieval_noise_floor in harness): for each gene with >=2 replicate assays at >=5 conditions, use replicate A's fit as the PREDICTION and replicate B's fit as the TRUTH and compute NDCG@k/precision@k \u2014 the best any model could do given biological noise; reported as a ceiling line (only for the 23 orgs with adequate replicate design). METRICS (R-LOCK-4 v2): PRIMARY is NDCG@5 (retrieval; relevance = max(0,-fit) so a stronger stressor = more negative fit = higher gain, ranking conditions by predicted-most-essential first); SECONDARY/anti-gaming is within-gene Spearman and Kendall (full-list completeness). Every metric carries a HIERARCHICAL bootstrap CI: resample organisms with replacement, then genes within each chosen org (n=1000, 95% percentile) \u2014 because genes within an org are correlated, a flat bootstrap would be overconfident. THE GATE: a learned model is promoted over chem-kNN only if it beats chem-kNN by the effect-size margin (CLAUDE.md: >= ~0.026 NDCG@5) AND the two hierarchical-bootstrap CIs are DISJOINT; the harness also provides a one-sided hierarchical bootstrap p-value on the per-gene paired delta and Benjamini-Hochberg FDR across a tier's arms. WHAT WAS ACTUALLY RUN through this harness: the locked pointwise_huber model vs all three baselines, on both a fast 3-org gate (Keio+Caulo+MR1, seed 0, N=9,152 eligible val genes) and the 23-org / 3-seed headline (N=39,356 eligible val genes), pinned in the committed artifact data_contract/ranking/reval_baseline.json.",
+  "results": [
+   {
+    "label": "chem-kNN gate \u2014 NDCG@5 (23-org / 3-seed headline)",
+    "number": "0.4852",
+    "plain_explanation": "NDCG@5 ranges 0 to 1 (higher = better top-of-list ranking). This is the value of the competitive baseline (chem-kNN: predict a gene's fit at a cold condition from that gene's OWN fit at its chemically-nearest train conditions). It is the bar any learned model must clear to be promoted. It is high because retrieving a gene's own warm history is a very strong strategy on a split that is transductive over genes."
+   },
+   {
+    "label": "locked model (pointwise_huber) \u2014 NDCG@5 (23-org / 3-seed)",
+    "number": "0.4319",
+    "plain_explanation": "The best learned model's headline NDCG@5. It sits BELOW the chem-kNN gate of 0.4852 (a gap of about -0.053), so the model does NOT earn promotion on the warm within-org split. This is the honest, correctly-measured central finding the harness exists to surface: parametric learning loses to local memorization here \u2014 not because the embedding is worthless, but because looking up a gene's own past behavior is hard to beat."
+   },
+   {
+    "label": "linear inductive-MF \u2014 NDCG@5 (23-org / 3-seed)",
+    "number": "0.4289868052015972",
+    "plain_explanation": "The bilinear control baseline (free per-gene latents + chemistry column factors). It lands essentially at the deep model's level (0.4290 vs 0.4319) and below chem-kNN, showing the deep model's nonlinearity buys nothing over a linear feature-MF on this task \u2014 a key negative that only a matched baseline can reveal."
+   },
+   {
+    "label": "chem-NULL floor \u2014 NDCG@5 (23-org / 3-seed)",
+    "number": "0.3433539276426068",
+    "plain_explanation": "The gene-blind population baseline (nearest-chemistry train-condition mean, ignoring gene identity). It is the FLOOR: a real model must beat it. The learned model (0.4319) clears it comfortably, confirming the model captures gene-specific structure beyond the population profile even though it fails to beat the stronger chem-kNN gate."
+   },
+   {
+    "label": "promotion margin required over chem-kNN (NDCG@5)",
+    "number": ">= ~0.026",
+    "plain_explanation": "The effect-size-anchored margin (from CLAUDE.md) by which a model must beat the chem-kNN gate to be promoted, AND the two hierarchical org->gene bootstrap CIs must be disjoint. It is a deliberately strict, non-overlapping-evidence bar; the current model falls short (it is below the gate, not 0.026 above it)."
+   },
+   {
+    "label": "hierarchical bootstrap settings",
+    "number": "n=1000, 95% percentile, resample orgs then genes",
+    "plain_explanation": "Every reported NDCG@5 / Spearman carries a two-level (org -> gene) bootstrap CI. Resampling organisms first, then genes within, honors that genes in one organism are correlated; a flat gene-level bootstrap would give a too-narrow (overconfident) CI and inflate false promotions. This is what makes the 'disjoint CIs' gate trustworthy."
+   },
+   {
+    "label": "eligible val genes scored (headline / fast gate)",
+    "number": "39,356 (23-org/3-seed) \u00b7 9,152 (Keio+Caulo+MR1, seed 0)",
+    "plain_explanation": "Sample sizes N for the denominator-parity comparison: the model and all three baselines are scored on exactly these same eligible val genes (genes with >=5 conditions and non-constant fit). Large N makes the bootstrap CIs tight, which is why even a ~0.05 model-vs-gate gap is a meaningful, not noise-driven, shortfall."
+   },
+   {
+    "label": "holdout fraction / seed / condition unit",
+    "number": "0.20 \u00b7 seed 0 \u00b7 condition_key = (expDesc, media, temperature)",
+    "plain_explanation": "The split rule (R-LOCK-2): hold out 20% of each org's distinct conditions at the condition (not assay) level so replicates of a val condition never leak into train. Fraction-based (not fixed-k) because org sizes span 17x. This is what makes val columns chemically cold and the task genuine composition."
+   },
+   {
+    "label": "eligibility spread metric / per-org threshold",
+    "number": "tail_g = p95 - p5; tail_min_org = max(0.20, 0.80 x (1 - r_replicate_org))",
+    "plain_explanation": "The eligibility rule (R-LOCK-1): rank a gene only if its fit range (p95-p5) exceeds a per-org bar scaled to that org's replicate noise. tail (not IQR) is used because a gene essential in only 3-5 of 100 conditions has IQR ~ 0 but is the MOST rankable gene \u2014 IQR would throw away exactly the best targets. Noisier orgs (replicate reproducibility spans 5.4x, 0.16 to 0.89) get a higher bar."
+   }
+  ],
+  "analysis": "The harness works because it forces an apples-to-apples comparison on a deliberately hard task. The split makes val conditions 100% chemically-disjoint from train (\"cold columns\"): the model never sees the held-out condition during training, so it can only score well by composing the gene embedding with the condition's chemistry \u2014 the deployment-relevant claim (\"novel condition combinations within a known organism\"). The eligibility filter (tail_g = p95 - p5 of a gene's fit across conditions, over a per-org threshold scaled to that org's replicate noise) removes flat, non-conditional genes whose ranking is meaningless/undefined, and it uses tail rather than IQR specifically because a gene essential in only 3-5 of 100 conditions has IQR ~ 0 by construction yet is exactly the most rankable target. Denominator parity \u2014 model and every baseline scored on the identical eligible val genes \u2014 is what makes the deltas trustworthy. The three baselines triangulate what \"learning\" would even mean: chem-NULL (gene-blind population profile via nearest-chemistry train-condition mean) is the floor a real model must clear; chem-kNN (the gene's OWN warm history retrieved through chemistry) is the hard, non-parametric bar that turns out to WIN \u2014 because the split is transductive over genes, so simply looking up a gene's past behavior beats parametric generalization; linear inductive-MF (free per-gene latents + a chemistry-feature column map, Fit[g,c]=U[g]\u00b7(W\u00b7x[c])+b[g]) is the bilinear control that isolates whether the deep model's nonlinearity buys anything. The replicate oracle (replicate A predicting replicate B) sets the attainable ceiling. The gate (beat chem-kNN by the effect-size-anchored margin with disjoint hierarchical org->gene bootstrap CIs) is deliberately strict: the hierarchical bootstrap widens the CI to respect that genes within an org are correlated, preventing overconfident \"disjoint CI\" promotions. CAVEATS: two versions of the metric contract exist \u2014 the original R-LOCK-4-DEC-001 (2026-05-24) locked within-gene Spearman as primary with a \"per-condition train mean\" baseline and flat gene-level bootstrap; the amended r_lock_4_v2 (R-LOCK-4-DEC-002, 2026-05-25, materialized in metric_contract.yaml and implemented in harness.py) supersedes it after the publication-readiness audit \u2014 NDCG@5 became primary, the hierarchical org->gene bootstrap replaced flat, and baselines became split-specific; the dashboard should describe the CURRENT (v2) harness that harness.py implements. The \"~0.026 NDCG@5 margin\" is the CLAUDE.md statement of the gate; metric_contract.yaml states numeric promotion deltas in Spearman/Kendall terms (0.01/0.008 absolute) plus \"CIs must be disjoint\" \u2014 disjoint CIs is the operative rule. The eligibility policy's per-org r_replicate values were flagged (R-LOCK-1 audit 2026-05-25) as computed on the full dataset rather than train-only \u2014 a real but small-magnitude locked-artifact violation. Threshold constants (floor 0.20, coef 0.80, tail_ref=per-org p75, holdout frac 0.20) are documented judgment calls, not derived optima. The replicate ceiling (~0.66 NDCG@5 per the brief) comes from retrieval_noise_floor and is only available for the 23 orgs with an adequate replicate design.",
+  "meaning": "This harness is the measuring instrument for the entire within-organism program \u2014 every R-tier experiment (R1 chemistry, R-LOSS loss family, R-CONF, R-AUG, R-COLD, R-EVAL) inherits its split, eligibility, parity rule, baselines, and gate, so its correctness is load-bearing for all downstream verdicts. Two design choices proved decisive. First, holding out conditions (not assays) at the condition level made the val columns chemically cold, which reframed the task from easy matrix completion to genuine cold-start composition \u2014 and revealed that chem-kNN (retrieving a gene's own warm history) is a very strong, hard-to-beat bar precisely because the split is transductive over genes. That is why the headline result across the project is that the learned model does NOT beat chem-kNN on the warm within-org split (model NDCG@5 0.4319 vs gate 0.4852), which the harness reports honestly rather than hiding. Second, making NDCG@5 primary with an HONEST hierarchical bootstrap exposed that apparent wins can be CI-overlapping even when a flat bootstrap would have called them significant \u2014 the harness is what keeps the project from over-claiming promotions. In short, this infrastructure is what lets the project distinguish \"the embedding is useless\" (false) from \"local memorization beats global parametric learning on the warm split\" (the actual, correctly-measured finding).",
+  "verification": "mixed",
+  "source_files": [
+   "/home/ds85/projects/ConditionalGeneEssentiality/research_log/decisions/r_lock/R-LOCK-1-DEC-001.md",
+   "/home/ds85/projects/ConditionalGeneEssentiality/research_log/decisions/r_lock/R-LOCK-2-DEC-001.md",
+   "/home/ds85/projects/ConditionalGeneEssentiality/research_log/decisions/r_lock/R-LOCK-3-DEC-001.md",
+   "/home/ds85/projects/ConditionalGeneEssentiality/research_log/decisions/r_lock/R-LOCK-4-DEC-001.md",
+   "/home/ds85/projects/ConditionalGeneEssentiality/src/ranking/eval/harness.py",
+   "/home/ds85/projects/ConditionalGeneEssentiality/data_contract/ranking/metric_contract.yaml",
+   "/home/ds85/projects/ConditionalGeneEssentiality/data_contract/ranking/reval_baseline.json",
+   "/home/ds85/projects/ConditionalGeneEssentiality/docs/project_memory/progress.md"
+  ],
+  "caveats": "Two versions of the metric contract exist: R-LOCK-4-DEC-001 (v1, 2026-05-24) locked within-gene Spearman as primary with a per-condition-train-mean baseline and flat gene bootstrap; r_lock_4_v2 (R-LOCK-4-DEC-002, 2026-05-25, in metric_contract.yaml + harness.py) supersedes it \u2014 NDCG@5 primary, hierarchical org->gene bootstrap, split-specific baselines. Describe the v2 harness (what harness.py implements). The ~0.026 NDCG@5 gate margin is from CLAUDE.md; the yaml states promotion deltas as Spearman 0.01 / Kendall 0.008 absolute plus mandatory disjoint CIs \u2014 disjoint CIs is the operative rule. R-LOCK-1 audit (2026-05-25) flagged that per-org r_replicate values were computed on the full dataset, not train-only \u2014 a real but small locked-artifact violation. Threshold constants (tail floor 0.20, noise coef 0.80, tail_ref = per-org p75, holdout frac 0.20) are documented judgment calls, not derived optima. Replicate ceiling (~0.66 NDCG@5) is only available for the 23 orgs with adequate replicate design. Baseline numbers are reproduced in the committed reval_baseline.json (code-verified); the split/eligibility/gate definitions are from the decision ledger + harness source (ledger-verified) \u2014 hence verification=mixed."
+ },
+ {
+  "id": "r1_encoder",
+  "name": "Chemistry encoder sweep (R1)",
+  "family": "within_org_warm",
+  "hypothesis": "H-R-CHEM-01: under within-organism condition-holdout ranking (\"find the top stressors for each gene\"), structural chemistry fingerprints (Morgan / RDKit / MACCS) should outperform the 425-dimensional multihot chemistry baseline \u2014 reversing the earlier T6-A result, which was measured under a different (MSE + cross-organism regression) setup. Secondary prediction: any chemistry arm using the locked T5-A deep architecture should beat the non-parametric gene-specific chemistry-kNN baseline.",
+  "how_tested": "Data and task: within-organism conditional-essentiality ranking on Tn-seq fitness data \u2014 for each gene the model ranks held-out experimental conditions by fitness effect. Evaluated on the 23 replicate organisms with a reliable noise floor (ANA3, BFirm, Btheta, Burk376, Caulo, Cola, Cup4G11, Dda3937, Ddia6719, DdiaME23, Dino, DvH, Dyella79, HerbieS, Kang, Keio, Korea, Koxy, MR1, Marino, Methanococcus_JJ, Methanococcus_S2, Miya). All arms and all baselines were scored on one common eligible validation gene set of ~46,000 genes (denominator parity). Split: a single within-organism condition-holdout split (R-LOCK-2, seed 0) \u2014 genes are seen in training, but the specific held-out conditions are not (transductive over genes). Arms: 6 chemistry-encoder arms, all on the locked T5-A deep architecture (AdapterResidualMLP over frozen ProteomeLM gene embeddings plus a chemistry-feature vector): (1) multihot_425, a 425-dim binary compound presence/absence vector (control + T-regime lock); (2) morgan_2048, 2048-bit Morgan fingerprint; (3) rdkit_2048, 2048-bit RDKit fingerprint; (4) maccs_167, 167-bit MACCS keys; (5) morgan_plus_multihot; (6) maccs_plus_multihot (the two hybrids concatenate a fingerprint with multihot). Design: 6 arms x 3 seeds (0,1,2) x 23 orgs; the 3 seeds vary only model initialization (split fixed at seed 0), so per-arm metrics are mean \u00b1 std over 3 seeds. Held-constant controls: R-LOCK-1 eligibility (tail_g / w_g weighting), R-LOCK-2 split, R-LOCK-3 pointwise sampler, R-LOCK-4 metric contract, T5-A architecture, weighted pointwise MSE loss, 8 epochs, Spearman early stopping. Baselines on the identical gene set: chem-kNN (gene-specific chemistry-similarity lookup, the bar), chem-NULL (gene-identity-free population profile, the floor), and a replicate-based noise-floor ceiling. Pre-registered promotion rule: \u0394 within-gene Spearman \u2265 0.023 vs chem-kNN AND beat chem-kNN on NDCG@5, with Benjamini-Hochberg FDR across the 6 arms, and must also clear the chem-NULL gate. Reported metrics: within-gene Spearman, NDCG@1, NDCG@5 (retrieval), precision@5. Artifacts referenced by the ledger: artifacts/runs/r1/r1_results.csv and r1_metric_comparison.csv.",
+  "results": [
+   {
+    "label": "multihot_425 NDCG@5 (best arm)",
+    "number": "0.422 \u00b1 0.001",
+    "plain_explanation": "NDCG@5 measures how well the top-5 ranked conditions match the true top stressors for each gene; it ranges 0 to 1, higher is better. The multihot presence/absence encoder was the single best of the 6 arms at 0.422. This is well BELOW the chem-kNN gate of 0.485 that a learned model must beat, so even the best encoder is a clear loss. The tiny \u00b10.001 std across 3 seeds means the result is highly stable, not noise."
+   },
+   {
+    "label": "multihot_425 within-gene Spearman",
+    "number": "0.130 \u00b1 0.002",
+    "plain_explanation": "Spearman is the secondary, full-list rank-agreement metric (higher is better). The best arm reached only 0.130, far below chem-kNN's 0.240 \u2014 another decisive loss on the secondary metric, and nowhere near the +0.023 improvement the promotion rule required (it was worse, not better)."
+   },
+   {
+    "label": "morgan_2048 NDCG@5",
+    "number": "0.415 \u00b1 0.004",
+    "plain_explanation": "The 2048-bit Morgan structural fingerprint scored slightly WORSE than multihot (0.415 vs 0.422). Since the hypothesis predicted fingerprints would beat multihot, this is evidence against it: structural priors did not help."
+   },
+   {
+    "label": "rdkit_2048 NDCG@5",
+    "number": "0.406 \u00b1 0.003",
+    "plain_explanation": "The RDKit fingerprint was the WEAKEST arm at 0.406 \u2014 the largest shortfall from multihot among the structural encoders, and furthest below the 0.485 chem-kNN gate. Structural information actively hurt here relative to simple presence/absence bits."
+   },
+   {
+    "label": "maccs_167 NDCG@5",
+    "number": "0.414 \u00b1 0.003",
+    "plain_explanation": "The 167-bit MACCS structural keys scored 0.414, again below multihot's 0.422. Consistent with all fingerprint arms being no-better-or-worse than the multihot control."
+   },
+   {
+    "label": "morgan_plus_multihot NDCG@5",
+    "number": "0.420 \u00b1 0.001",
+    "plain_explanation": "Concatenating Morgan with multihot gave 0.420 \u2014 essentially tied with plain multihot (0.422) and still below the 0.485 gate. Adding structural bits on top of multihot bought nothing."
+   },
+   {
+    "label": "maccs_plus_multihot NDCG@5",
+    "number": "0.419 \u00b1 0.005",
+    "plain_explanation": "The MACCS+multihot hybrid scored 0.419, again indistinguishable from plain multihot and below the gate. All 6 encoders cluster tightly around NDCG@5 \u2248 0.41\u20130.42."
+   },
+   {
+    "label": "chem-kNN gate (baseline to beat) NDCG@5 / Spearman",
+    "number": "0.485 / 0.240",
+    "plain_explanation": "chem-kNN is the non-parametric gene-specific chemistry-similarity lookup that every learned model must beat. Its NDCG@5 of 0.485 and Spearman of 0.240 sit far above the best deep-model arm (0.422 / 0.130). The gap is large and consistent across all 3 seeds (arm std \u2264 0.01), and it points in the WRONG direction \u2014 no arm is even a promotion candidate."
+   },
+   {
+    "label": "chem-NULL floor NDCG@5 / Spearman",
+    "number": "0.343 / 0.023",
+    "plain_explanation": "chem-NULL is the gene-identity-free floor (population-average condition profile). The deep model (0.422 NDCG@5) clearly beats this floor, showing the model has SOME real signal \u2014 but the simple gene-specific kNN lookup (0.485) is decisively better than the deep model, so the model's signal is not enough to be useful over the lookup."
+   },
+   {
+    "label": "noise-floor ceiling NDCG@5 / Spearman",
+    "number": "0.658 / 0.393",
+    "plain_explanation": "The replicate-based noise ceiling (~0.658 NDCG@5) is the practical upper bound set by measurement reproducibility. It frames the scale: chem-kNN at 0.485 is well along toward the ceiling, while all model arms (~0.42) lag both the ceiling and the kNN gate."
+   }
+  ],
+  "analysis": "The sweep isolated the chemistry encoder while holding architecture (T5-A) and loss (pointwise MSE) fixed. Two clean findings emerged. First, structural fingerprints did NOT beat multihot \u2014 multihot_425 was the single best arm (NDCG@5 0.422), and every fingerprint arm was uniformly slightly worse (Morgan 0.415, RDKit 0.406, MACCS 0.414, hybrids ~0.42), so H-R-CHEM-01 was rejected in the same direction as the earlier T6-A result. The likely mechanism: dataset S1 has \u226595% chemistry overlap between train and held-out conditions, so held-out conditions are recombinations of already-seen chemicals; multihot's exact-match bits are already lossless in that regime, leaving little novel chemistry for a fingerprint's structural smoothness to generalize over. Second and more decisive, NO arm beat the chem-kNN gate \u2014 the best model (0.422 / 0.130) lost to chem-kNN (0.485 / 0.240) by a wide, seed-consistent margin (std \u2264 0.01), far larger than the 0.023 promotion delta and in the wrong direction, so FDR correction was moot. The model does beat the chem-NULL floor (0.422 vs 0.343), so it has some signal, but the interpretation is architectural/objective rather than representational: the locked deep model under pointwise MSE cannot beat a non-parametric gene-specific similarity lookup. The bottleneck is the fusion topology and the loss, not the chemistry features. R1 was therefore confounded (it varied the encoder while holding two suspect factors fixed), so the encoder verdict was recorded as provisional.",
+  "meaning": "This result set the strategic direction for the whole R-regime. The encoder is not the lever under the MSE + T5-A setup, so the project (i) carried multihot_425 forward as the held-constant chemistry encoder for subsequent tiers (it was both the best arm here and the T-regime lock), (ii) deferred rather than killed the fingerprint question for an R1-revisit after a better architecture and loss were found, and (iii) crucially, promoted chem-kNN (NDCG@5 0.485 / Spearman 0.240) to be the standing promotion-gate baseline for R2, R-LOSS, and all later R-tiers. The decisive read \u2014 that a deep model under pointwise MSE cannot beat a gene-specific similarity lookup \u2014 redirected effort toward fusion topology and ranking loss as the real candidate levers, and foreshadowed the eventual understanding of the \"chem-kNN beats global learning\" wall as a memorization regime rather than a fixable modeling gap.",
+  "verification": "ledger",
+  "source_files": [
+   "/home/ds85/projects/ConditionalGeneEssentiality/research_log/decisions/r1/R1-DEC-001.md",
+   "/home/ds85/projects/ConditionalGeneEssentiality/configs/experiment/R1-A_chemistry.yaml",
+   "/home/ds85/projects/ConditionalGeneEssentiality/docs/project_memory/progress.md"
+  ]
+ },
+ {
+  "analysis": "Both a tiny bilinear model and a large nonlinear one plateau at the same place (~0.43 NDCG@5) and both lose to a simple local lookup (chem-kNN, 0.485). The synthesis pins the mechanism: the useful conditional-essentiality signal is gene-idiosyncratic and LOCAL \u2014 it lives in each gene's OWN deviations from the population/bulk condition profile (which itself carries ~0 within-gene signal, per chem-NULL). Any GLOBAL parametric model, regardless of size, minimizes average error over ~54k genes and therefore averages those per-gene idiosyncratic deviations away \u2014 they look like cross-gene noise to a shared parameter set. So the linear-MF (13k params, bilinear) and the deep model (2.5M params, nonlinear) converge to the same ceiling: the limiting factor is not the model's expressive power but the global-vs-local structure of the task. 'Capacity buys nothing' means: once you have enough parameters to capture the bulk pattern, adding ~190x more parameters and nonlinearity does not recover the gene-specific signal, because that signal is not learnable by any global function \u2014 it must be retrieved from each gene's own history (what kNN does). The linear-MF arm carries a second, sharper meaning (synthesis section 5): its free per-gene latent U[g] is a fitness-AWARE representation learned from scratch on the fitness data, discarding ProteomeLM entirely. That it still ties the frozen-embedding deep model and still loses to kNN shows the warm-task bottleneck is NOT the embedding's fitness-blindness \u2014 it is the global-vs-local structure. Even a perfect fitness-aware gene vector, used globally, loses to local lookup.",
+  "verification": "ledger",
+  "source_files": [
+   "/home/ds85/projects/ConditionalGeneEssentiality/research_log/SCIENTIFIC_SYNTHESIS.md",
+   "/home/ds85/projects/ConditionalGeneEssentiality/research_log/decisions/r_lock/R-LOCK-4-DEC-001.md",
+   "/home/ds85/projects/ConditionalGeneEssentiality/docs/project_memory/progress.md"
+  ],
+  "id": "capacity",
+  "name": "Capacity / nonlinearity (linear-MF vs deep)",
+  "family": "within_org_warm",
+  "hypothesis": "Is model CAPACITY (parameter count / nonlinearity) the lever that lets a learned global model beat the chem-kNN lookup baseline on the within-organism warm ranking task? Prediction under test: a high-capacity nonlinear deep network should extract more of the gene-by-condition signal than a tiny bilinear model, and possibly close the gap to the chem-kNN gate. The experiment pits a ~13k-parameter bilinear matrix-factorization model against a ~2.5M-parameter nonlinear deep model on identical eligible validation genes.",
+  "how_tested": "Data and task: the within-organism WARM ranking task (R-regime, condition-holdout split). For each gene, the goal is to rank that gene's conditions from most- to least-stressful (\"find the top stressors for this gene\"). Data are Tn-seq fitness measurements across 23 replicate organisms (the replicate-org subset used for headline numbers: ANA3, BFirm, Btheta, Burk376, Caulo, Cola, Cup4G11, Dda3937, Ddia6719, DdiaME23, Dino, DvH, Dyella79, HerbieS, Kang, Keio, Korea, Koxy, MR1, Marino, Methanococcus_JJ, Methanococcus_S2, Miya). Scoring is restricted to \"eligible val genes\" only (genes passing the R-LOCK-1 eligibility filter), and \u2014 by the project's denominator-parity rule \u2014 the model and every baseline are scored on the IDENTICAL eligible val gene set. The full model population is ~54k genes.\n\nSplit: this is condition-holdout, so held-out conditions are 100% disjoint from train (cold columns) \u2014 i.e. inductive cold-start matrix completion with chemistry as column-features. Vocab/scalers/eligibility thresholds are fit on train rows only (train-only preprocessing). Runs use 3 model seeds and are aggregated as the mean over eligible val genes (not per-org-balanced).\n\nThe two arms compared (the capacity contrast):\n1. linear-MF: a bilinear matrix-factorization model, ~13k parameters, whose per-gene representation is a FREE learned latent vector U[g] (a fitness-aware gene embedding learned from scratch on the fitness data, discarding the frozen ProteomeLM embedding).\n2. deep model: the \"intended\" R1 architecture (AdapterResidualMLP), ~2.5M parameters, nonlinear, using the frozen ProteomeLM sequence embedding + media-chemistry features.\n\nMetrics: primary is NDCG@5 (top-5 ranking agreement, k=5); secondary is within-gene Spearman (full-list ordinal agreement). Per the R-LOCK-4 metric contract, metrics are the mean over eligible val genes with a bootstrap CI (n=1000, over genes; hierarchical org->gene bootstrap in later reporting).\n\nBaselines / reference lines on the SAME eligible val genes: (a) chem-kNN \u2014 the gate \u2014 a local, non-parametric lookup that reads each gene's OWN observed history and interpolates by chemistry similarity (NDCG@5 0.485 / 0.4852); (b) chem-NULL \u2014 the population condition profile, gene-identity-free, predicting the same vector for every gene (NDCG@5 ~0.31, Spearman ~0.02); (c) noise floor / ceiling \u2014 biological-replicate agreement (NDCG@5 ~0.66 / Spearman ~0.39). Promotion over the gate requires \u0394NDCG@5 >= ~0.026 with disjoint hierarchical-bootstrap CIs.\n\nWhat was actually run and read out: the two capacity arms were trained and evaluated under this harness; their NDCG@5 (and Spearman) were compared head-to-head and against the chem-kNN gate. The finding: the ~13k-param bilinear linear-MF (NDCG@5 0.43, Spearman 0.14) essentially equals the ~2.5M-param nonlinear deep model (NDCG@5 0.42, Spearman 0.13); both plateau at NDCG@5 ~0.42-0.44 and both lose to chem-kNN at 0.485. This sits alongside the parallel encoder sweep (R1) and objective sweep (R-LOSS), all three of which independently returned negative (\"all three say no\").",
+  "results": [
+   {
+    "label": "linear-MF (~13k params, bilinear) NDCG@5",
+    "number": "0.43",
+    "plain_explanation": "NDCG@5 measures top-5 ranking agreement, ranges 0 (random) to 1 (perfect), higher is better. This tiny ~13k-parameter bilinear model scores 0.43. That is BELOW the chem-kNN lookup gate of 0.485 and well below the replicate ceiling of 0.66 \u2014 so it does not beat the simple baseline. The point is that despite being ~190x smaller than the deep model, it matches the deep model's score, showing capacity is not what is limiting performance."
+   },
+   {
+    "label": "deep model (~2.5M params, nonlinear) NDCG@5",
+    "number": "0.42",
+    "plain_explanation": "Same NDCG@5 scale (0-1, higher better). The large ~2.5M-parameter nonlinear deep network scores 0.42 \u2014 statistically the same as the tiny bilinear model's 0.43, and again below the chem-kNN gate (0.485) and the ceiling (0.66). Adding ~190x more parameters plus nonlinearity buys essentially nothing: the two land at the same place. Both are net negatives against the gate."
+   },
+   {
+    "label": "chem-kNN gate NDCG@5",
+    "number": "0.485",
+    "plain_explanation": "This is the baseline both capacity arms must beat. chem-kNN is a LOCAL, non-parametric lookup that reads each gene's own past measurements and interpolates by chemistry similarity. At 0.485 it outranks both learned global models (0.42 and 0.43). Beating it needs \u0394NDCG@5 >= ~0.026 with disjoint CIs \u2014 neither arm comes close, so both fail to promote. This is the 'a simple local baseline wins' result."
+   },
+   {
+    "label": "linear-MF Spearman (secondary)",
+    "number": "0.14",
+    "plain_explanation": "Within-gene Spearman is the secondary full-list ranking metric, ranging -1 to 1, higher better; the replicate ceiling is ~0.39 and chem-kNN reaches 0.24. linear-MF's 0.14 is far below both, and only marginally above the deep model's 0.13 \u2014 confirming on the secondary metric too that the extra capacity of the deep model adds nothing and both trail the lookup."
+   },
+   {
+    "label": "deep model Spearman (secondary)",
+    "number": "0.13",
+    "plain_explanation": "Same Spearman scale (-1 to 1, ceiling ~0.39, chem-kNN 0.24). The deep model's 0.13 essentially ties the bilinear model's 0.14. Both are far under the local lookup (0.24) and the ceiling (0.39). Reinforces that neither model size nor nonlinearity recovers the gene-specific ordering signal."
+   },
+   {
+    "label": "chem-NULL (population profile) NDCG@5 / Spearman",
+    "number": "0.31 / 0.02",
+    "plain_explanation": "chem-NULL predicts the population's average condition profile for every gene (no gene specificity). Its within-gene Spearman of ~0.02 is essentially zero \u2014 meaning the population/cross-gene pattern carries almost NO within-gene signal. This is the mechanistic anchor for 'capacity buys nothing': since the shared/bulk pattern is worthless for ranking, all useful signal lives in each gene's OWN deviations, which a global model of any size averages away."
+   },
+   {
+    "label": "replicate ceiling (noise floor) NDCG@5 / Spearman",
+    "number": "0.66 / 0.39",
+    "plain_explanation": "The best achievable score, set by how well biological replicates of the same experiment agree with each other. NDCG@5 ~0.66 and Spearman ~0.39 \u2014 a MODEST ceiling, meaning the target is intrinsically noisy. Context: even the winning chem-kNN (0.485) leaves a real gap to 0.66, and the ~0.42-0.43 models leave more. Shows the plateau is not just 'models are bad' \u2014 the whole task has a low ceiling \u2014 but the models still sit below the local baseline within that ceiling."
+   }
+  ],
+  "meaning": "This is the third independent leg (with encoder/R1 and objective/R-LOSS) of the project's central negative: on the within-organism warm ranking task, a learned GLOBAL model does not beat a simple local chemistry-similarity lookup \u2014 and here the specific lever ruled out is model capacity/nonlinearity. 'Capacity buys nothing' is not a tuning complaint; it is structural evidence that the bottleneck is the global-vs-local nature of the task, not model expressiveness. This directly de-risks and de-prioritizes scaling up the network. It also carries the project's sharpest strategic implication (synthesis section 5): because linear-MF's free latent U[g] is itself a fitness-AWARE representation learned from the fitness data, and it still ties the frozen-embedding deep model and still loses to kNN, the warm-task bottleneck is NOT the embedding's fitness-blindness. That is the main argument the project uses to DEFER the expensive fitness-aware-embedding (R-EMB) moonshot for the warm task \u2014 a global representation, however good, gets compressed away by global averaging. Together with R1, R-LOSS, and R-HYBRID-A/B, this supports the adopted 'characterization' scope: publish the rigorous, pre-registered negative that the task is memorization-dominated with chem-kNN as a strong baseline learned global models cannot surpass. Note the boundary: this conclusion is warm-only; the later cold-gene diagnostic (R-COLD) showed the global model DOES beat the applicable gate where a gene's own history is removed.",
+  "caveats": "The capacity arm's exact numbers are reported at ~2-decimal precision in the Scientific Synthesis (linear-MF 0.43 / deep 0.42; Spearman 0.14 / 0.13) rather than as a committed metrics artifact with per-seed CIs, so verification is 'ledger'. The synthesis does not give a separate promotion-gate decision doc for the capacity arm specifically (unlike R1-DEC-001 and R-LOSS-DEC-001, which have their own ledgers); capacity is documented as a bullet within Synthesis section 4 and elaborated in section 5. The R-LOCK-4 decision I read defines the evaluation contract (metrics, baselines, bootstrap, promotion deltas) under which the comparison was scored but is not itself the capacity experiment record. The parameter counts (~13k, ~2.5M) and the 'both ~0.43' framing are quoted directly from the synthesis; I did not independently re-run or re-count parameters. The headline warm numbers used project-wide (model NDCG@5 0.4319, chem-kNN 0.4852) come from the 23-org/3-seed anchor in progress.md; the section-3/4 table rounds these to 0.42 and 0.485."
+ },
+ {
+  "analysis": "The result reveals a locality bottleneck, not an objective bottleneck. Motivated by R1 (encoder didn't matter and a linear matrix-factorization tied the deep model), the team suspected that using a pointwise regression loss (MSE) to optimize a ranking metric was the real limiter. R-LOSS tested that by swapping in dedicated ranking losses \u2014 including LambdaRank and ApproxNDCG, which optimize NDCG directly. The finding: none of them helped. Every global parametric model \u2014 MSE, Huber, all four ranking losses, and the linear-MF from R1 \u2014 clusters at NDCG@5 ~0.40-0.44, a plateau well below the chem-kNN gate (0.485). The one within-family improvement (Huber > MSE, +0.012 NDCG@5) comes from robustness to outlier fitness values, not from ranking-awareness. LambdaRank's NDCG@5 (0.431, 2nd best) with a collapsed Spearman (0.080) is diagnostic: a purely top-focused objective can raise top-of-list agreement slightly while wrecking full-list order, but it still cannot cross the gate. Mechanistically, chem-kNN wins because it exploits each gene's measured behavior at chemically-near conditions locally; a single global weight matrix cannot reproduce that per-gene locality regardless of encoder, objective, or capacity. Two independent levers (encoder in R1, objective here) plus capacity (R1's linear-MF \u2248 deep) have all failed, which is what redirects the project toward local/hybrid methods.",
+  "caveats": "Single split seed only (R-LOCK-2 seed 0); the 3 model seeds vary initialization, not the train/val partition \u2014 so these numbers speak to init-robustness, not split-robustness. The per-loss table reports means with sd only for Spearman and NDCG@5 (NDCG@1 and prec@5 are point estimates). The baseline rows (chem-kNN, linear-MF, chem-NULL, noise-floor) are listed without sd. The referenced artifacts (artifacts/runs/rloss/rloss_results.csv, rloss_metric_comparison.csv) are NOT present in the working tree and NOT git-tracked, and the decision file's code_sha is unfilled (`<fill on commit>`), so the numbers are documented only in the ledger, not reproduced from a committed artifact. LambdaRank's Spearman collapse is attributed to the early-stop-on-NDCG@5 criterion; a Spearman+NDCG composite stop was not run and, per the decision, would not close the ~0.05 gate gap anyway. The promotion rule text differs slightly between the two source files: the decision file states delta_spearman >= 0.023 while its prose narrative mentions 0.021 as Huber's actual Spearman gain over MSE (the 0.023 is the threshold, not an achieved value).",
+  "family": "within_org_warm",
+  "how_tested": "DATA AND TASK: The within-organism top-k ranking task \u2014 for each gene, rank that gene's conditions to surface its top stressors, scored primarily by NDCG@5 (agreement on the top of the ranked list). Inputs are frozen ProteomeLM gene embeddings plus media-chemistry features; the target is Tn-seq fitness. SPLIT: A single fixed data split (R-LOCK-2 split seed 0) was used throughout; every model and baseline was scored on the identical common eligible validation gene set (denominator parity \u2014 a hard project rule). SCOPE: 23 replicate organisms (ANA3, BFirm, Btheta, Burk376, Caulo, Cola, Cup4G11, Dda3937, Ddia6719, DdiaME23, Dino, DvH, Dyella79, HerbieS, Kang, Keio, Korea, Koxy, MR1, Marino, Methanococcus_JJ, Methanococcus_S2, Miya). WHAT WAS VARIED: exactly one thing \u2014 the training loss. Six losses were compared: two pointwise (pointwise_mse, the R1 control; and pointwise_huber, a robustness control), two pairwise (pairwise_ranknet; lambdarank, which is NDCG-weighted pairwise and targets NDCG directly), and two listwise (listmle, a listwise permutation loss; approxndcg, a smooth NDCG surrogate that also targets NDCG directly). HELD CONSTANT: the encoder (multihot_425) and the architecture (T5-A, i.e. the AdapterResidualMLP), both pinned from R1-DEC-001, so any difference is attributable to the objective alone. BATCHING (a required methodological detail): pointwise losses were trained ROW-batched (their natural/best form, matching the R1 control), while pairwise and listwise losses were trained GENE-batched (required so a full per-gene list is present to compute pairwise/listwise terms). SEEDS/EPOCHS: each loss was run with 3 model seeds (0,1,2) for 15 epochs; reported per-loss numbers are mean +/- sd over the 3 seeds. BASELINES on the same eligible val genes: chem-kNN (the non-parametric local chemistry-k-nearest-neighbor gate to beat, NDCG@5 0.485), linear-MF (a linear matrix-factorization capacity reference from R1), chem-NULL (a chemistry-only null lower bound), and noise-floor (a replicate-agreement ceiling). PROMOTION RULE (pre-registered): a loss had to beat the chem-kNN gate on NDCG@5 AND achieve a Spearman gain of at least 0.023, with BH-FDR multiple-testing correction across the losses. The primary metrics were NDCG@5 and within-gene Spearman.",
+  "hypothesis": "H-R-LOSS-01: that the training OBJECTIVE is the bottleneck \u2014 that swapping pointwise MSE regression for a ranking loss (pairwise RankNet/LambdaRank or listwise ListMLE/ApproxNDCG, including losses that optimize NDCG directly) would close the gap to the chem-kNN gate (NDCG@5 0.485). The motivation came from R1: since the encoder didn't matter and a linear matrix-factorization matched the deep model, the objective (using MSE to hit a ranking metric) was the suspected lever. The prediction: a ranking loss should beat pointwise MSE and approach or exceed the gate; if it doesn't, the bottleneck lies elsewhere (the local-vs-global nature of the signal).",
+  "id": "rloss",
+  "meaning": "This is the second of two independent levers to fail, and it redirects the whole project. Combined with R1 (encoder doesn't matter; linear-MF \u2248 deep model on capacity), R-LOSS shows the objective is also not the lever: every global parametric model \u2014 regardless of encoder, objective, or capacity \u2014 plateaus at NDCG@5 \u2248 0.42-0.44, while a local non-parametric chem-kNN sits at 0.485. The converged conclusion is that the bottleneck is the LOCAL-vs-GLOBAL nature of the signal: kNN exploits each gene's behavior at chemically-near conditions directly, and a single global mapping cannot reproduce that. Concrete consequences recorded in the decision: (1) do NOT pursue fancier NDCG surrogates like NeuralNDCG/differentiable-sorting \u2014 LambdaRank already optimizes NDCG directly and lost, so the ~0.05 gap is about locality, not the loss surrogate; (2) DEMOTE R2 (fusion topology), since it is another capacity lever and thus low expected value; (3) PIVOT to a local/hybrid approach (explicit parametric+chem-kNN residual, retrieval/attention over chemically-near train conditions, or local refinement) \u2014 proposed as the next tier R-HYBRID; (4) carry pointwise_huber + multihot forward as the parametric base. The one durable positive: Huber is adopted as the default pointwise loss over MSE.",
+  "name": "Loss family (R-LOSS)",
+  "results": [
+   {
+    "label": "pointwise_huber NDCG@5 (best loss)",
+    "number": "0.435 \u00b1 .003",
+    "plain_explanation": "NDCG@5 measures agreement on the top of each gene's ranked condition list; it runs 0-1, higher is better. Huber was the single best of all six losses, yet 0.435 is still about 0.05 BELOW the chem-kNN gate (0.485) that a learned model must beat, and far below the replicate ceiling (0.66). So even the winning loss fails the promotion gate. The \u00b1 .003 over 3 seeds shows this is stable, not noise."
+   },
+   {
+    "label": "pointwise_mse NDCG@5 (control)",
+    "number": "0.422 \u00b1 .001",
+    "plain_explanation": "The R1 baseline objective. At 0.422 it also sits below the 0.485 gate. Huber beats it by +0.012 NDCG@5 \u2014 a small but seed-consistent gain from robustness to fitness outliers, not from being ranking-aware. This is the only within-family improvement the experiment found."
+   },
+   {
+    "label": "pointwise_huber vs MSE Spearman gain",
+    "number": "0.151 \u00b1 .005 vs 0.130 \u00b1 .002 (\u0394 +0.021)",
+    "plain_explanation": "Within-gene Spearman is the secondary metric \u2014 full-list rank agreement (0-1-ish, higher is better). Huber lifts it by +0.021 over MSE, consistent across seeds, reinforcing that robust pointwise regression is the better pointwise choice. But +0.021 is below the pre-registered 0.023 Spearman threshold and, more importantly, neither model beats the gate on the primary NDCG@5 metric."
+   },
+   {
+    "label": "lambdarank NDCG@5 and Spearman (the collapse)",
+    "number": "NDCG@5 0.431 \u00b1 .005; Spearman 0.080 \u00b1 .003",
+    "plain_explanation": "LambdaRank optimizes NDCG directly and reached the 2nd-best NDCG@5 (0.431) \u2014 still under the 0.485 gate \u2014 but its full-list Spearman COLLAPSED to 0.080, roughly half of Huber's 0.151 and well below even MSE's 0.130. This is the headline pathology: a purely top-focused objective can nudge top-of-list agreement while destroying overall list order, so it is not a usable trade. Attributed to early-stopping on NDCG@5 letting it overfit the top."
+   },
+   {
+    "label": "pairwise_ranknet NDCG@5",
+    "number": "0.420 \u00b1 .003",
+    "plain_explanation": "The simplest ranking loss. At 0.420 it is essentially tied with MSE (0.422) and below both Huber and the gate. Evidence that switching to a pairwise ranking objective does not, by itself, help."
+   },
+   {
+    "label": "listmle NDCG@5",
+    "number": "0.399 \u00b1 .003",
+    "plain_explanation": "The listwise permutation loss lands at 0.399 \u2014 BELOW even the MSE control (0.422). A listwise objective actively hurt here, further undercutting the hypothesis that a ranking loss is the fix."
+   },
+   {
+    "label": "approxndcg NDCG@5 (worst loss)",
+    "number": "0.368 \u00b1 .005",
+    "plain_explanation": "ApproxNDCG, a smooth NDCG surrogate that targets NDCG directly, was the WORST of the six at 0.368 \u2014 only modestly above the chem-NULL floor (0.343) and far under the 0.485 gate. Directly optimizing a smooth NDCG proxy did not help and hurt the most, part of why the decision says do not chase fancier NDCG surrogates."
+   },
+   {
+    "label": "chem-kNN gate (baseline to beat)",
+    "number": "NDCG@5 0.485; Spearman 0.240",
+    "plain_explanation": "The non-parametric local chemistry-kNN baseline is the gate. No loss beat it \u2014 the best learned model (Huber 0.435) is ~0.05 short on NDCG@5, and every model's Spearman (best 0.151) is far under kNN's 0.240. This is the core negative result: local kNN dominates all global parametric objectives."
+   },
+   {
+    "label": "linear-MF NDCG@5 (capacity reference)",
+    "number": "0.429",
+    "plain_explanation": "The R1 linear matrix-factorization scores 0.429 \u2014 squarely inside the 0.42-0.44 plateau shared by MSE, Huber, and the ranking losses, and below the 0.485 gate. Its presence in the same band shows the plateau is not about capacity or objective; a simple linear model lands where the deep ranking-loss models do."
+   },
+   {
+    "label": "noise-floor ceiling / chem-NULL floor",
+    "number": "ceiling NDCG@5 0.658; floor 0.343",
+    "plain_explanation": "The replicate-agreement ceiling (0.658) is the practical maximum achievable NDCG@5 and the chem-NULL floor (0.343) is the chemistry-only lower bound. All six losses (0.368-0.435) sit in the lower-middle of this band, closer to the floor than the ceiling and beneath the 0.485 gate \u2014 quantifying how much headroom remains and how far global parametric models fall short of it."
+   }
+  ],
+  "source_files": [
+   "/home/ds85/projects/ConditionalGeneEssentiality/research_log/decisions/rloss/R-LOSS-DEC-001.md",
+   "/home/ds85/projects/ConditionalGeneEssentiality/configs/experiment/R-LOSS_loss_family.yaml",
+   "/home/ds85/projects/ConditionalGeneEssentiality/docs/project_memory/progress.md"
+  ],
+  "verification": "ledger"
+ },
+ {
+  "id": "rtopk",
+  "name": "Top-k-truncated losses (R-TOPK)",
+  "family": "within_org_warm",
+  "hypothesis": "H-R-TOPK-01: The prior loss-family experiment (R-LOSS) rejected the ranking losses, but its ApproxNDCG/LambdaRank objectives optimized NDCG over the WHOLE ranked list. The prediction here is that, now that training runs through the proper RankingBatch listwise samplers, a loss that truncates the NDCG gain to the TOP-5 \u2014 exactly matching the headline metric NDCG@5 \u2014 will close the gap to the chem-kNN gate (NDCG@5 0.485). Rationale: NDCG@5 is the promotion metric, so if any objective could win it should be the one that optimizes precisely that quantity. This was framed as the last objective-axis lever before concluding the objective is not the bottleneck.",
+  "how_tested": "Design: a pre-registered 5-arm x 3-seed comparison run through the shared R-LOSS handler/runner. Data: the project's within-organism ranking task on Tn-seq fitness, over 23 replicate organisms held constant (ANA3, BFirm, Btheta, Burk376, Caulo, Cola, Cup4G11, Dda3937, Ddia6719, DdiaME23, Dino, DvH, Dyella79, HerbieS, Kang, Keio, Korea, Koxy, MR1, Marino, Methanococcus_JJ, Methanococcus_S2, Miya). Feature set held constant across all arms: multihot_425 media-chemistry features + the T5-A encoder configuration. Training: 15 epochs per arm, seeds [0,1,2], all arms trained through the RankingBatch listwise samplers (the [B,L]+mask substrate) so the listwise losses see proper per-gene condition lists. The 5 arms were: (1) pointwise_huber \u2014 the locked/carried-forward baseline (robust pointwise regression); (2) lambdarank \u2014 NDCG-weighted pairwise, top-focused; (3) approxndcg \u2014 smooth NDCG surrogate over the whole list; (4) lambdarank_top5 \u2014 NEW, the LambdaRank \u0394NDCG truncated to the top-5; (5) approxndcg_top5 \u2014 NEW, an NDCG@5 surrogate with a top-k gate. Scoring: each arm evaluated on the COMMON eligible validation gene set (denominator parity \u2014 model and every arm scored on the identical eligible val genes), reporting seed-mean over 3 seeds of NDCG@5 (primary), within-gene Spearman, and precision@5. Baseline / gate: chem-kNN (NDCG@5 0.4852), the promotion gate a learned model must beat. Promotion rule: beat the chem-kNN gate on NDCG@5 without tanking Spearman. During the run a bug was discovered and fixed: approxndcg_top5 initially FROZE in training (val NDCG@5 flat ~0.354, Spearman ~0) because the top-k gate reused the score-softmax temperature (0.5), making the gate too sharp and the gradient vanish; the fix was a separate gate_temp=2.0 in approxndcg_topk (src/ranking/losses/family.py). Only after this fix did every arm train and get evaluated fairly. A unit test (test_topk_truncation_engages_on_long_lists) guards that the top-k variants are finite, differ from their untruncated form, and prefer a stressor-first ordering. Reproduce: python -m src.cli.run_experiment +experiment=R-TOPK_loss (artifacts in artifacts/runs/rloss/, log topk_full.log).",
+  "results": [
+   {
+    "label": "pointwise_huber (base) NDCG@5",
+    "number": "0.4319 (vs gate -0.0533)",
+    "plain_explanation": "NDCG@5 measures agreement on the top-5 of the ranked list, ranges 0-1 with higher=better. The best learned arm scores 0.4319, which is 0.0533 BELOW the chem-kNN gate of 0.485 and well under the replicate ceiling of 0.66. This is the strongest of the five arms but still fails to beat the baseline, so the learned objective does not win."
+   },
+   {
+    "label": "pointwise_huber (base) Spearman",
+    "number": "0.1522",
+    "plain_explanation": "Within-gene Spearman (secondary, full-list completeness metric) for the base arm; higher=better. At 0.1522 it is the highest Spearman of the learned arms but far below the chem-kNN baseline's 0.2402, again showing the learned model trails the local baseline even on full-list ordering."
+   },
+   {
+    "label": "pointwise_huber (base) precision@5",
+    "number": "0.4014",
+    "plain_explanation": "Fraction of the top-5 predicted conditions that are truly top stressors; higher=better. Base arm 0.4014, below chem-kNN's 0.446, consistent with the NDCG@5 shortfall."
+   },
+   {
+    "label": "lambdarank NDCG@5",
+    "number": "0.4289 (vs gate -0.0563)",
+    "plain_explanation": "Untruncated NDCG-weighted pairwise loss. 0.4289 is slightly below the base arm and 0.0563 under the gate (0.485; higher=better, 0-1 scale) \u2014 a ranking loss does not beat robust pointwise regression here."
+   },
+   {
+    "label": "lambdarank_top5 (NEW) NDCG@5",
+    "number": "0.4239 (vs gate -0.0613)",
+    "plain_explanation": "The top-5-truncated version of LambdaRank. Critically it scores 0.4239, BELOW its own untruncated counterpart lambdarank (0.4289). Truncating the gradient to the top-5 slightly HURT rather than helped, and it sits 0.0613 under the gate \u2014 the central negative result of the experiment."
+   },
+   {
+    "label": "approxndcg NDCG@5",
+    "number": "0.3620 (vs gate -0.1232)",
+    "plain_explanation": "Full-list smooth NDCG surrogate. At 0.3620 it is one of the two worst arms, 0.1232 below the gate, showing the ApproxNDCG family badly underperforms pointwise regression on this task."
+   },
+   {
+    "label": "approxndcg_top5 (NEW) NDCG@5",
+    "number": "0.3695 (vs gate -0.1157)",
+    "plain_explanation": "The NDCG@5-surrogate variant (after the gate_temp fix that un-froze training). At 0.3695 it is only marginally above untruncated approxndcg (0.3620) and both are far below the base arm; it is 0.1157 under the gate. So even the loss that most directly targets NDCG@5 fails badly."
+   },
+   {
+    "label": "chem-kNN (GATE) NDCG@5",
+    "number": "0.4852",
+    "plain_explanation": "The chem-kNN promotion gate \u2014 the local baseline a learned model must beat. At 0.4852 (Spearman 0.2402, precision@5 0.446) it exceeds every learned arm, so H-R-TOPK-01 is rejected: no loss, truncated or not, closes the gap to the gate."
+   },
+   {
+    "label": "approxndcg_top5 frozen-training symptom (pre-fix)",
+    "number": "val NDCG@5 flat ~0.354, Spearman ~0",
+    "plain_explanation": "Before the fix, approxndcg_top5 did not learn at all: val NDCG@5 stuck near 0.354 and Spearman near 0, because the top-k gate reused the score-softmax temperature (0.5), making the gate too sharp and the gradient vanish. The fix (separate gate_temp=2.0 in approxndcg_topk in src/ranking/losses/family.py) un-froze training so the arm could be evaluated fairly \u2014 this is why the fixed-run value (0.3695) is meaningful rather than an artifact of a dead optimizer."
+   }
+  ],
+  "analysis": "Restricting the loss gradient to the top-5 removes the broader ordering signal without adding any top-end skill that the local chem-kNN baseline does not already possess. Each truncated variant scored below its untruncated counterpart (lambdarank_top5 0.4239 < lambdarank 0.4289; approxndcg_top5 0.3695 only marginally above approxndcg 0.3620 and both far below the base). The best learned objective remains a robust pointwise regression (pointwise_huber, 0.4319), which still trails chem-kNN by 0.0533 on NDCG@5. This is consistent with R-LOSS-DEC-001 and the memorization-dominated finding: the objective is NOT the bottleneck. The remaining gap to chem-kNN is structural \u2014 a local-vs-global effect (the local baseline exploits nearby-condition structure the global model cannot) \u2014 not a matter of which ranking surrogate is optimized. Separately, the ApproxNDCG training-freeze was a temperature-coupling bug: reusing the sharp score-softmax temperature (0.5) for the top-k gate zeroed the gradient; decoupling it to gate_temp=2.0 restored training and let the arm be judged fairly (it still lost).",
+  "meaning": "This experiment closes the objective axis for the within-organism warm-ranking task. Having now tested pointwise, pairwise/top-focused, whole-list NDCG surrogate, AND top-5-truncated NDCG-matched losses, none beats the chem-kNN gate, so the project concludes the choice of ranking loss is not what is holding the model back. H-R-TOPK-01 is rejected; pointwise_huber stays the locked objective; the top-k loss variants are retained in the loss registry (tested, cheap to keep) but are NOT promoted. Strategically this redirects effort away from objective engineering and toward the structural local-vs-global gap \u2014 the memorization-dominated finding \u2014 as the real bottleneck.",
+  "verification": "ledger",
+  "source_files": [
+   "research_log/decisions/rloss/R-TOPK-DEC-001.md",
+   "configs/experiment/R-TOPK_loss.yaml"
+  ],
+  "caveats": "All numbers are seed-mean over 3 seeds (seeds 0,1,2) and are read from the R-TOPK-DEC-001 decision ledger table; they are NOT independently reproduced from a committed metrics artifact in this record (verification=ledger). The 0.485 gate appears as 0.4852 in the arm table and is referred to as ~0.485 in the config header. The approxndcg_top5 value (0.3695) is post-fix; before the gate_temp=2.0 fix the arm was frozen (val NDCG@5 ~0.354, Spearman ~0) and would not have been a fair comparison. No hierarchical-bootstrap CIs are reported in the ledger for these arms; the reject decision rests on point estimates all falling below the gate. Note a wording nuance in the ledger: the truncated ApproxNDCG variant (0.3695) is marginally ABOVE its untruncated form (0.3620), whereas the truncated LambdaRank variant (0.4239) is below its untruncated form (0.4289); the general 'truncation did not help / slightly hurt' claim holds cleanly for LambdaRank and for both families relative to the pointwise base."
+ },
+ {
+  "id": "rhybrid_a",
+  "name": "Static model+kNN ensemble (R-HYBRID-A)",
+  "family": "within_org_warm",
+  "hypothesis": "H-R-HYBRID-01: the global parametric model (the frozen-embedding + chemistry MLP) carries signal that is COMPLEMENTARY to the local chem-kNN lookup, so combining the two should beat chem-kNN alone. This is the first test of whether the learned model adds ANYTHING on top of the local lookup \u2014 because no standalone global model (from R1 or R-LOSS) had ever beaten chem-kNN by itself. The answer decides whether the project has a genuine model contribution (path: keep hybridizing) or is purely memorization (path: characterization paper).",
+  "how_tested": "Data and split: The within-organism warm ranking task on the 23 replicate organisms (the headline subset with a reliable replicate noise floor), evaluated on 53,189 eligible validation genes. The task is \"rank a gene's conditions to find its top stressors.\" Two predictors were fused: (1) the standalone global model \u2014 a Huber-loss, row-batched MLP over frozen ProteomeLM gene embeddings plus multihot media-chemistry features, which was the R-LOSS loss-family winner; and (2) chem-kNN, the local lookup baseline that is the project's promotion gate. Fusion method: a per-gene z-scored convex combination \u2014 for each gene, both the kNN scores and the model scores are z-scored (standardized) within that gene, then blended as alpha*z(kNN) + (1-alpha)*z(model). alpha was swept over [0,1], where alpha=1 is pure kNN and alpha=0 is pure model. First, the full-val alpha-curve was computed over all 53,189 eligible val genes (alpha in {0.0, 0.5, 0.7, 0.8, 0.9, 1.0}), which located the curve peak at alpha\u22480.8. Because reading the peak off the same val set it is scored on would leak (curve-peeking), an HONEST held-out alpha-selection was then done: the val GENES were split 50/50 by hash into a tune half and a test half; alpha* was chosen to maximize NDCG@5 on the tune half only, then that fixed alpha* (=0.8) was applied and reported on the held-out test half \u2014 so the reported hybrid number is out-of-sample, not curve-peeked. Baselines/comparators: the hybrid was compared against pure chem-kNN (the gate) on the identical eligible val genes; a knn+linear-MF convex combo was also run as a reference fusion to check whether the deep model's complement exceeds linear matrix-factorization's. Primary metric NDCG@5 (top-of-list ranking agreement), with within-gene Spearman reported as the secondary full-list metric. Promotion requires clearing the pre-registered delta of roughly +0.023 to +0.026 NDCG@5 over the gate.",
+  "results": [
+   {
+    "label": "Honest held-out hybrid NDCG@5 (alpha*=0.8 selected on tune-half, reported on test-half)",
+    "number": "0.494 vs kNN 0.486 = +0.008",
+    "plain_explanation": "NDCG@5 runs 0 to 1, higher is better; the chem-kNN gate sits at ~0.485 and the replicate ceiling is ~0.66. The blended model+kNN scores 0.494 versus pure kNN's 0.486 on the same held-out test genes, a +0.008 gain. This is a genuine, out-of-sample (not curve-peeked) win \u2014 the model does add complementary signal \u2014 but +0.008 is well below the ~0.023-0.026 promotion delta, so it is a real-but-tiny effect: directionally positive, not a promotion."
+   },
+   {
+    "label": "Full-val alpha-curve NDCG@5 at the peak (alpha=0.8) vs pure kNN (alpha=1.0)",
+    "number": "0.493 (peak, alpha=0.8) vs 0.485 (pure kNN, alpha=1.0)",
+    "plain_explanation": "On the full 53,189-gene val set, the blend peaks at alpha\u22480.8 (mostly kNN plus about 20% model), NOT at pure kNN. That the optimum is a mix rather than alpha=1 is the core positive: the learned model contributes signal the local lookup misses. The peak (0.493) sits just above the kNN gate (0.485), again a ~+0.008 gain \u2014 good enough to confirm complementarity, not good enough to clear the gate."
+   },
+   {
+    "label": "Full-val alpha-curve NDCG@5 at pure model (alpha=0.0)",
+    "number": "0.432",
+    "plain_explanation": "With alpha=0, the ensemble is the standalone Huber model alone, scoring 0.432 NDCG@5 \u2014 clearly below the chem-kNN gate (~0.485). This restates the standing negative: the global model by itself loses to the local lookup. Its value only appears when blended in as a minority (~20%) partner."
+   },
+   {
+    "label": "Full-val Spearman at the peak (alpha=0.8) vs pure kNN (alpha=1.0)",
+    "number": "0.248 vs 0.240",
+    "plain_explanation": "Spearman is the secondary, full-list rank-agreement metric (also 0-1-like, higher=better; here on the order of 0.24). The blend improves Spearman from the pure-kNN 0.240 to 0.248 (+0.008) at the same alpha=0.8 peak, so the complementary signal shows up on the completeness metric too, in the same direction and magnitude as NDCG@5 \u2014 reinforcing that the gain is real, just small."
+   },
+   {
+    "label": "knn+linear-MF reference fusion",
+    "number": "also beats kNN, but by less than knn+model",
+    "plain_explanation": "A convex blend of kNN with linear matrix-factorization also beats pure kNN, but by a smaller margin than the deep-model blend. This is a positive control: it shows the DEEP model's complement is larger than linear-MF's, i.e. the gain is attributable to nonlinear structure the model captures, not merely to any second signal source."
+   }
+  ],
+  "analysis": "The peak of the honest alpha-curve landing at alpha\u22480.8 (a kNN-dominant mix) rather than at pure kNN is the mechanistic finding: the global parametric model captures cross-gene / sparse-neighborhood structure that the local chem-kNN lookup misses, so a small (~20%) admixture of the model raises top-of-list ranking. The effect is genuine \u2014 it holds out-of-sample under a hash-split tune/test alpha-selection (no curve-peeking) and appears on both NDCG@5 and Spearman \u2014 but it is tiny (+0.008), far under the ~0.023-0.026 promotion delta. The authors read this as a LOWER BOUND: a crude per-gene z-score convex ensemble is the weakest possible fusion, so +0.008 is the floor of what hybridization can extract, not the ceiling. The knn+linear-MF comparison shows the deep model's complement exceeds linear-MF's, attributing the gain to nonlinear learned structure.",
+  "meaning": "This is the first positive signal in the warm-split regime that the learned global model is not useless \u2014 it captures structure the local lookup cannot, confirming hypothesis H-R-HYBRID-01 directionally. But because the +0.008 gain falls below the locked promotion bar, it is NOT a promotion: the static ensemble does not deliver a model contribution the project can headline. The decision routes to R-HYBRID-B \u2014 a learned hybrid (kNN-residual model, retrieval-augmented model, or learned per-example gating alpha(g,c)) expected to extract more of the complementary signal than the crude static blend. The stated go/no-go: if R-HYBRID-B clears the promotion delta, the project has a real model contribution; if it also stalls near +0.01, the complementary signal is genuinely small and the honest scope is the characterization result. (Per progress.md, R-HYBRID-B subsequently also failed to beat the gate, and the warm objective is now understood as memorization-capped.)",
+  "verification": "ledger",
+  "source_files": [
+   "/home/ds85/projects/ConditionalGeneEssentiality/research_log/decisions/rhybrid/R-HYBRID-DEC-001.md",
+   "/home/ds85/projects/ConditionalGeneEssentiality/src/experiments/rhybrid/_rhybrid_common.py",
+   "/home/ds85/projects/ConditionalGeneEssentiality/artifacts/runs/rhybrid_alpha_curve.csv",
+   "/home/ds85/projects/ConditionalGeneEssentiality/docs/project_memory/progress.md"
+  ],
+  "caveats": "Status of the decision record is \"proposed\" (not finalized). The reported hybrid gain of +0.008 NDCG@5 is directional and out-of-sample but BELOW the pre-registered promotion delta (~0.023-0.026), so it is explicitly NOT a promotion vs the chem-kNN gate. The full-val alpha-curve numbers (peak 0.493) are curve-peeked and shown only to locate the peak; only the tune/test hash-split number (0.494 vs 0.486) is the honest, leakage-free comparison. No hierarchical-bootstrap CI is reported for this hybrid delta in the source, so CI-disjointness is not established \u2014 the +0.008 is a point-estimate win only. The +0.008 is characterized as a LOWER BOUND from the weakest possible (crude z-score) fusion. Reproducibility artifact (rhybrid_alpha_curve.csv) and code path are cited in the ledger but I did not independently open/rerun them, so verification is marked 'ledger' rather than 'code'/'artifact'."
+ },
+ {
+  "analysis": "The mechanism behind the ~0 result is that the within-org conditional-essentiality ranking task is memorization-dominated: the chem-kNN gate wins by retrieving a gene's OWN training history (a local lookup), and the standalone parametric model (AdapterResidualMLP) is a weak global prior. Fusing a weak global signal with a strong local lookup cannot exceed the lookup. Each of the three fusions fails for a specific reason: (a) the residual model adds a continuous model correction on top of knn_loo that helps NDCG@5 marginally (+0.0002) but hurts Spearman (-0.0049), and its per-seed sign-flip (+0.0048/-0.0076/+0.0033) proves the effect is within split-noise, not a stable gain; (b) retrieval-augmentation and (c) learned gating both blend in too much of the weak global prior and REGRESS on both metrics. The learned gate is the clearest diagnostic: it settled at mean_alpha ~0.46 (trusting kNN and model roughly equally in the z-scored blend), but because the model half is weak, any weight moved onto it hurts \u2014 the data says 'trust the lookup.' Three orthogonal fusions all converging on ~0 is strong evidence the ceiling is a real property of the task, not a fusion-design artifact. Notably, the learned hybrids extracted LESS complementary signal than R-HYBRID-A's crude static z-score ensemble (+0.008 honest NDCG@5), whose gain came from a fixed, conservative alpha~0.8 (mostly kNN). The Keio single-org dev run gave the residual hybrid a misleadingly large honest +0.042 NDCG@5, but this is a single-org-ceiling artifact (Keio is an easy organism) that vanished under the governing full 23-org multi-org eval, where residual collapsed to ~0.",
+  "family": "within_org_warm",
+  "how_tested": "DATA & SPLIT: The warm within-organism ranking task on the project's canonical Tn-seq fitness data, restricted to the 23 replicate organisms that have a reliable replicate noise floor (the headline eval subset; eligibility_policy.yaml r_replicate_org). Genes are split transductively; evaluation is on the eligible val gene set with the eligibility filter r_lock_1_v1. Sample size: ~52,900-53,200 common eligible val genes shared across models (denominator parity). Run with 3 model seeds (0/1/2), 8 training epochs, k=5 neighbors, weighted-Huber loss, multihot_425 chemistry featurization, and n_bootstrap=1000 for CIs.\n\nWHAT WAS ACTUALLY RUN: Three separate LEARNED fusions of the standalone parametric model (AdapterResidualMLP \u2014 the T5-A locked model, trained row-batched with weighted-Huber, the R-LOSS winner) with the local chem-kNN gate (k=5, cosine similarity on condition multihot; standalone NDCG@5 ~0.485 / Spearman ~0.24 on full val). (a) RESIDUAL MODEL: added an exclude_self flag to chemistry_knn_predict to enable leave-one-out (LOO) kNN on train; trained AdapterResidualMLP to predict the residual r = fit \u2212 knn_loo (train rows with NaN knn_loo dropped); val prediction = knn_val + model_residual_val. (b) RETRIEVAL-AUGMENTED MODEL: for each (gene g, condition c), retrieved gene g's k=5 nearest TRAIN conditions by chemistry, built retrieval features [neighbor fits, similarities, weighted-mean fit, coverage], concatenated adapter(gene_emb) + chem_c + retrieval_features, and trained end-to-end with Huber to predict fit; train rows use LOO retrieval, val rows retrieve from TRAIN only. (c) LEARNED GATING: alpha(g,c) = sigmoid(MLP(gate_features)) where gate_features = [distance to nearest train condition, neighborhood density, kNN coverage]; final score = alpha*z(knn) + (1\u2212alpha)*z(model) computed per gene via per-gene z-scoring (as in R-HYBRID-A); alpha's MLP trained on TRAIN (LOO kNN) to match per-gene-z-scored true fit.\n\nBASELINE / GATE: The chem-kNN gate itself (k=5, cosine on condition multihot), scored on the IDENTICAL eligible val gene set as each hybrid (denominator parity). This is the standing project gate a learned model must beat by the promotion delta (~0.026 NDCG@5 / ~0.023 Spearman).\n\nMETRICS & STATS: within-gene Spearman with a hierarchical org->gene bootstrap (n=1000), NDCG@1/@3/@5, and precision@5. NDCG@5 is the primary metric. Reported both (i) full-val seed-averaged numbers on the same genes as chem-kNN, and (ii) an HONEST held-out check: val genes split 50/50 by hash, hybrid reported on the test half (none of the three hybrids has a val-selected scalar, so test-half eval is the honest number). Also reported per-seed \u0394 NDCG@5 to test stability. Leakage discipline: all train-side kNN/retrieval is leave-one-out; all val-side neighbors come from TRAIN only. A separate DEV run on Keio single-organism was used during development.\n\nREFERENCE BARS: chem-kNN gate NDCG@5 ~0.485 / Spearman ~0.24; replicate-agreement noise-floor ceiling NDCG@5 ~0.658 / Spearman ~0.39; promotion delta ~0.026 NDCG@5 / ~0.023 Spearman over the gate.",
+  "hypothesis": "H-R-HYBRID-01 (round 2): a LEARNED hybrid of the global parametric model (AdapterResidualMLP) plus the local chem-kNN lookup can extract MORE of the complementary signal than R-HYBRID-A's static z-score ensemble (which gained only +0.008 NDCG@5), ideally clearing the promotion delta (~0.026 NDCG@5 / ~0.023 Spearman over the chem-kNN gate). If even a learned hybrid stalls near +0.01 or worse, the complementary signal is genuinely small and the honest scope is characterization, not a promotable model.",
+  "id": "rhybrid_b",
+  "meaning": "This closes the modeling thread for the within-organism warm ranking task. Two learned-hybrid rounds (A static, B residual/retrieval/gating) plus the full R1 (encoder), capacity, and R-LOSS (objective) sweeps have ALL now failed to beat the simple chem-kNN lookup by a promotable margin. Three orthogonal fusions converging on ~0 is strong evidence the ceiling is a real property of the task, not a fusion-design artifact \u2014 so no fourth hybrid variant was pursued. The honest, publishable result is the rigorous negative: a pre-registered benchmark showing the within-org conditional-essentiality ranking task is memorization-dominated, with a chemistry-similarity lookup as the strong baseline that learned global models cannot surpass. The decision was NO PROMOTION and a pivot to the CHARACTERIZATION scope; recommended follow-ups were the cold-gene diagnostic (the one regime where a global model could in principle help \u2014 later run as R-COLD, the project's first positive) and folding these results into SCIENTIFIC_SYNTHESIS.",
+  "name": "Learned hybrids (R-HYBRID-B)",
+  "results": [
+   {
+    "label": "Residual hybrid \u2014 \u0394 NDCG@5 vs chem-kNN (full val, seed-avg)",
+    "number": "+0.0002 (hybrid 0.4900 vs kNN 0.4899)",
+    "plain_explanation": "NDCG@5 measures top-5 ranking agreement on a 0-1 scale where higher is better; the chem-kNN gate sits at ~0.485 and the replicate ceiling at ~0.66. This is a statistical TIE \u2014 essentially zero improvement \u2014 and it is far below the ~0.026 needed to promote. Bad for the hypothesis: the best of the three fusions does not beat the lookup."
+   },
+   {
+    "label": "Residual hybrid \u2014 \u0394 Spearman vs chem-kNN (full val, seed-avg)",
+    "number": "\u22120.0049 (hybrid 0.2136 vs kNN 0.2185)",
+    "plain_explanation": "Spearman is the secondary full-list ranking metric (0-1-like correlation, higher is better; gate ~0.24). Even the best hybrid REGRESSES slightly here. So the one fusion that ties on the primary metric actually gets worse on the secondary one \u2014 no genuine gain."
+   },
+   {
+    "label": "Residual hybrid \u2014 per-seed \u0394 NDCG@5 (sign-flips)",
+    "number": "+0.0048 / \u22120.0076 / +0.0033 (seeds 0/1/2)",
+    "plain_explanation": "The sign of the effect flips across the three random seeds \u2014 positive, negative, positive. This is the key evidence that the tiny +0.0002 average is within split-noise, not a stable real gain. A promotable improvement would be the same sign every seed and clearly above the gate."
+   },
+   {
+    "label": "Retrieval-augmented hybrid \u2014 \u0394 NDCG@5 / \u0394 Spearman",
+    "number": "\u22120.0059 NDCG@5 (0.4840 vs 0.4899) / \u22120.0109 Spearman (0.2075 vs 0.2185)",
+    "plain_explanation": "Both metrics REGRESS below the chem-kNN gate. Feeding retrieval features into an end-to-end model blends in too much of the weak global prior and makes ranking worse, not better. Clearly bad \u2014 moving the wrong direction on both primary and secondary metrics."
+   },
+   {
+    "label": "Learned gating hybrid \u2014 \u0394 NDCG@5 / \u0394 Spearman",
+    "number": "\u22120.0081 NDCG@5 (0.4817 vs 0.4898) / \u22120.0181 Spearman (0.2003 vs 0.2185)",
+    "plain_explanation": "The worst of the three: both metrics regress the most below the gate. A learnable blend weight that can ever down-weight the kNN loses ground, because the kNN lookup is the strong signal and the model is weak. Bad \u2014 the most flexible fusion does the most damage."
+   },
+   {
+    "label": "Learned gating \u2014 learned mean alpha",
+    "number": "mean_alpha ~0.46",
+    "plain_explanation": "Alpha is the weight on the kNN in the per-gene z-scored blend (1.0 = pure kNN, 0.0 = pure model). The gate settled at ~0.46, trusting the kNN and the model roughly equally. Because the model half is weak, this ~equal weighting HURT relative to leaning almost entirely on the lookup \u2014 the data effectively says 'trust the lookup.' This is the mechanistic explanation for why gating regressed."
+   },
+   {
+    "label": "Residual hybrid \u2014 HONEST held-out \u0394 NDCG@5 (test half of 50/50 split)",
+    "number": "+0.0009 (hybrid 0.4912 vs kNN 0.4903)",
+    "plain_explanation": "The leakage-clean honest number for the best hybrid: essentially zero, confirming no real gain survives an honest held-out test. Far below the ~0.026 promotion bar. This is the governing verdict for the residual fusion."
+   },
+   {
+    "label": "Retrieval / gating \u2014 HONEST held-out \u0394 NDCG@5",
+    "number": "retrieval \u22120.0057 (0.4846 vs 0.4903) / gating \u22120.0081 (0.4822 vs 0.4903)",
+    "plain_explanation": "Both other fusions REGRESS on the honest held-out test too, consistent with their full-val numbers. Bad \u2014 no fusion clears the gate honestly."
+   },
+   {
+    "label": "Keio-only dev run \u2014 misleading residual honest \u0394 NDCG@5",
+    "number": "+0.042 (Keio single-org) \u2192 collapses to ~0 on full 23-org eval",
+    "plain_explanation": "During development the residual hybrid looked strongly positive (+0.042, which would clear the ~0.026 promotion bar) on the single organism Keio. But this vanished under the full 23-org multi-org eval (residual -> ~0). It is a single-org-ceiling artifact \u2014 Keio is a known-easy organism \u2014 and the full-val multi-org number is the honest governing result. A cautionary example of a single-org number overstating a gain."
+   },
+   {
+    "label": "Reference: R-HYBRID-A static ensemble (prior round, for comparison)",
+    "number": "+0.008 honest NDCG@5 (static alpha~0.8, mostly kNN)",
+    "plain_explanation": "The earlier crude static z-score ensemble gained +0.008 by fixing a conservative weight of ~0.8 on the kNN. The learned hybrids here extracted LESS than this crude baseline (best honest +0.0009). Counterintuitive but telling: giving the fusion freedom to learn hurt, because it moved weight onto the weak model \u2014 reinforcing that the lookup is the honest ceiling."
+   }
+  ],
+  "verification": "ledger",
+  "source_files": [
+   "research_log/decisions/rhybrid/R-HYBRID-DEC-002.md",
+   "docs/project_memory/progress.md",
+   "artifacts/runs/rhybrid_b/full_results.csv",
+   "artifacts/runs/rhybrid_b/full_run.log",
+   "src/experiments/rhybrid/_rhybrid_b.py",
+   "src/experiments/rhybrid/run_rhybrid_b.py",
+   "src/evaluation/ranking_eval.py",
+   "tests/unit/test_rhybrid_b.py"
+  ],
+  "caveats": "NO PROMOTION: none of the three learned hybrids clears the promotion delta (~0.026 NDCG@5 / ~0.023 Spearman) on either co-primary metric. The best (residual) is a statistical tie on NDCG@5 (+0.0002, sign-flipping across seeds: +0.0048/\u22120.0076/+0.0033) and a small regression on Spearman (\u22120.0049); honest held-out \u0394 = +0.0009 confirms ~zero. Retrieval and gating regress on both metrics. Verification is LEDGER-level: numbers are recorded in the decision ledger (R-HYBRID-DEC-002) and cite committed artifacts (artifacts/runs/rhybrid_b/full_results.csv + full_run.log) and passing tests (pytest tests/unit green, 156 passed / 1 skipped), but I read the decision document, not the raw artifact CSV, so I mark this ledger rather than code/artifact. The multi-seed CI bounds elsewhere in the project are summary bands (mean of per-seed CIs), not pooled bootstraps; the \u0394 significance here rests on point estimates + per-seed sign consistency rather than a paired bootstrap on the per-gene \u0394. The Keio-only +0.042 dev number is explicitly a single-org-ceiling artifact and must NOT be read as a result. The metrics_primary in the header list Spearman first (R-LOCK-4 v2), but per the 2026-06-24 project-wide change NDCG@5 is the primary metric everywhere \u2014 this record leads with NDCG@5 accordingly."
+ },
+ {
+  "id": "raug",
+  "name": "Train-organism augmentation (R-AUG)",
+  "family": "within_org_warm",
+  "hypothesis": "H-R-AUG-01: because the headline trains the global model on only the 23 replicate organisms (leaving ~25 embedded feba organisms, including some of the largest, out of training entirely), training the shared encoder on ALL 48 embedded organisms \u2014 while evaluating on the same locked 23 organisms against the same chem-kNN gate \u2014 should NARROW the model-to-gate gap, since more organisms give the encoder more (protein-embedding, chemistry)->fitness examples to generalize from. This is the cleanest, cheapest test of whether the model-to-gate gap is a training-data-VOLUME problem (fixable with more data, including external Tn-seq datasets) or a STRUCTURAL one (no transferable cross-organism signal).",
+  "how_tested": "Data and objective: the project predicts conditional gene essentiality and the active metric is within-organism top-k ranking of a gene's conditions (\"find the top stressors for this gene\"), scored primarily by NDCG@5 (k=5). The experiment asks whether adding more TRAINING organisms narrows the gap between the learned global model and the chem-kNN baseline (the promotion gate). The headline configuration trains AND evaluates the global model on only the 23 replicate organisms (ANA3, BFirm, Btheta, Burk376, Caulo, Cola, Cup4G11, Dda3937, Ddia6719, DdiaME23, Dino, DvH, Dyella79, HerbieS, Kang, Keio, Korea, Koxy, MR1, Marino, Methanococcus_JJ, Methanococcus_S2, Miya), leaving the other ~25 embedded feba organisms (including some of the largest: Putida, psRCH2, the pseudo* set, WCS417, Phaeo, Pedo557) contributing zero training rows.\n\nDesign (a clean controlled A/B): the same locked model architecture (pointwise_huber loss + multihot_425 chemistry features + T5-A encoder/adapter) was trained TWICE on the IDENTICAL locked evaluation. Arm 1 (base_23org): model trained on the 23 eval organisms only. Arm 2 (aug_48org): model trained on all 48 embedded organisms \u2014 the 23 eval organisms plus the 25 extra organisms (config extra_orgs=auto = all embedded organisms minus eval_orgs). Both arms were scored on the identical eligible validation gene set against the identical chem-kNN gate. Settings: 3 model seeds [0,1,2], split_seed=0, 8 epochs.\n\nWhat was held fixed (the key control): the validation set, R-LOCK-1 gene eligibility, and ALL baselines (chem-kNN gate, chem-NULL, linear-MF) were produced exactly as prepare_r1_data over the 23 eval organisms. The extra 25 organisms contribute ENTIRELY to training and never touch the evaluation. This was implemented via R1Data.baseline_train (baselines score on the locked eval-organism train set) plus prepare_r_aug_data (grafts the extra-organism rows onto the .train split only, and extends the embedding/multihot matrices to the 48-organism union). Crucially, the chem-kNN gate was asserted bit-identical between the two arms (drift = 0.000000), which proves the evaluation is held fixed and only the model's training data changed. This is the one lever that can help ONLY the global model, because chem-kNN is per-organism-local and gains nothing from extra training organisms.\n\nBaselines compared: the chem-kNN gate (primary promotion gate), plus chem-NULL and linear-MF, all scored on the same eligible val genes as the model. Primary metrics: NDCG@5 and within-gene Spearman (prec@5 also reported). Pre-registered promotion rule: augmentation must IMPROVE the model toward the gate (delta-NDCG@5 > 0 vs base, consistent across seeds) to justify ingesting more (including external) organisms. Reproduce command: python -m src.cli.run_experiment +experiment=R-AUG_train_org_augmentation (artifacts in artifacts/runs/raug/).",
+  "results": [
+   {
+    "label": "aug_48org NDCG@5 (seed-mean, 3 seeds)",
+    "number": "0.4166",
+    "plain_explanation": "NDCG@5 ranges 0 to 1 (higher is better); it measures top-of-list ranking agreement, i.e. how well the model surfaces a gene's true top stressors. This is the model trained on all 48 organisms. At 0.4166 it sits BELOW the chem-kNN gate (0.4852) and well below the replicate ceiling (~0.66), so it does not beat the baseline it must beat. Worse, it is lower than the same model trained on only 23 organisms (0.4319), so adding organisms actively hurt."
+   },
+   {
+    "label": "base_23org NDCG@5 (seed-mean, 3 seeds)",
+    "number": "0.4319",
+    "plain_explanation": "The reference arm: the same locked model trained on only the 23 eval organisms. At 0.4319 it is still below the chem-kNN gate (0.4852) and the ~0.66 ceiling (the learned model does not beat chem-kNN even at baseline), but it is the BETTER of the two arms, showing the 23-org training set is preferable to the 48-org one."
+   },
+   {
+    "label": "Delta NDCG@5 (aug - base)",
+    "number": "-0.0152",
+    "plain_explanation": "The change from adding 25 training organisms is NEGATIVE 0.0152 NDCG@5. The pre-registered rule required a POSITIVE delta to support augmentation; instead the gap to the gate WIDENED. This is the headline negative-transfer result: more training organisms degrade top-of-list ranking on the target organisms."
+   },
+   {
+    "label": "Per-seed NDCG@5 (base vs aug, disjoint)",
+    "number": "base [0.4333, 0.4302, 0.4321] vs aug [0.4173, 0.4133, 0.4193]",
+    "plain_explanation": "Every single aug seed (max 0.4193) is below every single base seed (min 0.4302); the two groups do not overlap at all. This means the harm from augmentation is a robust, real effect, not seed-to-seed noise, so the conclusion does not hinge on averaging."
+   },
+   {
+    "label": "aug_48org within-gene Spearman (seed-mean)",
+    "number": "0.1270",
+    "plain_explanation": "Spearman is the secondary, full-list rank-completeness metric (higher is better). The 48-org model scored 0.1270, down from the 23-org model's 0.1522 (a drop of 0.0252) and far below chem-kNN's 0.2402. So augmentation hurts full-list ranking too, not just the top-5."
+   },
+   {
+    "label": "base_23org within-gene Spearman (seed-mean)",
+    "number": "0.1522",
+    "plain_explanation": "The 23-org model's secondary full-list metric. At 0.1522 it beats the augmented arm (0.1270) but is still well under the chem-kNN gate's Spearman of 0.2402, reaffirming that the learned model trails the local baseline on the warm split regardless of training-organism count."
+   },
+   {
+    "label": "aug_48org prec@5 (seed-mean)",
+    "number": "0.3870",
+    "plain_explanation": "Precision@5 (higher is better) = fraction of the top-5 predicted conditions that are truly top stressors. The 48-org model hits 0.3870, below the 23-org model's 0.4014 and below chem-kNN's 0.446, the same negative-transfer direction on a third metric."
+   },
+   {
+    "label": "base_23org prec@5 (seed-mean)",
+    "number": "0.4014",
+    "plain_explanation": "The 23-org model's precision@5. Higher than the augmented arm (0.3870) but still under chem-kNN (0.446), consistent with the model trailing the local baseline on the warm split."
+   },
+   {
+    "label": "chem-kNN gate NDCG@5 (both arms, drift)",
+    "number": "0.4852 (drift 0.000000)",
+    "plain_explanation": "chem-kNN is the promotion gate a learned model must beat (~0.485). It reads 0.4852 in BOTH arms with drift exactly 0.000000, because it is per-organism-local and cannot benefit from extra training organisms. The bit-identical gate is the control that proves this is a clean A/B: only the model's training data changed, so the -0.0152 model drop is attributable solely to augmentation, not to any shift in the evaluation."
+   }
+  ],
+  "analysis": "The mechanism is negative transfer. The shared encoder weights, when forced to also fit 25 additional heterogeneous organisms whose conditional (protein-embedding, chemistry)->fitness structure does not transfer to the target organisms (the T-regime already measured cross-organism transfer as approximately random), are pulled away from the 23 eval organisms' specific structure. The extra training data is the wrong kind: distribution shift / noise relative to the target organisms rather than reinforcing signal. Because chem-kNN is a per-organism-local baseline, it gains nothing from extra training organisms, so its gate number stays bit-identical (drift 0.000000), making the two arms a clean controlled A/B where ONLY the model's training data changed. Doubling the training organisms (roughly doubling the rows) widened the model-to-gate gap rather than closing it, proving the bottleneck is structural (absence of transferable cross-organism signal), not training-data volume. This is consistent with, and reinforced by, R1 (encoder/capacity don't matter) and R-LOSS/R-TOPK (objective doesn't matter).",
+  "meaning": "The hypothesis was rejected \u2014 and then some, because the sign came out negative. For the within-organism warm-gene headline objective, augmenting training with additional organisms is strictly counterproductive, so the locked configuration keeps the 23-organism training set. Scientifically this closes the training-DATA axis: the model-to-gate gap is structural (absence of transferable cross-organism signal), not a matter of training-data volume. Combined with R-LOSS/R-TOPK (the objective doesn't matter) and R1 (the encoder/capacity don't matter), no global-model lever tried has moved the warm headline \u2014 it is memorization-dominated and local. It also empirically backs the 2026-06-18 external-Tn-seq survey's \"skip\" verdict: adding even MORE DISTANT organisms (MtbTnDB, A. baumannii \u2014 different clades and assay methods) would almost certainly worsen negative transfer, so the external-data integration cost is not justified for this objective. The one place a global model could still win \u2014 the cold-gene regime, where kNN has no within-organism history to retrieve \u2014 is explicitly left open and is the designated next experiment.",
+  "caveats": "Scope is strictly the warm-gene, within-organism headline metric (chem-kNN's home turf). R-AUG does NOT close the cold-gene regime (genes with no within-organism history for kNN to retrieve); more-diverse training organisms could even HELP there while hurting the warm headline, and the cold-gene diagnostic (materialize_cold_gene) is the designated next experiment. The result is from 3 model seeds at split seed 0, 8 epochs, on the locked 23-organism replicate subset only. Numbers are read from the decision ledger (R-AUG-DEC-001.md) and progress log; the source states artifacts exist at artifacts/runs/raug/ but the figures were verified against the committed ledger, not by re-running or opening the artifact CSVs. Minor source note: the evidence table lists chem-kNN NDCG@5 as 0.4852 while CLAUDE.md's durable gate figure is quoted as ~0.485 (the same number, rounded).",
+  "verification": "ledger",
+  "source_files": [
+   "/home/ds85/projects/ConditionalGeneEssentiality/research_log/decisions/raug/R-AUG-DEC-001.md",
+   "/home/ds85/projects/ConditionalGeneEssentiality/configs/experiment/R-AUG_train_org_augmentation.yaml",
+   "/home/ds85/projects/ConditionalGeneEssentiality/docs/project_memory/progress.md"
+  ]
+ },
+ {
+  "analysis": "The experiment tests a reviewer's most obvious objection to the project's central negative result (no global/hybrid deep model beats a local chem-kNN baseline): \"your labels are just noisy, so the metric is measuring noise, not model quality.\" If that were true, denoising the evaluation (keeping only well-measured genes/cells) should let the model catch up to or pass kNN, and/or up-weighting confident labels during training should help. Neither happens. chem-kNN wins in all 4 confidence quartiles and at all 3 cell-level |t| thresholds, and confidence-weighted training slightly hurts (Delta about -0.004). What confidence DOES change is the achievable ceiling: the biological-replicate noise floor rises from 0.586 (Q1) to 0.835 (Q4), and the model-vs-kNN gap narrows from 0.055 to 0.040 (stratified) / 0.050 to 0.010 (cell-filtered) but never reaches zero. Mechanistically this is consistent with the whole R-series: the deficit is local-vs-global, not a fitting or noise problem. A single global model cannot reproduce each gene's idiosyncratic local condition-ranking history, whereas kNN copies it directly from chemically-similar neighbors. Label noise explains PART of the model-to-ceiling gap (the ceiling itself is only 0.59 in Q1, so the low-confidence task is intrinsically noisy) but noise does NOT explain the model-to-kNN gap, which persists at every confidence level. A logged selection-bias caveat: the cell-filter's large apparent NDCG@5 gains come from discarding 39k genes down to 3.3k and isolating big-effect conditions, not from the model getting better; a Keio-only dev signal where the model edged ahead at |t|>=4 did not survive the multi-org run.",
+  "caveats": "The cell-level high-|t| filter (finding 2) is selection-biased and is reported as a companion, not a headline: raising the threshold discards genes (39,356 -> 8,427 -> 3,276) and isolates big-effect conditions, so nearly all of the rising NDCG@5 comes from an easier surviving problem, not from the model improving. A Keio-only development run had the model edge ahead of kNN at |t|>=4, but this did NOT survive the 23-org multi-org run (another single-organism-ceiling artifact). This is a CHARACTERIZATION decision, not a promotion gate; chem-kNN is used as a reference only. Ceiling values are the biological-replicate noise floor restricted to each stratum's genes. Stratum sizes are approximate (~9.8k genes/stratum, quartiles of the eligible val gene set).",
+  "family": "within_org_warm",
+  "how_tested": "DATA AND SPLIT: The locked base ranking model (AdapterResidualMLP + weighted Huber loss + multihot_425 chemistry encoder) was trained and evaluated on the 23 replicate-organism headline subset (ANA3, BFirm, Btheta, Burk376, Caulo, Cola, Cup4G11, Dda3937, Ddia6719, DdiaME23, Dino, DvH, Dyella79, HerbieS, Kang, Keio, Korea, Koxy, MR1, Marino, Methanococcus_JJ, Methanococcus_S2, Miya). Three model seeds (0, 1, 2) were run and results were seed-averaged; training ran 8 epochs. All scoring uses the eligible val gene set with strict denominator parity: the model and every baseline are scored on the identical set of eligible validation genes. The confidence signal is abs_t, the Wetmore-et-al-2015 moderated t-statistic already present in the canonical fitness table (the field-standard |t|>4 = \"real effect\" threshold); it is carried through the pipeline via prepare_r1_data. THREE PROCEDURES WERE RUN. (1) CONFIDENCE-STRATIFIED EVAL (the primary analysis): eligible val GENES were binned into 4 quartiles (n_strata=4) by their median per-cell abs_t, from Q1 (lowest confidence, median |t|=0.52) to Q4 (highest, median |t|=2.06), roughly 9.8k genes per stratum. Within each stratum, four quantities were computed on the same genes: the deep model, the chem-kNN baseline (k=5), the chem-NULL baseline, each scored by within-gene Spearman AND NDCG@5, plus the biological-replicate noise-floor CEILING restricted to that stratum's genes. (2) CELL-LEVEL HIGH-|t| FILTER (a companion analysis): instead of binning whole genes, each gene's ranked list of conditions was restricted to cells with abs_t >= a threshold of {0, 2, 4}; NDCG@5 was recomputed for model vs kNN on the genes that still had >=5 surviving cells (n_genes: 39,356 at >=0; 8,427 at >=2; 3,276 at >=4). This is explicitly flagged as selection-biased because well-measured cells tend to be big-effect cells, so it is a companion not a headline. (3) t-WEIGHTED TRAINING (a secondary lever): the base model was retrained with each training row's loss weight multiplied by a saturating ramp f(abs_t) that rises to 1 at |t|=4 (|t| capped at 4.0), i.e. loss weight = w_g * f(abs_t); this was compared head-to-head against the w_g-only base, across all 3 seeds. Reproducibility: code in src/experiments/rconf/_rconf_common.py and src/experiments/rconf/run.py; 6 unit tests in tests/unit/test_rconf.py, full suite 161 passed; artifacts written to artifacts/runs/rconf/{stratified.csv, cell_filter.csv, tweight_overall.csv, full_run.log}.",
+  "hypothesis": "H-R-CONF-01: measurement label NOISE (not model/data structure) explains the deep model's deficit relative to the chem-kNN gate. If true, then (a) on well-measured (high-confidence) rows the model should catch up to kNN, and/or (b) confidence-weighting the training labels should help. The confidence signal is abs_t (Wetmore-2015 moderated t). This directly tests whether the project's central negative result (no global model beats local chem-kNN) is a label-noise artifact or is structural.",
+  "id": "rconf",
+  "meaning": "This is a defensive characterization result that hardens the project's central negative rather than overturning it. It pre-empts the single most likely reviewer objection (\"your labels are just noisy, so the model is fine and the metric is the problem\") with direct data: the model-vs-kNN ranking does NOT flip at any measurement-confidence level, so the deep model's deficit is structural (local-vs-global memorization), not a noise artifact. It simultaneously and honestly quantifies noise: measurement confidence sets a real, confidence-dependent ceiling (only 0.586 achievable at the noisy low end, rising to 0.835 at the clean end), and noise accounts for PART but never all of the gap. Confidence-weighted training being a non-lever (Delta about -0.004) reinforces that the bottleneck is not what a global model fits but that a single global model cannot reproduce each gene's idiosyncratic local history. Practically, the stratified figure/table becomes a characterization-paper exhibit (\"performance vs measurement confidence; the negative is noise-robust\"), and the finding was folded into SCIENTIFIC_SYNTHESIS. The only remaining regime where a global model could still help (unseen/cold genes) was flagged as the next optional diagnostic.",
+  "name": "Confidence stratification (R-CONF)",
+  "results": [
+   {
+    "label": "Q1 (low confidence) gap kNN-model, NDCG@5",
+    "number": "0.055 (chem-NULL 0.294, model 0.359, chem-kNN 0.414, ceiling 0.586; median |t|=0.52)",
+    "plain_explanation": "In the lowest-confidence quartile of val genes, chem-kNN's NDCG@5 (0.414) beats the deep model's (0.359) by 0.055. NDCG@5 runs 0-1, higher=better; higher means the top-5 ranked stress conditions for a gene are more right. kNN is ahead, which is bad for the model. Note every method is far below the chem-kNN reference gate of 0.485 here, and even the best-possible score (the biological-replicate ceiling) is only 0.586 - so this low-confidence slice is intrinsically noisy and hard for everyone."
+   },
+   {
+    "label": "Q2 gap kNN-model, NDCG@5",
+    "number": "0.056 (chem-NULL 0.299, model 0.375, chem-kNN 0.431, ceiling 0.562; median |t|=0.70)",
+    "plain_explanation": "Second quartile: kNN (0.431) still beats the model (0.375) by 0.056, essentially the same gap as Q1. The model has not started to catch up as confidence rises slightly. Still bad for the model; both remain below the 0.485 gate and the 0.562 ceiling for this slice."
+   },
+   {
+    "label": "Q3 gap kNN-model, NDCG@5",
+    "number": "0.050 (chem-NULL 0.321, model 0.423, chem-kNN 0.473, ceiling 0.626; median |t|=0.93)",
+    "plain_explanation": "Third quartile: kNN (0.473) beats the model (0.423) by 0.050 - the gap is starting to narrow slightly. Everything is rising with confidence (the ceiling is now 0.626), but the model still loses to kNN, which is the whole point: denoising is not flipping the winner."
+   },
+   {
+    "label": "Q4 (high confidence) gap kNN-model, NDCG@5",
+    "number": "0.040 (chem-NULL 0.467, model 0.593, chem-kNN 0.633, ceiling 0.835; median |t|=2.06)",
+    "plain_explanation": "Highest-confidence quartile: kNN (0.633) still beats the model (0.593) by 0.040 - the narrowest gap, but it never closes. This is the strongest test of the noise hypothesis (cleanest genes, median |t| about 2) and the model STILL loses. Absolute scores are high here (well above the 0.485 gate) only because the ceiling itself rose to 0.835, i.e. the task is easier on well-measured genes - not because the model overtook kNN."
+   },
+   {
+    "label": "Ceiling rise across strata (Q1->Q4)",
+    "number": "0.586 -> 0.562 -> 0.626 -> 0.835",
+    "plain_explanation": "The biological-replicate noise-floor ceiling (the best NDCG@5 any method could hope to reach, given how noisy the measurements are in that slice) climbs from about 0.59 to 0.83 as confidence rises. This quantifies that a large share of the model-to-ceiling gap at the low end is irreducible biological noise: on noisy genes even a perfect model is capped near 0.59. Good context, not a model win."
+   },
+   {
+    "label": "Q4 Spearman cross-check",
+    "number": "model 0.300 vs kNN 0.345",
+    "plain_explanation": "Using the secondary metric (within-gene Spearman, full-list rank agreement, also 0-1-ish higher=better) on the highest-confidence quartile, kNN (0.345) again beats the model (0.300). This confirms the NDCG@5 story is not a top-5-only quirk - the same ordering holds on the completeness metric."
+   },
+   {
+    "label": "Cell-filter |t|>=0 (all cells), NDCG@5",
+    "number": "n=39,356 genes; model 0.435, kNN 0.485, gap 0.050",
+    "plain_explanation": "Companion cell-level analysis at the no-filter baseline: across all 39,356 genes the model scores 0.435 vs kNN 0.485 (the project's headline gate value), a 0.050 gap. This is the unfiltered starting point - the model loses by the familiar full-project margin."
+   },
+   {
+    "label": "Cell-filter |t|>=2, NDCG@5",
+    "number": "n=8,427 genes; model 0.768, kNN 0.789, gap 0.021",
+    "plain_explanation": "Restricting each gene to cells with |t|>=2 shrinks the set to 8,427 genes and the gap to 0.021. Both scores jump (0.768/0.789) but that jump is a selection artifact - keeping only big-effect cells makes the ranking task easier for everyone. kNN still leads, so denoising at the cell level does not rescue the model."
+   },
+   {
+    "label": "Cell-filter |t|>=4, NDCG@5",
+    "number": "n=3,276 genes; model 0.825, kNN 0.835, gap 0.010",
+    "plain_explanation": "At the strictest cell filter (|t|>=4, the field-standard real-effect threshold) only 3,276 genes survive and the gap narrows to 0.010 - the smallest of all, but still positive in kNN's favor. The high absolute scores come almost entirely from discarding ~90% of genes and isolating clean big-effect conditions, NOT from the model improving. The gap never reaches zero, so the negative holds even on the cleanest cells."
+   },
+   {
+    "label": "t-weighted training effect, Delta(conf - base)",
+    "number": "NDCG@5 -0.0036, Spearman -0.0051 (all 3 seeds)",
+    "plain_explanation": "Retraining with confidence-weighted loss (up-weighting high-|t| rows) changed NDCG@5 by -0.0036 and Spearman by -0.0051 versus the unweighted base - i.e. it slightly HURT, consistently across all three seeds. This is bad for the noise hypothesis: if noise were the bottleneck, weighting confident labels should have helped. It did not, so confidence-weighting is not a usable lever."
+   }
+  ],
+  "source_files": [
+   "/home/ds85/projects/ConditionalGeneEssentiality/research_log/decisions/rconf/R-CONF-DEC-001.md",
+   "/home/ds85/projects/ConditionalGeneEssentiality/configs/experiment/R-CONF_confidence_strat.yaml",
+   "/home/ds85/projects/ConditionalGeneEssentiality/docs/project_memory/progress.md"
+  ],
+  "verification": "ledger"
+ },
+ {
+  "id": "rcold",
+  "name": "Cold-gene diagnostic \u2014 first positive (R-COLD)",
+  "family": "cold_gene",
+  "hypothesis": "H-R-COLD-01: On the project's primary (warm) split, chem-kNN wins only because it retrieves each gene's OWN train history \u2014 pure within-gene memorization that is unbeatable and tells us nothing about whether the frozen ProteomeLM embedding carries inductive value. The cold_gene split holds out WHOLE genes (zero train rows), removing memorization by construction. The question: does the frozen embedding carry gene-specific conditional-response signal that GENERALIZES to genes never seen in training, such that a global model beats the only baseline still applicable there (chem-NULL, the gene-identity-free population condition profile)?",
+  "how_tested": "Data and task: within-organism conditional-essentiality ranking (Tn-seq fitness data), predicting a gene's ordering over its stress conditions. Inputs are frozen ProteomeLM (layer-8) gene embeddings plus media-chemistry features. The single arm tested is the project's locked model configuration: pointwise_huber loss + multihot_425 chemistry features + the T5-A (AdapterResidualMLP) architecture. The key manipulation is the SPLIT: instead of the primary transductive-over-genes split (where each validation gene also has its own train rows), this used the cold_gene split via materialize_cold_gene with held-out fraction 0.20, so whole genes are held out per organism, cold genes have ZERO train rows, and never appear in training. The model early-stops on within-gene Spearman over the held-out cold val genes \u2014 no leakage is possible. Baselines and applicability under cold_gene: chem-kNN predicts from a gene's OWN train conditions, which a cold gene lacks, so 0% coverage and structurally inapplicable; linear-MF needs a learned per-gene latent that cannot exist for an unseen gene, so inapplicable and skipped (compute_mf=False); chem-NULL fits a train-gene-MEAN at the chemically-nearest train condition and is gene-identity-free, so it applies and becomes the gate. Denominator parity restricted to {model, chem-NULL} via R1Data.parity_pred_cols, both scored on the IDENTICAL eligible cold val gene set; chem-kNN/linear-MF coverage reported explicitly. Full headline: 23 replicate organisms, 3 model seeds (0,1,2), split seed 0, 8 epochs, n=11,761 eligible cold val genes. Fast confirmation on Keio+Caulo+MR1 (seed 0, n=1,912). Statistics: per-seed comparison (3 seeds) for directional robustness plus a hierarchical (organism\u2192gene) bootstrap 95% CI for BOTH NDCG@5 (primary) and Spearman (secondary) with a model-vs-gate disjointness flag; multi-seed CI bounds are the mean of per-seed CIs. Diagnostic promotion rule: model must beat chem-NULL consistently (\u0394NDCG@5 > 0, per-seed disjoint). Regression check: primary-split R-EVAL fast gate reproduced bit-exactly (model 0.4468 / chem-kNN 0.5091) and 125 unit tests passed, confirming the new cold-gene path did not disturb existing behavior. Reproduce fast: python -m src.cli.run_experiment +experiment=R-COLD_cold_gene; full: add experiment.tag=full experiment.model_seeds=[0,1,2] and the 23 replicate orgs. Artifacts in artifacts/runs/rcold/.",
+  "results": [
+   {
+    "label": "Model NDCG@5 (primary, 23-org / 3-seed, n=11,761)",
+    "number": "0.2748 (per-seed [0.2732, 0.2746, 0.2765]); 95% CI [0.2424, 0.3179]",
+    "plain_explanation": "NDCG@5 measures top-of-list ranking agreement, ranges 0-1, higher is better; it is the project's primary metric. 0.2748 is the model's top-5 accuracy at ranking a cold gene's most-essential conditions. This BEATS the applicable baseline (chem-NULL, 0.2447) and every one of the 3 model seeds sits above the gate, so the win is directionally robust and not seed noise. In absolute terms 0.2748 is modest and far below both the warm-split model (~0.43) and the chem-kNN warm gate (0.485) and the replicate ceiling (0.66) \u2014 the cold-gene regime is genuinely harder because there is no own-gene history to lean on."
+   },
+   {
+    "label": "chem-NULL NDCG@5 (the gate, 23-org / 3-seed)",
+    "number": "0.2447; 95% CI [0.2118, 0.2823]",
+    "plain_explanation": "chem-NULL is the population condition profile (gene-identity-free), the ONLY baseline applicable to held-out whole genes here, so it is the bar to beat in this regime. 0.2447 is what you get with no gene-specific information at all. The model's 0.2748 exceeds it, meaning the frozen embedding adds real gene-specific signal on genes it never trained on. Note this is a WEAKER bar than the warm-split chem-kNN gate (0.485), so beating it is not a headline promotion."
+   },
+   {
+    "label": "\u0394NDCG@5 (model \u2212 chem-NULL, primary)",
+    "number": "+0.0301 (also written +0.030)",
+    "plain_explanation": "A positive gap of +0.0301 NDCG@5 points is the size of the embedding's advantage over the population average on unseen genes. It is consistent (all 3 seeds disjoint above the gate) but small in absolute magnitude \u2014 the embedding adds real but modest gene-specificity, not a large effect. For context, the warm-split promotion rule requires \u0394NDCG@5 \u2273 0.026 vs the (stronger) chem-kNN gate, so this +0.030 is not comparable to that promotion bar."
+   },
+   {
+    "label": "NDCG@5 bootstrap-CI disjointness (primary) \u2014 THE KEY NUANCE",
+    "number": "NOT disjoint: model [0.2424, 0.3179] OVERLAPS chem-NULL [0.2118, 0.2823]",
+    "plain_explanation": "This is the central caveat. Although the model's POINT estimate beats chem-NULL on the primary metric across all 3 seeds, the two 95% confidence intervals OVERLAP \u2014 so the +0.0301 win is NOT statistically CI-significant on NDCG@5. The reason is that NDCG@5 has higher per-gene variance than Spearman, giving it a wider CI. An earlier record wrongly called the win CI-confirmed on the strength of Spearman alone; that was corrected once NDCG@5 got its own CI (precisely why NDCG@5 is held as the primary metric). Verdict: a strong directional lead to pursue, not a closed/confirmed win."
+   },
+   {
+    "label": "Model within-gene Spearman (secondary, 23-org / 3-seed)",
+    "number": "0.0735 (per-seed [0.0712, 0.0756, 0.0738]); 95% CI [0.0523, 0.1034]",
+    "plain_explanation": "Spearman is the secondary, full-list rank-correlation metric (whole-list completeness rather than just the top-5); it also runs -1 to 1, higher is better. 0.0735 is a weak-but-positive correlation between predicted and true condition ordering for cold genes. It beats chem-NULL's 0.0359, and unlike NDCG@5 its 95% CI is DISJOINT from the gate's \u2014 so the win IS CI-significant on this secondary metric (though the margin is thin)."
+   },
+   {
+    "label": "chem-NULL within-gene Spearman (secondary)",
+    "number": "0.0359; 95% CI [0.0230, 0.0514]",
+    "plain_explanation": "The population-baseline full-list rank correlation for cold genes, with no gene-specific information. The model's 0.0735 is about double this and its CI does not overlap [0.0230, 0.0514], establishing a CI-disjoint secondary-metric win. \u0394 = +0.0376."
+   },
+   {
+    "label": "chem-kNN coverage under cold_gene",
+    "number": "0.0000 (inapplicable); linear-MF also inapplicable (skipped)",
+    "plain_explanation": "This 0.0000 is the design-confirming result: chem-kNN, the strong warm-split gate, retrieves a gene's own train conditions, and cold genes have none \u2014 so it covers 0% of cold val genes and structurally cannot play. linear-MF is likewise unlearnable for an unseen gene. This is why chem-NULL (not chem-kNN) is the gate here, and it proves the warm-split model\u2192chem-kNN gap is a MEMORIZATION gap (kNN retrieving own-gene offsets), not evidence the embedding carries nothing."
+   },
+   {
+    "label": "Fast confirmation (Keio+Caulo+MR1, seed 0, n=1,912)",
+    "number": "model NDCG@5 0.2905 / Spearman 0.1155 vs chem-NULL 0.2633 / 0.0813 \u2192 \u0394 +0.0271 / +0.0342",
+    "plain_explanation": "The small 3-organism confirmation reproduces the same sign and magnitude as the 23-org headline, so the directional win is not an artifact of the full org panel. However, on this smaller set the bootstrap CIs OVERLAP on BOTH metrics (including Spearman), consistent with less statistical power \u2014 CI-significance on Spearman needs the full 23-org panel."
+   }
+  ],
+  "analysis": "Mechanism: the primary split is transductive over genes, so chem-kNN wins by retrieving each validation gene's own train history \u2014 unbeatable within-gene memorization. Holding out WHOLE genes removes that mechanism (chem-kNN coverage collapses to 0.0000, linear-MF becomes unlearnable), leaving chem-NULL (the gene-identity-free population profile) as the only applicable baseline. In that clean setting the global model beats chem-NULL by \u0394NDCG@5 +0.0301 and \u0394Spearman +0.0376, with point estimates disjoint across all 3 seeds. Therefore the frozen ProteomeLM embedding does carry transferable, gene-specific conditional-response signal that generalizes to unseen genes \u2014 the first positive global-model result in the project. The CI nuance is essential and honest: on the PRIMARY metric (NDCG@5) the model and chem-NULL 95% CIs OVERLAP, because NDCG@5's per-gene variance produces a wider CI; only the SECONDARY Spearman is CI-disjoint. So the result is directionally robust (3/3 seeds) and Spearman-CI-disjoint, but does NOT clear a strict disjoint-CI bar on the primary metric. An earlier claim of CI-confirmation rested on Spearman alone and was corrected once NDCG@5 got its own CI.",
+  "meaning": "This reframes the project's central finding. The warm-split negatives (R1 encoder, R-LOSS/R-TOPK objective, R-HYBRID, R-AUG training-org volume) are a MEMORIZATION-dominance result, not an \"embeddings are useless\" result: the global model loses to chem-kNN on the warm split only because chem-kNN memorizes each gene's own history, which is unavailable for unseen genes. The cold-gene regime is where the embedding's inductive value is actually visible and where the global model is BEST among applicable methods. Two consequences: (1) it is a diagnostic acceptance of H-R-COLD-01 (directional), NOT a promotion against the locked chem-kNN gate \u2014 chem-NULL is a weaker bar than chem-kNN, so no headline number changes; and (2) it opens the one path the warm axes had closed, namely the inductive cold-start-over-genes objective, where more-diverse training organisms (R-AUG's negative transfer was measured warm-only) could plausibly HELP rather than hurt. Recommended firm-up: a paired/pooled bootstrap on the per-gene NDCG@5 \u0394 (model \u2212 chem-NULL), which cancels shared per-gene variance and is more powerful than comparing two marginal CIs, to convert the primary-metric lead into a CI-significant claim.",
+  "verification": "ledger",
+  "source_files": [
+   "research_log/decisions/rcold/R-COLD-DEC-001.md",
+   "docs/project_memory/progress.md"
+  ],
+  "caveats": "This is a DIAGNOSTIC, directional acceptance, not a promotion against the locked R1 gate: the gate here is chem-NULL, a WEAKER bar than the warm-split chem-kNN gate (0.485), so the +0.030 is not comparable to the \u0394NDCG@5 \u2273 0.026-vs-chem-kNN promotion rule and no headline number changes. The most important statistical caveat: on the PRIMARY metric (NDCG@5) the model [0.2424, 0.3179] and chem-NULL [0.2118, 0.2823] 95% CIs OVERLAP, so the +0.0301 point-estimate win is NOT CI-significant on the primary metric; only the secondary Spearman is CI-disjoint (0.0735 [0.0523, 0.1034] vs 0.0359 [0.0230, 0.0514], and that margin is thin). The fast 3-org set OVERLAPS on BOTH metrics. Multi-seed CI bounds are the mean of per-seed CIs (a summary band, not a single pooled bootstrap). An earlier record claimed the win was CI-confirmed on Spearman alone; that was corrected once NDCG@5 got its own CI. Recommended firm-up: a paired/pooled bootstrap on the per-gene NDCG@5 \u0394 (cancels shared per-gene variance). Absolute performance is modest (~0.27, well below the ~0.43 warm split and 0.66 replicate ceiling) \u2014 the embedding adds real but small gene-specificity. Numbers are from the decision ledger; no committed metrics artifact was independently re-read for this record."
+ },
+ {
+  "id": "rdark",
+  "name": "Dark-genome residual miner spike (R-DARK)",
+  "family": "discovery",
+  "hypothesis": "Because the project is memorization-capped (chem-kNN beats every learned model at predicting fitness), the proposal flips the question: instead of predicting fitness, treat chem-kNN as a null model of what is chemically predictable and mine its RESIDUAL \u2014 the conditional essentiality the lookup cannot explain. The specific hypothesis under test is that unannotated (\"dark genome\") genes \u2014 protein-coding genes with no/hypothetical/DUF/uncharacterized descriptions \u2014 are ENRICHED for reproducible, chemically-surprising essentiality (large studentized residuals) relative to annotated genes, so the dark genome is where the surprising conditional biology hides. This is a discovery task, not a ranking task, so NDCG@5 and the chem-kNN promotion gate do NOT apply.",
+  "how_tested": "Data: the canonical fitness matrix data/derived/canonical/v0/fitness_experiment_long.parquet (gene x condition fitness `fit`, with `expName`, `gene_key`=orgId:locusId, and a `condition_key` built from media/temperature). Replicates are multiple `expName` rows sharing a `condition_key`. Ran on 3 organisms: Keio, Caulo, MR1. No model training and no GPU \u2014 a lightweight residual-mining pass reusing existing loaders and the harness chem-kNN.\n\nTwo code versions were built (src/experiments/rdark/spike.py v1, then spike_repro.py v2), both uncommitted. v1 was found flawed: its naive top \"surprises\" were single-measurement (n_rep=1) artifacts (the low-replication/\u03c3 risk that had been predicted), and its gene-permutation null tested predictability rather than surprise-beyond-noise. v2 is the honest test and is the source of the reported numbers.\n\nThe v2 procedure per organism: (1) restrict to REPLICATED cells only (n_rep>=2). Keio had 204,606 replicated cells (35,748 orphan/dark), Caulo 284,832 (63,984 orphan), MR1 166,408 (65,296 orphan). (2) Compute chem-kNN expected fitness with chemistry_knn_predict(k=5, exclude_self=True) \u2014 exclude_self gives genuine leave-one-condition-out so the expectation never includes the scored cell; the inline kNN was verified against the canonical harness to ~1e-16. (3) Form the studentized residual r* = (observed - expected)/\u03c3(condition). (4) Require the deviation to REPRODUCE across a gene's two replicate halves: both halves |z|>3 vs \u03c3(condition) AND concordant sign; a passing cell is a CONFIRMED surprise. (5) Split cells by annotation via a Gene-table join on (orgId, locusId): dark/orphan = protein-coding (type=1) with desc null/empty or matching hypothetical/DUF/uncharacterized/unknown-function; annotated = the rest.\n\nTwo tests were run. GATE (real vs noise): a within-condition replicate-shuffle null \u2014 shuffle replicate labels within each condition, recompute residuals, count confirmed surprises surviving by chance; compare the real confirmed-orphan count to the shuffle-null count with an empirical p over 500 permutations (0.0020 is the 500-perm floor). ENRICHMENT (dark MORE surprising than annotated?): compare per-gene confirmed-surprise RATE for orphan vs annotated genes with a label-permutation p (label_p ~1.0 = orphans significantly QUIETER, i.e. the opposite of enriched). The planned Step 4 cross-organism ortholog concordance (Ortholog table, the intended primary non-circular validator) was NOT run \u2014 the spike stopped at Steps 1-3 once the enrichment premise failed.",
+  "results": [
+   {
+    "label": "Keio \u2014 confirmed orphan surprises vs shuffle null",
+    "number": "794 / 75.9 (emp_p 0.0020)",
+    "plain_explanation": "In Keio, 794 dark-gene cells passed the reproducible-surprise test, versus only ~76 expected by the replicate-shuffle null \u2014 about 10x the noise floor, with emp_p at the 500-permutation floor. This is a GOOD/positive result for the sub-claim that reproducible chemically-unexpected essentiality is real signal, not measurement noise."
+   },
+   {
+    "label": "Caulo \u2014 confirmed orphan surprises vs shuffle null",
+    "number": "2235 / 293 (emp_p 0.0020)",
+    "plain_explanation": "In Caulo, 2235 dark-gene surprises vs ~293 from the null \u2014 again roughly an order of magnitude above chance at the permutation floor. Confirms the surprise signal is real in a second organism."
+   },
+   {
+    "label": "MR1 \u2014 confirmed orphan surprises vs shuffle null",
+    "number": "2404 / 234 (emp_p 0.0020)",
+    "plain_explanation": "In MR1, 2404 dark-gene surprises vs ~234 from the null \u2014 ~10x the null, permutation-floor significant. Third organism confirming the residual carries genuine reproducible signal. Across all three orgs the finding 'it is all artifacts' is killed."
+   },
+   {
+    "label": "Keio \u2014 orphan vs annotated confirmed-surprise RATE",
+    "number": "0.0222 vs 0.0595 (label_p 1.0000)",
+    "plain_explanation": "The per-gene surprise rate is LOWER for dark genes (2.2%) than for annotated genes (6.0%); label_p=1.0 means orphans are significantly QUIETER, not richer. This is the key negative: it FALSIFIES the enrichment premise \u2014 dark genes are less surprising, the opposite of the hypothesis."
+   },
+   {
+    "label": "Caulo \u2014 orphan vs annotated confirmed-surprise RATE",
+    "number": "0.0349 vs 0.0576 (label_p 1.0000)",
+    "plain_explanation": "Same direction in Caulo: dark 3.5% vs annotated 5.8%, label_p=1.0 (orphans significantly quieter). The enrichment premise fails in a second organism."
+   },
+   {
+    "label": "MR1 \u2014 orphan vs annotated confirmed-surprise RATE",
+    "number": "0.0368 vs 0.1020 (label_p 1.0000)",
+    "plain_explanation": "Same in MR1, and the gap is widest here: dark 3.7% vs annotated 10.2%, label_p=1.0. Across all three orgs the surprising conditional biology is broader and STRONGER in annotated genes \u2014 'the dark genome is special' is dead."
+   }
+  ],
+  "analysis": "The mechanism is a clean split of two nested claims. First, the residual DOES carry real biology: after restricting to replicated cells, requiring concordant |z|>3 reproduction across a gene's two replicate halves, and using a proper within-condition replicate-shuffle null, confirmed surprises run ~10x that null in all three organisms (emp_p at the 500-perm floor). So reproducible, chemically-unexpected conditional essentiality is genuine signal, not measurement noise \u2014 this kills the 'it's all \u03c3/low-replication artifacts' worry that sank v1. Second, and fatally for the direction, the dark genome is NOT where that signal concentrates: orphan genes have a LOWER confirmed-surprise rate than annotated genes in every org (rate ~0.02\u20130.04 vs ~0.06\u20130.10, label_p=1.0 = significantly quieter). The phenomenon is broader and stronger in annotated genes, so the 'unknown genes harbor the surprising biology' hook is unsupported. The deeper problem exposed by the spike: a 'confirmed chemically-unexpected reproducible phenotype' is essentially a specific phenotype, and feba.db's SpecificPhenotype table already catalogs 38,525 of those \u2014 so even the real-signal finding has thin novelty over existing annotation.",
+  "meaning": "This is a fast, cheap (days, no training, no GPU) reframe that reached a clear decision at Step 3 without proceeding to the expensive cross-organism ortholog step. Its verdict: the headline reframe 'the dark genome is special / enriched for surprising essentiality' is DEAD (premise falsified in 3/3 orgs). The one surviving angle is narrow and borderline \u2014 the orphan subset of residual-defined (not merely large-|fit|) reproducible surprises, gated on whether Step-4 cross-organism ortholog concordance yields a corroborated subset that existing annotation misses; proceed only if that specific nugget is wanted, and do not headline dark-genome enrichment. For the project as a whole, R-DARK removes the top-ranked reframe candidate (it had been the #1 pick on the reframe slate) from contention, and its falsification was independently re-confirmed by the 2026-06-29 adversarial direction slate (which retracted/demoted 'dark-genome-by-condition' explicitly citing R-DARK). No project code or behavior changed; the R-EVAL regression gate was untouched.",
+  "verification": "ledger",
+  "source_files": [
+   "/home/ds85/projects/ConditionalGeneEssentiality/research_log/PROPOSAL_dark_genome_residual_miner.md",
+   "/home/ds85/projects/ConditionalGeneEssentiality/docs/project_memory/progress.md",
+   "/home/ds85/projects/ConditionalGeneEssentiality/src/experiments/rdark/"
+  ]
+ },
+ {
+  "analysis": "Mechanism of the finding: The project repeatedly observed that a non-parametric chem-kNN baseline (which predicts a gene's fitness at a held-out condition by looking up THAT SAME gene's fitness at chemically-near conditions) beats every global parametric model \u2014 an MLP over frozen ProteomeLM embeddings + chemistry, linear matrix factorization, ranking losses, and capacity scaling. Adding training organisms hurt (negative transfer), and naive score-fusion of model+kNN failed. The natural worry was \"this feels like cheating / a data leak.\" The literature sweep resolves this: chem-kNN winning is the EXPECTED outcome of a named cross-field regime \u2014 \"local memorization beats global learning.\" The single most on-point precedent is literally titled for the situation: Khandelwal et al., \"Generalization THROUGH Memorization: Nearest Neighbor Language Models\" (kNN-LM, ICLR 2020), where a frozen global model is beaten on the long tail by a kNN lookup over its own representation space, and the field's response was to keep the non-parametric memory as a permanent first-class component, not to declare the model a failure. Feldman (STOC 2020) proves long-tail memorization is NECESSARY for near-optimal generalization \u2014 if each gene is a rare subpopulation, a smooth global map provably cannot match a memorizer. Grinsztajn (NeurIPS 2022) / McElfresh (NeurIPS 2023) explain that MLPs are too smooth/rotation-invariant for irregular per-instance tabular targets (predicts the capacity-scaling failure). Rendle (RecSys 2020) shows an MLP struggles to even learn a dot product (predicts capacity failure); Dacrema (RecSys 2019) shows simple baselines beat reproducible neural recommenders. Xu/Alon/Neubig (ICML 2023) explain WHY the naive blend fails \u2014 the kNN-LM gain comes from representation + distance-temperature, not ensembling \u2014 which directly explains R-HYBRID's failure. Ahlmann-Eltze/Huber/Anders (Nature Methods 2025) is the in-domain analog: deep-learning perturbation prediction does not outperform simple linear baselines. So chem-kNN exploits each gene's OWN observed fitness at a chemically-near condition = an in-domain near-neighbor, and a strong in-domain similarity baseline that a model only beats out-of-domain is the textbook expectation, not a leak.",
+  "how_tested": "This was NOT a code experiment \u2014 no model was trained and R-EVAL was untouched (the R-EVAL regression gate stayed bit-exact at model NDCG@5 0.4468 / chem-kNN 0.5091, and no headline number moved). It was a citation-verified multi-agent literature sweep run on 2026-06-25 (the writeup is dated 2026-06-24/25 in the header), spanning 8 research fields. The methodology was a three-stage pipeline per the document header: (1) SEARCH \u2014 fan out web searches across the fields; (2) ADVERSARIAL-VERIFY \u2014 a verifier agent checked each candidate citation against the actual source text, catching and correcting hallucinated or mis-attributed cites; (3) SYNTHESIZE \u2014 map each verified precedent onto the project's specific 'wall.' The precise question put to the literature had two parts: Q1, is 'local memorization beats global learning' a recognized phenomenon or are we cheating/leaking? Q2, what techniques are CATEGORICALLY DIFFERENT from the naive scalar-blend fusion (R-HYBRID) that already failed? The fields swept and the anchor references verified in each: Learning theory (Feldman, STOC 2020, arXiv:1906.05271; Feldman & Zhang, NeurIPS 2020); NLP (Khandelwal kNN-LM, ICLR 2020, arXiv:1911.00172; Xu/Alon/Neubig 'Why do Nearest Neighbor Language Models Work?', ICML 2023); Tabular ML (Grinsztajn, NeurIPS 2022, arXiv:2207.08815; McElfresh, NeurIPS 2023, arXiv:2305.02997); Recommenders (Cheng Wide&Deep, RecSys 2016, arXiv:1606.07792; Dacrema 'Are We Really Making Much Progress?', RecSys 2019, arXiv:1907.06902; Rendle NCF-vs-MF Revisited, RecSys 2020, arXiv:2005.09683); Cheminformatics/QSAR applicability domain (Sahigara, J. Cheminformatics 2013; Sheridan time-split, JCIM 2013); plus in-domain genomics (Ahlmann-Eltze/Huber/Anders, Nature Methods 2025, PMC12328236). The verifier explicitly flagged the genomics framing as having the weakest citation reliability, so only the Ahlmann-Eltze paper is treated as solidly verified in-domain and is framed as an ANALOG, not the same task. The verification stage produced five documented corrections (recorded in the source): Dacrema is '6 of 7' reproducible neural methods beaten (not the '11 of 12' that circulates); a personal-transcriptome cite conflated two separate Nature Genetics 2023 companion papers (Huang et al. s41588-023-01574-w vs Sasse et al. s41588-023-01524-6); 'one PCA still rules them all' is Bendidi et al. (NeurIPS 2024 wksp), not fabricated names; the activity-cliff 'memorization' framing belongs to Elangovan 2021 / Walters 2024, not van Tilborg 2022; and genomics-specific perturbation benchmarks (PertEval-scFM, Systema, Rastogi/Mostafavi) surfaced as plausible but were NOT text-verified and were flagged as fetch-before-citing. The synthesis then mapped the three observed project failure modes onto predictions from the literature (capacity failure -> Rendle/Grinsztajn; negative transfer from more organisms -> Feldman long-tail dilution; naive fusion failure -> Xu/Alon/Neubig) and concluded chem-kNN winning is EXPECTED. Output artifact: research_log/LITERATURE_local_vs_global_memorization.md, a synthesis document (the 'ledger'), not a committed numeric artifact.",
+  "hypothesis": "The project's recurring wall \u2014 a non-parametric chem-kNN (which retrieves a gene's own fitness at chemically-near conditions) beats every global parametric model, adding organisms hurts, and naive model+kNN fusion fails \u2014 was suspected to be either a modeling failure or a data leak ('this feels like cheating'). The hypothesis put to the literature: is 'local memorization beats global learning' a named, characterized phenomenon across fields rather than a bug or leak, such that chem-kNN winning is the EXPECTED in-domain outcome? And, secondarily, which published techniques are categorically different from the failed naive scalar-blend fusion?",
+  "results": [
+   {
+    "label": "Fields where the regime is named/characterized",
+    "number": "\u22655 fields (learning theory, NLP, tabular ML, recommenders, QSAR/cheminformatics; plus an in-domain genomics analog)",
+    "plain_explanation": "The 'local memorization beats global learning' pattern is not idiosyncratic to this project \u2014 it is independently documented as a named, characterized regime in at least five distinct research fields. This is the core verdict: the wall is expected, well-precedented behavior, so chem-kNN winning is NOT a leak or a modeling failure. Good for the project's scientific credibility, because it converts a nagging 'are we cheating?' worry into a citable phenomenon and justifies reframing the project around characterizing the regime rather than fruitlessly trying to beat the local baseline."
+   },
+   {
+    "label": "Most on-point precedent (kNN-LM)",
+    "number": "Khandelwal et al., 'Generalization through Memorization: Nearest Neighbor Language Models,' ICLR 2020, arXiv:1911.00172",
+    "plain_explanation": "The single closest precedent, whose title literally describes the project's situation: a FROZEN global model is beaten on the long tail by a kNN lookup over its own representation space. Crucially, the field's response was NOT 'the model failed' \u2014 it was to keep the non-parametric memory as a permanent first-class component. This is the strongest evidence that the project's outcome is the normal, published pattern, and it directly motivates a principled local+global hybrid rather than abandoning the model."
+   },
+   {
+    "label": "Learning-theory basis (Feldman)",
+    "number": "Feldman, 'Does Learning Require Memorization? A Short Tale about a Long Tail,' STOC 2020, arXiv:1906.05271 (+ Feldman & Zhang, NeurIPS 2020)",
+    "plain_explanation": "Proves that long-tail memorization is NECESSARY for near-optimal generalization. Applied here: if each gene behaves like a rare subpopulation, a smooth global map provably CANNOT match a memorizer \u2014 so the model losing to chem-kNN on warm genes is a theorem, not a tuning bug. It also explains why adding organisms hurt (averaging dilutes the per-gene memorized structure). This is why the project decided NOT to retry augmentation or more capacity."
+   },
+   {
+    "label": "Why naive fusion failed (Xu/Alon/Neubig)",
+    "number": "Xu, Alon, Neubig, 'Why do Nearest Neighbor Language Models Work?', ICML 2023",
+    "plain_explanation": "Explains that the kNN-LM gain comes from representation + distance-temperature, NOT from ensembling \u2014 which directly explains why the project's naive single-scalar-blend hybrid (R-HYBRID) failed. This is load-bearing: it tells the project the failure was inherent to naive blending, and points to categorically different successors (ResMem residual memorization, Correct-and-Smooth, an adaptive per-query Meta-k gate) rather than re-tuning a blend weight."
+   },
+   {
+    "label": "Tabular-ML basis",
+    "number": "Grinsztajn, NeurIPS 2022, arXiv:2207.08815; McElfresh, NeurIPS 2023, arXiv:2305.02997",
+    "plain_explanation": "Establishes that MLPs are too smooth / rotation-invariant for irregular per-instance targets, which PREDICTED the project's capacity-scaling failure (adding MLP capacity/depth did not help). Confirms the observed dead-end is a documented property of the model class on this kind of data, not a missed hyperparameter."
+   },
+   {
+    "label": "Recommender-systems basis",
+    "number": "Rendle NCF-vs-MF Revisited, RecSys 2020, arXiv:2005.09683; Dacrema 'Are We Really Making Much Progress?', RecSys 2019, arXiv:1907.06902 ('6 of 7', corrected from the circulating '11 of 12'); Cheng Wide&Deep, RecSys 2016, arXiv:1606.07792",
+    "plain_explanation": "Rendle shows an MLP struggles to even learn a dot product (predicts the project's capacity failure); Dacrema shows simple baselines beat 6 of 7 reproducible neural recommenders (the verifier corrected the commonly-mis-cited '11 of 12' to '6 of 7'); Wide&Deep names the memorization-vs-generalization split directly. Together they name the project's exact split and validate its gate discipline (beat a tuned baseline with disjoint CIs) as exactly what this field prescribes."
+   },
+   {
+    "label": "In-domain genomics analog (verified)",
+    "number": "Ahlmann-Eltze, Huber, Anders, 'Deep-learning perturbation-effect prediction does not outperform simple linear baselines,' Nature Methods 2025, PMC12328236",
+    "plain_explanation": "The only in-domain (genomics) precedent the verifier certified as solidly verified \u2014 deliberately framed as an ANALOG, not the same task, because the genomics framing had the weakest citation reliability in the sweep. It shows the same pattern (deep learning fails to beat simple baselines) inside biology, strengthening the case that the project's wall is a domain-wide phenomenon, but it is intentionally not treated as a same-task equivalence."
+   },
+   {
+    "label": "Verifier corrections applied",
+    "number": "5 documented corrections (Dacrema '6 of 7' not '11 of 12'; Huang vs Sasse Nature Genetics 2023 conflation split; 'one PCA' = Bendidi et al. NeurIPS 2024 wksp; activity-cliff memorization = Elangovan 2021/Walters 2024 not van Tilborg 2022; PertEval-scFM/Systema/Rastogi NOT text-verified)",
+    "plain_explanation": "The adversarial-verify stage caught and corrected five hallucinated or mis-attributed citations before they became load-bearing. This is a quality signal, not a scientific result: it shows the reference list was pressure-tested, so the surviving 'key references (verified)' set can be trusted for the reframe, while the flagged-unverified genomics benchmarks must be re-fetched before use."
+   }
+  ],
+  "meaning": "This diligence closes the strategic question of whether the warm 'beat chem-kNN' objective is a fixable modeling gap: it is not \u2014 it is a named, cross-field regime, so chem-kNN winning is expected and is not a leak. The consequences for the whole project are concrete and directive: (1) STOP pursuing global-model fixes for the warm ranking task \u2014 more MLP capacity/depth, more training organisms / global pooling, and any naive scalar-\u03bb blend are all explicitly ruled out as documented weak versions, and the project's own R-TOPK, R-AUG, R1, and R-HYBRID negatives are now understood as predicted by theory. (2) The realistic ceiling on warm genes is to MATCH a learned-local method (EASE/TabR) or CORRECT its residual (ResMem), never to beat kNN everywhere. (3) The genuine generalization win lives on cold genes / out-of-applicability-domain \u2014 validating the R-COLD cold-gene positive as the real signal and reframing the warm negative as a MEMORIZATION gap (kNN retrieves a gene's own history), not an 'embeddings are useless' result. (4) It defines a publishable reframe: a rigorous characterization of a memorization-dominated conditional-essentiality task (strong tuned baseline, denominator parity, hierarchical-bootstrap CIs, similarity-stratified / applicability-domain-aware evaluation, the cold-gene generalization result, and a principled local+global hybrid), where 'this feels like cheating' becomes the thesis. It also produced a concrete, ranked menu of categorically-different next techniques (Tier 1: ResMem, Correct-and-Smooth, adaptive Meta-k gate; Tier 2: EASE, TabR, metric learning) that reuse the locked model + existing chem-kNN datastore and preserve the cold-gene win by construction. Per progress.md, direction remains under the project lead's review (reframe-and-publish vs a different question vs wind down), with an explicit hold on new global-model architectures for the warm task.",
+  "verification": "ledger",
+  "source_files": [
+   "/home/ds85/projects/ConditionalGeneEssentiality/research_log/LITERATURE_local_vs_global_memorization.md",
+   "/home/ds85/projects/ConditionalGeneEssentiality/docs/project_memory/progress.md"
+  ],
+  "id": "literature",
+  "name": "Literature diligence \u2014 the memorization regime",
+  "family": "literature",
+  "caveats": "This is a literature synthesis, NOT a code experiment: no model was trained, no numeric metric was computed, and R-EVAL was untouched (it stayed bit-exact at model 0.4468 / chem-kNN 0.5091; no headline number moved). The 'results' are verified references and field counts, not measured quantities \u2014 verification is 'ledger' (a synthesis document, research_log/LITERATURE_local_vs_global_memorization.md), not a committed reproducible artifact. Citation-reliability caveats stated by the source: the in-domain genomics framing had the WEAKEST citation reliability, so only Ahlmann-Eltze et al. (Nature Methods 2025) is treated as solidly verified in-domain and only as an ANALOG, not the same task. Three genomics-specific perturbation benchmarks (PertEval-scFM, Systema, Rastogi/Mostafavi) surfaced as plausible but were explicitly NOT text-verified and must be fetched before being used as load-bearing cites. The '6 of 7' Dacrema figure is the corrected number; the widely-circulated '11 of 12' is wrong. The document itself notes the reframe direction is still under the project lead's review (reframe-and-publish, ask a different question, or wind down), so the conclusions are diligence-and-recommendation, not a locked decision. Finally, the header date (2026-06-24/25) and the progress-log entry (2026-06-25) differ slightly on exact date; the sweep is logged under 2026-06-25."
+ }
+]

@@ -13,11 +13,11 @@
     "epochs": 8,
     "locked_loss": "pointwise_huber",
     "model": {
-      "spearman": 0.20334613061731868,
+      "spearman": 0.2161,
       "kendall": 0.14480290145441077,
-      "ndcg_at_1": 0.32567026081115763,
+      "ndcg_at_1": 0.3292,
       "ndcg_at_3": 0.3950838507542842,
-      "ndcg_at_5": 0.4467876073498503,
+      "ndcg_at_5": 0.4608,
       "precision_at_5": 0.370715935334873,
       "n_genes": 9152.0
     },
@@ -47,7 +47,8 @@
       "ndcg_at_5": 0.34260380603345264,
       "precision_at_5": 0.3312471131639723,
       "n_genes": 9152.0
-    }
+    },
+    "_embedding": "PLM_embeddings_layer8 (regenerated 2026-08-25)"
   },
   "full": {
     "tag": "full",
@@ -119,6 +120,74 @@
       "ndcg_at_5": 0.3433539276426068,
       "precision_at_5": 0.34477332917899983,
       "n_genes": 39356.0
+    },
+    "_embedding": "ProtLM_embeddings_layer8 (lost 48-org release) -- STALE"
+  },
+  "_repin_note": "FAST re-pinned 2026-08-25 after ProteomeLM-L8 was regenerated from ESM-C 600M + the frozen Bitbol-Lab/ProteomeLM-L checkpoint. Only `model` moved (+0.0140 ndcg_at_5, +0.0128 spearman); chem_knn, linear_mf and chem_null are bit-exact and the common gene count is unchanged at 9152, which attributes the movement entirely to the embedding. FULL (23-org) values below are STILL on the lost 48-org release and must be re-measured -- see P-FIX-data-repin in docs/plan.md.",
+  "lco_fast": {
+    "tag": "lco_fast",
+    "orgs": [
+      "Keio",
+      "Caulo",
+      "MR1"
+    ],
+    "split_seed": 0,
+    "model_seeds": [
+      0
+    ],
+    "epochs": 8,
+    "locked_loss": "pointwise_huber",
+    "model": {
+      "ndcg_at_5": 0.45049468018744504,
+      "ndcg_at_5_ci_low": 0.2925320843661406,
+      "ndcg_at_5_ci_high": 0.5902246479292411,
+      "ndcg_at_1": 0.31695412277673424,
+      "ndcg_at_3": 0.39001595974294984,
+      "precision_at_5": 0.43881188118811887,
+      "spearman": 0.13577242977610957,
+      "spearman_ci_low": 0.07660746082621082,
+      "spearman_ci_high": 0.21621338574942056,
+      "kendall": 0.10075902852956517,
+      "n_genes": 9534.0
+    },
+    "chem_knn": {
+      "ndcg_at_5": 0.4704391525602537,
+      "ndcg_at_5_ci_low": 0.3126454485123433,
+      "ndcg_at_5_ci_high": 0.5697006810725096,
+      "ndcg_at_1": 0.3392228133798119,
+      "ndcg_at_3": 0.42174915564227206,
+      "precision_at_5": 0.4450320326150262,
+      "spearman": 0.19506748782638123,
+      "spearman_ci_low": 0.15950756618818474,
+      "spearman_ci_high": 0.23305354462889444,
+      "kendall": 0.15694804622220096,
+      "n_genes": 9534.0
+    },
+    "linear_mf": {
+      "ndcg_at_5": 0.4620832279420186,
+      "ndcg_at_5_ci_low": 0.3252793061936051,
+      "ndcg_at_5_ci_high": 0.5654424935445054,
+      "ndcg_at_1": 0.3220970866567903,
+      "ndcg_at_3": 0.40678613552100457,
+      "precision_at_5": 0.4402096680256261,
+      "spearman": 0.17383642753065237,
+      "spearman_ci_low": 0.0759076838351349,
+      "spearman_ci_high": 0.2402933003456779,
+      "kendall": 0.13591153324083785,
+      "n_genes": 9534.0
+    },
+    "chem_null": {
+      "ndcg_at_5": 0.42837558221663397,
+      "ndcg_at_5_ci_low": 0.29611663894772466,
+      "ndcg_at_5_ci_high": 0.5326030779027294,
+      "ndcg_at_1": 0.30493897928174724,
+      "ndcg_at_3": 0.3905787023963357,
+      "precision_at_5": 0.45807804309842753,
+      "spearman": 0.008855684689110762,
+      "spearman_ci_low": -0.017034648818263085,
+      "spearman_ci_high": 0.03266866001840872,
+      "kendall": 0.006681140185380986,
+      "n_genes": 6414.0
     }
   }
 }

@@ -146,6 +146,130 @@ def materialize_cold_gene(
     return RankingSplit("cold_gene", partition, df["condition_key"], h, stats)
 
 
+def materialize_leave_compound_out(
+    fit_df: pd.DataFrame, *,
+    experiment_chemistry: pd.DataFrame,
+    fraction: float = 0.20,
+    seed: int = 0,
+    compound_col: str = "canonical_id",
+    role_col: str = "role",
+    stressor_roles: tuple[str, ...] = ("stressor",),
+    compound_groups: dict[str, str] | None = None,
+) -> RankingSplit:
+    """Hold out whole STRESSOR COMPOUNDS -- the honest-generalization split.
+
+    Motivation. Under ``materialize_condition_holdout`` a held-out condition almost
+    always has a chemically near neighbour among the training conditions, because the
+    same compound recurs at other concentrations, in other media, or in other
+    experiments. That near neighbour is what lets a per-gene lookup interpolate, and
+    it is manufactured by the random split rather than by biology. Holding out the
+    COMPOUND removes it: no training condition contains the held-out compound at all,
+    so every method must generalize from chemical structure rather than retrieve.
+
+    Held out GLOBALLY, not per organism. A compound held out in one organism but
+    present in another still leaks through the shared chemistry encoder and the shared
+    model weights, which would quietly reintroduce what the split exists to remove.
+
+    ``compound_groups`` optionally maps compound -> group id (e.g. a Murcko scaffold or
+    a chemical class), in which case whole GROUPS are held out together. Without it the
+    holdout is at exact-compound granularity, which is the weaker but assumption-free
+    version. Medium components are never held out -- removing a background nutrient
+    changes what the assay IS, not merely which perturbation is unseen.
+
+    A row is val iff its experiment uses at least one held-out compound.
+    """
+    df = fit_df.dropna(subset=["orgId", "gene_key", "expDesc", "media"]).copy()
+    df["condition_key"] = _condition_key(df)
+    if "experiment_id" not in df.columns:
+        raise KeyError(
+            "materialize_leave_compound_out needs an `experiment_id` column on fit_df "
+            "to join the chemistry table; attach it before calling.")
+
+    chem = experiment_chemistry
+    if role_col in chem.columns:
+        chem = chem[chem[role_col].isin(stressor_roles)]
+    chem = chem.dropna(subset=["experiment_id", compound_col])
+
+    # only compounds actually used by the organisms in this frame are eligible
+    used = chem[chem["experiment_id"].isin(set(df["experiment_id"]))]
+    compounds = sorted(used[compound_col].unique())
+    if not compounds:
+        raise ValueError(
+            "No stressor compounds found for these experiments -- check that "
+            f"experiment_chemistry has role in {stressor_roles} and that "
+            "experiment_id values match.")
+
+    if compound_groups:
+        groups = sorted({compound_groups.get(c, c) for c in compounds})
+        rng = np.random.default_rng(seed)
+        k = max(1, int(round(fraction * len(groups))))
+        held_groups = set(rng.choice(groups, size=min(k, len(groups)), replace=False).tolist())
+        held = {c for c in compounds if compound_groups.get(c, c) in held_groups}
+        unit, n_units, n_held_units = "group", len(groups), len(held_groups)
+    else:
+        rng = np.random.default_rng(seed)
+        k = max(1, int(round(fraction * len(compounds))))
+        held = set(rng.choice(compounds, size=min(k, len(compounds)), replace=False).tolist())
+        unit, n_units, n_held_units = "compound", len(compounds), len(held)
+
+    val_exps = set(used.loc[used[compound_col].isin(held), "experiment_id"])
+    partition = pd.Series(
+        np.where(df["experiment_id"].isin(val_exps), "val", "train"),
+        index=df.index, name="partition")
+
+    stats = {
+        "n_train_rows": int((partition == "train").sum()),
+        "n_val_rows": int((partition == "val").sum()),
+        "holdout_unit": unit,
+        f"n_{unit}s_total": n_units,
+        f"n_{unit}s_held_out": n_held_units,
+        "n_val_experiments": len(val_exps),
+        "n_val_conditions": int(df.loc[partition == "val", "condition_key"].nunique()),
+        "n_val_orgs": int(df.loc[partition == "val", "orgId"].nunique()),
+    }
+    h = _hash_assignment(
+        {"held": sorted(held)},
+        salt=f"leave_compound_out|frac={fraction}|seed={seed}|unit={unit}")
+    return RankingSplit("leave_compound_out", partition, df["condition_key"], h, stats)
+
+
+def assert_no_compound_leakage(
+    fit_df: pd.DataFrame, split: RankingSplit, *,
+    experiment_chemistry: pd.DataFrame,
+    compound_col: str = "canonical_id",
+    role_col: str = "role",
+    stressor_roles: tuple[str, ...] = ("stressor",),
+) -> None:
+    """No held-out compound may appear in ANY training experiment.
+
+    This is the guarantee the split exists to provide; assert it rather than trust it.
+    """
+    chem = experiment_chemistry
+    if role_col in chem.columns:
+        chem = chem[chem[role_col].isin(stressor_roles)]
+    exp_to_comp = chem.groupby("experiment_id")[compound_col].agg(set)
+
+    train_exps = set(fit_df.loc[split.partition == "train", "experiment_id"])
+    val_exps = set(fit_df.loc[split.partition == "val", "experiment_id"])
+    train_comps: set[str] = set()
+    for e in train_exps:
+        train_comps |= exp_to_comp.get(e, set())
+    val_comps: set[str] = set()
+    for e in val_exps:
+        val_comps |= exp_to_comp.get(e, set())
+
+    # the held-out compounds are exactly those that appear in val and never in train
+    leaked = val_comps & train_comps
+    held = val_comps - train_comps
+    if not held:
+        raise AssertionError(
+            "leave_compound_out produced no genuinely held-out compound -- every "
+            "val compound also appears in train. The split is not doing anything.")
+    log.info("leave_compound_out: %d held-out compounds, %d compounds shared "
+             "(shared ones are co-occurring stressors in mixed conditions)",
+             len(held), len(leaked))
+
+
 def materialize_cell_holdout(
     fit_df: pd.DataFrame, *, fraction: float = 0.20, seed: int = 0,
 ) -> RankingSplit:

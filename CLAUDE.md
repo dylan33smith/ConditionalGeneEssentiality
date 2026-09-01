@@ -1,10 +1,30 @@
 # Project: ConditionalGeneEssentiality
 
 Predicting **conditional gene essentiality** from Tn-seq fitness data using frozen
-ProteomeLM gene embeddings + media-chemistry features. The active objective is
-**within-organism top-k ranking** of a gene's conditions ("find the top stressors
-for this gene"). This file holds durable facts + the Memory Protocol; see
-`README.md` for the current state and `docs/project_memory/` for working memory.
+protein-language-model gene embeddings + media-chemistry features. The active
+objective is **within-organism top-k ranking** of a gene's conditions ("find the
+top stressors for this gene").
+
+This file is the **contract**: mission, environment, hard rules, conventions.
+It carries **no findings, no results, no numbers** — those live in `docs/`.
+
+---
+
+## The six-file documentation system
+
+| file | when it is read | what it holds |
+|---|---|---|
+| `CLAUDE.md` | auto-loaded every session | this contract |
+| `docs/plan.md` | read at session start | current state, WIP, the ledger |
+| `docs/terms.md` | searched before naming anything | glossary, provenance, status |
+| `docs/data.md` | read before touching data/runs/paths | registry of every path and its state |
+| `docs/memory.md` | **NEVER read whole — grep it** | permanent chronological ledger |
+| `docs/bugs.md` | grep by symptom | `[Symptom]` → `[Proven fix]` |
+
+Do not create documentation files outside this set. Anything that is not one of
+these is code, config, data, an artifact, `paper/`, or `archive_docs/`.
+
+---
 
 ## Build / test / run
 
@@ -14,104 +34,110 @@ python -m src.cli.run_experiment +experiment=R-LOSS_loss_family
 python -m src.cli.run_experiment +experiment=R1-A_chemistry
 python -m src.cli.run_experiment +experiment=R-CONF_confidence_strat
 
-# REGRESSION CHECK — reproduces the locked-best model vs the chem-kNN baseline
-# in one pinned command (split seed 0, k=5). Run after any change to ranking
-# behavior; it gates against data_contract/ranking/reval_baseline.json.
-python -m src.cli.run_experiment +experiment=R-EVAL_regression                # fast gate (Keio+Caulo+MR1)
-# full 23-org headline (the replicate-org subset the published ~0.435/0.485 use —
-# NOT orgs=null, which is all organisms and gives different, lower numbers):
-python -m src.cli.run_experiment +experiment=R-EVAL_regression experiment.tag=full \
-    experiment.model_seeds=[0,1,2] \
-    'experiment.orgs=[ANA3,BFirm,Btheta,Burk376,Caulo,Cola,Cup4G11,Dda3937,Ddia6719,DdiaME23,Dino,DvH,Dyella79,HerbieS,Kang,Keio,Korea,Koxy,MR1,Marino,Methanococcus_JJ,Methanococcus_S2,Miya]'
+# REGRESSION CHECK — the locked-best model vs the chem-kNN baseline in one
+# pinned command. Run after ANY change to ranking behavior; it gates against
+# data_contract/ranking/reval_baseline.json.
+python -m src.cli.run_experiment +experiment=R-EVAL_regression     # fast gate
+# full replicate-org headline: see the exact command in docs/data.md
 
 # tests (must stay green before any commit)
 python -m pytest tests/
+python -m pytest tests/test_docs_contract.py    # the docs contract — see below
 ```
 
-Registered CLI handlers: `R0` (data characterization), `R1` (encoder),
-`R-LOSS` (loss family), `R-CONF` (confidence stratification), `R-EVAL`
-(regression check). The legacy T-regime handlers were pruned (see
-`docs/PRUNED_INDEX.md`).
+Registered CLI handlers: `R0`, `R1`, `R-LOSS`, `R-CONF`, `R-COLD`, `R-AUG`,
+`R-EVAL`. Legacy T-regime handlers were pruned.
+
+---
 
 ## Where things live
 
 ```
 src/ranking/            the ranking objective (self-contained reusable core)
-  data/                 fingerprints (+ data layer); split/eligibility/chemistry live in src/data/datasets
+  data/                 fingerprints (+ data layer)
   models.py             AdapterResidualMLP + ResidualBlock (the locked model)
-  losses/               pointwise (mse/huber) + ranking (ranknet/lambdarank/listmle/approxndcg) — top-k substrate
-  eval/                 harness.py (canonical metrics + baselines + stats) + contract.py (R-LOCK-4 gate helpers)
-  pipeline.py           prepare_r1_data (split+eligibility+features), train_r1_arm, eval harness
-  train.py              loss-family trainers (pointwise row-batched / ranking gene-batched)
-  runner.py             shared train→eval→report runner: ArmSpec + run_experiment + standardized_report
+  losses/               pointwise (mse/huber) + ranking (ranknet/lambdarank/listmle/approxndcg)
+  eval/                 harness.py (canonical metrics + baselines + stats) + contract.py
+  pipeline.py           prepare_r1_data (split+eligibility+features), train_r1_arm
+  train.py              loss-family trainers
+  runner.py             shared train->eval->report runner: ArmSpec + run_experiment
 src/experiments/<R*>/run.py   thin CLI handlers that declare arms and call the runner
-src/data/               data ingestion / preprocessing / encoders (provenance) + the ranking data modules
+src/data/               data ingestion / preprocessing / encoders + ranking data modules
 src/cli/run_experiment.py     Hydra entrypoint + handler dispatch
-configs/experiment/     one yaml per experiment (R0/R1/R-LOSS/R-CONF/R-EVAL)
-data_contract/          frozen handoff artifacts + schemas + the ranking metric contract + R-EVAL baseline
-research_log/           decisions/ (the decision ledger), figures/, SCIENTIFIC_SYNTHESIS.md (canonical learnings)
-README.md               single source of truth for current state (overview + architecture + results)
-docs/project_memory/    progress.md (where we are) · decisions.md (why) · bugs.md (quirks + fixes)
-docs/PRUNED_INDEX.md    what was pruned in the cleanup and where its learning lives
+configs/experiment/     one yaml per experiment
+data_contract/          frozen handoff artifacts + schemas + the ranking metric contract
+docs/                   the five working docs (see table above)
+archive_docs/           superseded documentation, unchanged, read-only
+paper/                  manuscript drafts and the scientific narrative
+tests/                  unit + integration + the docs contract test
 ```
 
-## How to add a new ranking test
-
-A new test is declarative — no copy-pasted pipeline:
-
-```python
-from src.ranking.runner import ArmSpec, run_experiment
-run_experiment(
-    [ArmSpec("huber", loss="pointwise_huber"), ArmSpec("lambda", loss="lambdarank")],
-    orgs=None, model_seeds=(0, 1, 2), out_dir="artifacts/runs/my_test", tag="my_test")
-```
-You get the standardized comparison (model + chem-kNN/NULL/linear-MF on the same
-eligible val genes, per-seed + seed-mean, tidy CSV + side-by-side vs the gate).
+---
 
 ## Conventions (hard rules)
 
-- **Train-only preprocessing.** Vocab/scalers/eligibility-thresholds fit on train
-  rows only; val unseen categories → explicit `<UNK>`; log unknown-category rate.
-- **Denominator parity.** Model and every baseline are scored on the identical
-  eligible val gene set.
-- **The gate.** chem-kNN (NDCG@5 ~0.485) is the baseline a learned model must beat;
-  promotion needs ΔNDCG@5 ≳ 0.026 with disjoint hierarchical-bootstrap CIs.
-- **Primary metric: NDCG@5 (k=5).** NDCG@5 is held above within-gene Spearman
-  *everywhere* in this project (top-of-list agreement = "find the top stressors" is
-  the objective; Spearman is the secondary, full-list completeness metric). Report
-  NDCG@5 first, gate/promote on NDCG@5, and lead CIs/verdicts with it. Both NDCG@5
-  and Spearman carry a hierarchical (org→gene) bootstrap CI.
-- **Regression discipline.** After any change to ranking behavior, run `R-EVAL`;
-  if a number moves beyond tolerance, stop and investigate (do not "absorb" it).
-- **Tests green** before any commit.
+- **Train-only preprocessing.** Vocab/scalers/eligibility thresholds fit on train
+  rows only; val unseen categories -> explicit `<UNK>`; log unknown-category rate.
+- **Denominator parity.** The model and every baseline are scored on the identical
+  eligible val gene set. A ceiling or floor quoted against a method must come from
+  the same gene set and the same aggregator.
+- **The gate.** A learned model must beat the chem-kNN baseline by the promotion
+  delta recorded in `docs/terms.md`, with disjoint hierarchical-bootstrap CIs.
+- **Primary metric.** `ndcg_at_5` outranks `within_gene_spearman_mean` everywhere:
+  report it first, gate on it, lead CIs and verdicts with it.
+- **Regression discipline.** After any change to ranking behavior run `R-EVAL`; if
+  a number moves beyond tolerance, stop and investigate — do not absorb it.
+- **Tests green** before any commit, including the docs contract test.
 
-## Authoritative data inputs
+## Naming
 
-| Artifact | Path |
-|---|---|
-| Raw fitness DB | `data/raw/feba.db` |
-| Canonical fitness | `data/derived/canonical/v0/fitness_experiment_long.parquet` |
-| Gene embeddings | `data/processed/ProtLM_embeddings_layer8/*.pt` |
-| Feature contract (S4, frozen) | `data_contract/preprocessing/de21504134c84a6c/` |
+- **Work items:** `<phase>-<KIND>-<slug>`, `KIND` in `DAT TRN EVL ANL FIX LCK`,
+  slug lowercase-hyphenated and meaningful (`azole`, never `A0`). Current phase
+  letter: `P`. Example: `P-EVL-leave-compound-out`.
+- **Historical IDs are frozen** (`S0`-`S5`, `T1`-`T6`, `R*`, `*-DEC-NNN`, `H-*`).
+  They are referenced by `docs/memory.md` and must never be rewritten. The
+  old-to-new bridge table is in `docs/terms.md`.
+- **Directories/files:** `<phase>_<TARGET>[_<variant>]`. Never two names differing
+  only in case. Never a loose file at a results root — everything belongs to an
+  owning directory. Put the varying parameter IN the filename. No brace/glob
+  shorthand in docs (write `run_a/`, `run_b/`). Deprecated things are renamed
+  `DEPRECATED_*` or deleted, and the choice is recorded in `docs/data.md`.
 
-## Memory Protocol (read + write the project memory)
+---
 
-**Before starting a task,** read `docs/project_memory/progress.md` (where the work
-was left off) — and `docs/project_memory/bugs.md` before debugging or touching data.
+## THE IN-PLACE CORRECTION RULE
 
-**At the end of every session, or whenever we solve a major bug or make a
-structural/scientific decision, you must automatically update the relevant files in
-`docs/project_memory/` to reflect the new state of the project:**
+`docs/memory.md` is permanent. **Never delete or overwrite a historical entry.**
+When something in it is proven wrong:
 
-- `progress.md` — update "Where we left off" + append a dated log entry. After any
-  change to ranking behavior, record the `R-EVAL` result. (Append-only log; never
-  rewrite past entries.)
-- `decisions.md` — add/update an entry when an architecture or approach choice is
-  made or changed, with the rationale.
-- `bugs.md` — add an entry whenever a non-obvious bug is solved, with the proven fix.
-- `README.md` — update only when the current-state summary, architecture, data flow,
-  or headline results actually change.
+1. Find the exact original line.
+2. Prepend `[INCORRECT] - `, preserving the original text verbatim.
+3. Insert directly below it: `[CORRECTION - YYYY-MM-DD]: ` with the new finding
+   and what changed.
 
-Keep durable facts in CLAUDE.md and README.md; keep in-progress status in
-`docs/project_memory/progress.md`, never in CLAUDE.md. The formal promotion-gate
-record stays in `research_log/decisions/**`.
+Preserving the wrong version is what makes the reasoning legible later. Grep
+`[INCORRECT]` to list everything the project has been wrong about.
+
+**Corrections do not propagate themselves.** After writing one, hunt its stale
+copies — grep the distinctive *number or phrase*, not the topic, across `docs/`,
+`src/`, `scripts/`, `CLAUDE.md`, `paper/`, and the assistant memory directory.
+Anything published outside the repo has no verifier; republishing is part of the
+Wrap-Up Protocol, not a courtesy.
+
+---
+
+## THE WRAP-UP PROTOCOL — run when any unit of work completes
+
+Not at the end of the project — at the end of each completed piece of work.
+
+1. **Archive to `docs/memory.md`.** Hypothesis/goal, method, provenance, result,
+   under today's date, newest-first at the top.
+2. **Compress to the ledger.** One row in `docs/plan.md`.
+3. **Document fixes.** `[Symptom]` → `[Proven fix]` into `docs/bugs.md`.
+4. **Define new terms.** Full six-field entry in `docs/terms.md`.
+5. **Register artifacts.** Every new output/dataset/checkpoint/directory gets a
+   `docs/data.md` row.
+6. **Reset the board.** Rewrite `docs/plan.md` Current State, add the ledger row,
+   bump `Last updated`.
+7. **Verify.** `python -m pytest tests/test_docs_contract.py` must pass before the
+   session ends.

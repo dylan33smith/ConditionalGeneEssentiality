@@ -24,6 +24,7 @@ from src.data.datasets.build_s5_dataset import (
     _load_concatenated_embeddings, build_or_load_experiment_multihot)
 from src.data.preprocessing.build_experiment_chemistry import experiment_uid
 from src.data.datasets.build_ranking_split import (
+    materialize_leave_compound_out,
     materialize_condition_holdout, materialize_cold_gene)
 from src.data.datasets.ranking_eligibility import (
     compute_train_weights, val_eligible_genes, load_policy)
@@ -31,12 +32,17 @@ from src.data.datasets.condition_chemistry import load_condition_chemistry_featu
 from src.data.datasets.conditions import _condition_key
 from src.ranking.models import AdapterResidualMLP
 from src.ranking.eval import (
+    retrieval_noise_floor,
     per_gene_correlations, hierarchical_bootstrap_ci, within_gene_retrieval,
     per_organism_breakdown, chemistry_nearest_condition_profile, chemistry_knn_predict)
 
 log = logging.getLogger(__name__)
 
-EMB_DIR = Path("data/processed/ProtLM_embeddings_layer8")
+# ProteomeLM-L layer 8. Regenerated 2026-08-25 from ESM-C 600M + the frozen
+# Bitbol-Lab/ProteomeLM-L checkpoint after the original directory was lost in the
+# 2026-07-06 data-root incident. NOT guaranteed bit-identical to the original:
+# ProteomeLM is proteome-contextual and this runs on the 62-organism release.
+EMB_DIR = Path("data/processed/PLM_embeddings_layer8")
 S4_DIR = Path("data_contract/preprocessing/de21504134c84a6c")
 _FIT_COLS = ["orgId", "setName", "seqindex", "media", "expName", "expDesc",
              "temperature", "expGroup", "gene_key", "fit", "abs_t"]
@@ -182,6 +188,35 @@ def prepare_cold_gene_data(orgs: list[str] | None, *, seed: int = 0) -> R1Data:
                            split_fn=materialize_cold_gene,
                            compute_mf=False,
                            parity_pred_cols=["model_pred", "null_pred"])
+
+
+def prepare_leave_compound_out_data(
+    orgs: list[str] | None, *, seed: int = 0, fraction: float = 0.20,
+) -> R1Data:
+    """HONEST-GENERALIZATION SPLIT: hold out whole stressor COMPOUNDS.
+
+    Under the primary condition-holdout split a held-out condition nearly always has
+    a chemically near neighbour in train -- the same compound at another
+    concentration, in another medium, in another experiment. That neighbour is what a
+    per-gene lookup interpolates from, and it is an artefact of splitting at random
+    over conditions rather than a property of the biology. Holding out the COMPOUND
+    removes it: no training row anywhere contains that compound.
+
+    All baselines remain applicable here (unlike cold_gene): a gene still has its own
+    train history, so chem-kNN can still retrieve -- it simply cannot retrieve
+    anything containing the held-out chemistry. That is the point. The comparison is
+    therefore the same four-way one as the primary split, on a split that does not
+    hand the lookup a near neighbour.
+    """
+    chem_path = S4_DIR / "experiment_chemistry.parquet"
+    experiment_chemistry = pd.read_parquet(chem_path)
+
+    def _split_fn(fit_df, **kw):
+        return materialize_leave_compound_out(
+            fit_df, experiment_chemistry=experiment_chemistry,
+            fraction=fraction, seed=kw.get("seed", seed))
+
+    return prepare_r1_data(orgs, seed=seed, split_fn=_split_fn, compute_mf=True)
 
 
 def prepare_r_aug_data(eval_orgs: list[str], extra_orgs: list[str], *,
@@ -469,6 +504,21 @@ def _full_eval(model, data: R1Data, arm: str, dev, *, seed: int, best_spear: flo
     knn_m = _metrics_for_pred(common, "knn_pred")
     mf_m = _metrics_for_pred(common, "mf_pred")
 
+    # REPLICATE CEILING, ON THE PARITY GENE SET (added 2026-08-25).
+    # Previously the ceiling was never computed here at all: it came from a one-off
+    # 2026-05-25 measurement on a DIFFERENT gene set (n=45,943 vs the parity common
+    # set), so every "fraction of achievable" figure silently mixed denominators.
+    # Restricting to `common["gene_key"]` makes the ceiling comparable to the four
+    # methods above by construction. It is a reference, not a competitor: it uses
+    # replicate B to predict replicate A and is not a predictor of anything.
+    ceiling_genes = set(common["gene_key"])
+    try:
+        ceiling_m = retrieval_noise_floor(
+            data.val_raw, k_values=(1, 3, 5), eligible_genes=ceiling_genes)
+    except Exception as e:                      # never let a reference kill a run
+        log.warning("replicate ceiling unavailable: %s", e)
+        ceiling_m = {"n_genes_used": 0, "parity_filtered": True}
+
     # per-org breakdown on the model (side metric)
     pg_model = per_gene_correlations(common.rename(columns={"model_pred": "pred"}),
                                      metric="spearman", pred_col="pred")
@@ -487,6 +537,11 @@ def _full_eval(model, data: R1Data, arm: str, dev, *, seed: int, best_spear: flo
         "model_precision_at_5": model_m["precision_at_5"],
         "knn_spearman": knn_m["spearman"], "knn_ndcg_at_5": knn_m["ndcg_at_5"],
         "knn_precision_at_1": knn_m["precision_at_1"],
+        "ceiling_ndcg_at_5": ceiling_m.get("ndcg_at_5", float("nan")),
+        "ceiling_ndcg_at_1": ceiling_m.get("ndcg_at_1", float("nan")),
+        "ceiling_precision_at_5": ceiling_m.get("precision_at_5", float("nan")),
+        "ceiling_n_genes": ceiling_m.get("n_genes_used", 0),
+        "ceiling_parity_filtered": ceiling_m.get("parity_filtered", False),
         "null_spearman": null_m["spearman"], "null_ndcg_at_5": null_m["ndcg_at_5"],
         "beats_knn_spearman": bool(model_m["spearman"] > knn_m["spearman"]),
         "beats_knn_ndcg5": bool(model_m["ndcg_at_5"] > knn_m["ndcg_at_5"]),

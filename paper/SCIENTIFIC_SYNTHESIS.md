@@ -5,8 +5,11 @@ questions* we have asked and answered — not by gate/stage/tier. Read this to
 understand what is durably established, the mechanisms behind each result, and
 the strategic fork we now face (esp. the fitness-aware-embedding decision).
 
-**Last updated:** 2026-06-06 (after R-HYBRID-A + R-HYBRID-B; modeling thread
-concluded, characterization scope adopted — R-HYBRID-DEC-002 approved).
+**Last updated:** 2026-07-06 — added **§9, a first-principles re-examination** that
+*amends the framing* of §3–§7: the warm "beat chem-kNN" contest is now understood as a
+**rigged benchmark (H1)**, not the scientific question. The durable measurements below stand;
+their *significance* is reinterpreted. Read §9 for the corrected conclusion. (Prior header:
+2026-06-06, after R-HYBRID-A/B; modeling thread concluded, characterization scope adopted.)
 
 For the operational pipeline and per-decision detail see `docs/REFACTORPLAN.md`
 (T-regime), `docs/RPLAN.md` (R-regime), and `research_log/decisions/`.
@@ -316,3 +319,67 @@ live lever — the one place the global model leads. Encoder/capacity (R1) and
 training-org volume (R-AUG, whose negative transfer was measured *warm-only*) are
 worth re-testing *in this regime*; diverse/external organisms (MtbTnDB,
 A. baumannii) are un-shelved as cold-gene candidates. See R-COLD-DEC-001.
+
+---
+
+## 9. First-principles re-examination (2026-07-06): the warm benchmark is RIGGED; retire H1, test H2
+
+A ground-up re-derivation (taking nothing above at face value) **amends the conclusion of §3–§7.**
+The measurements stand; what they *mean* changes.
+
+### 9.1 The decomposition that clarifies everything
+Any single fitness measurement is `fit(g,c) = μ + a_g + b_c + I(g,c) + noise`:
+`a_g` = gene main effect (importance on average), `b_c` = condition main effect (harshness on
+average), **`I(g,c)` = the interaction** (is gene *g* *specifically* needed for condition *c*), plus
+measurement noise. Within-gene ranking fixes `g` (so `a_g` drops out) and the eligibility filter
+selects genes where `b_c` is small — so **the entire task is predicting `I(g,c)`, the pure
+interaction.** That target was *chosen* by the metric + eligibility, not discovered.
+
+### 9.2 Two hypotheses were conflated
+- **H1 (a benchmark):** "can a learned model predict `I(g,c)` *better than chem-kNN*?" The kNN
+  predicts `I(g,c)` by reading **gene g's own measured `I(g,c′)`** at other conditions.
+- **H2 (the science / the foundational bet of §0):** "do the embedding (proxy for *what g does*) and
+  chemistry (proxy for *what c demands*) actually **contain** generalizable `I(g,c)` signal, where
+  nobody has the answer key?"
+
+### 9.3 The warm contest is rigged three ways — so H1 "no" is expected, not deep
+The kNN is handed **(a)** the target gene's own labels at inference; **(b)** genes pre-selected by
+eligibility to have *rich* histories (where lookups thrive); **(c)** a random condition-split that
+leaves each held-out condition a chemically-*near* measured neighbor. Given a high-rank, idiosyncratic
+target, a **lossless non-parametric** reader of history beats any **lossy parametric** model — this is
+correct (Feldman long-tail) but is largely a property of a *rigged formulation*, not a verdict on deep
+learning. The tell: **R-COLD removes the crutch (no own-history) and the model wins** → H2 is a partial
+**yes**. The embedding carries real `I(g,c)` signal; it is only outgunned where memorization is available.
+
+### 9.4 What was never actually tested (so §7's "concluded" is premature *for H1*, and irrelevant *for H2*)
+Every failed model was **global/compressing** (MLP; linear-MF rank-32; naive retrieval-concat;
+global-MLP-predicts-residual). The family designed for this regime — **learned non-parametric**
+(EASE / learned-metric kNN / TabR / canonical ResMem), a **de-meaned** target (model only `I`, not
+`a_g`/`b_c`), and a **denoised** target (replicate-average / `t`-shrink / low-rank) — was **not built**
+(verified: no such code). *But* note the trap: if a learned-*local* method wins, it is a **better
+memorizer**, which **confirms** the memorization finding rather than refuting it. So the learned-local
+sweep is worth running **only to make the H1 negative airtight**, not as a path to a modeling win.
+
+### 9.5 The ceiling, corrected
+The 0.66 NDCG@5 / 0.39 Spearman "replicate ceiling" is real (replicate A predicts replicate B) but it
+is the ceiling **of the single-noisy-measurement task**. It is computed on the same noisy cells the
+model is graded on; **denoising the target raises it.** The kNN→ceiling gap (0.175) ≫ the model→kNN gap
+(0.055) and is an unquantified mix of *irreducible noise* vs *structure the fixed kNN misses*.
+
+### 9.6 A non-rigged benchmark
+Demote **chem-kNN** from "the gate you must beat" to "a *reference* for what pure memorization achieves
+on warm data." The honest benchmark neutralizes the near-neighbor gift so *every* method must
+generalize:
+- **Primary split → leave-compound-out (scaffold / leave-chemical-class-out)**, plus cold-gene.
+- **Bar → chem-NULL** (population profile); **scored as fraction of the (denoised) ceiling.**
+- This measures **H2** — does the biology live in our features — instead of H1's rigged contest.
+
+### 9.7 The corrected high-level conclusion
+"No model beats the kNN" (§7) is re-scoped to: **"no *global* model beats a lookup that's been handed
+the gene's own answer key on a task selected to reward that."** That is expected, low-significance, and
+*not* the scientific question. **Retire H1.** The live science is **H2 on honest splits** and the
+**reframed questions** that make `I(g,c)` (or the whole matrix) the *input* rather than a look-up-able
+output: cold-condition prediction, fitness-as-feature (function / MoA), matrix-structure / co-essentiality,
+and cross-organism rewiring (§ see `research_log/DIRECTIONS_adversarial_slate_2026-06-29.md`). The new
+62-org dataset (M. tuberculosis + a TB-drug panel; in-vivo *mouse* / *in planta* conditions) materially
+strengthens the fitness-as-feature/MoA and cross-organism reframes.

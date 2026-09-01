@@ -111,7 +111,8 @@ def retrieval_noise_floor(
     val_rows_pre_pool: pd.DataFrame, *, k_values=(1, 3, 5),
     orgId_col="orgId", gene_col="gene_key", condition_col="condition_key",
     expName_col="expName", fit_col="fit", min_conditions=5,
-) -> dict:
+    eligible_genes=None, return_per_gene: bool = False,
+):
     """NDCG@k / precision@k CEILING from biological replicates.
 
     The retrieval analog of the Spearman noise floor: for each gene with >=2
@@ -120,14 +121,27 @@ def retrieval_noise_floor(
     NDCG@k / precision@k. This is the best NDCG any model could achieve — it's
     how well one replicate's top-k stressors match the other replicate's.
 
-    Returns {ndcg_at_k: median, precision_at_k: median, n_genes_used}.
+    Returns {ndcg_at_k: mean, precision_at_k: mean, n_genes_used}.
+
+    DENOMINATOR PARITY (added 2026-08-25). Pass `eligible_genes` to restrict the
+    ceiling to the same gene set the model and baselines are scored on. Without it
+    the ceiling is computed over ALL val genes with replicate structure, which is a
+    DIFFERENT denominator -- quoting that against a model score, or as a "fraction of
+    achievable", is the parity violation this harness exists to prevent.
+
+    `return_per_gene=True` additionally returns the per-gene frame (gene_key, orgId,
+    ndcg_at_k, precision_at_k) so the ceiling can carry a hierarchical bootstrap CI
+    like every other method.
     """
     df = val_rows_pre_pool.dropna(
         subset=[orgId_col, gene_col, condition_col, expName_col, fit_col]).copy()
     df = (df.groupby([orgId_col, gene_col, condition_col, expName_col])[fit_col]
           .median().reset_index())
+    if eligible_genes is not None:
+        df = df[df[gene_col].isin(set(eligible_genes))]
     per_gene = {f"ndcg_at_{k}": [] for k in k_values}
     per_gene.update({f"precision_at_{k}": [] for k in k_values})
+    per_gene_rows: list[dict] = []
     n_used = 0
     for (_org, _gene), g in df.groupby([orgId_col, gene_col], sort=False):
         a, b = [], []
@@ -141,19 +155,26 @@ def retrieval_noise_floor(
             continue
         a_arr, b_arr = np.asarray(a), np.asarray(b)
         used_any = False
+        rec = {"gene_key": _gene, "orgId": _org}
         for k in k_values:
             nd = ndcg_at_k(fit_true=b_arr, fit_pred=a_arr, k=k)
             pr = precision_at_k(fit_true=b_arr, fit_pred=a_arr, k=k)
             if not np.isnan(nd):
                 per_gene[f"ndcg_at_{k}"].append(nd); used_any = True
+                rec[f"ndcg_at_{k}"] = nd
             if not np.isnan(pr):
                 per_gene[f"precision_at_{k}"].append(pr)
+                rec[f"precision_at_{k}"] = pr
         if used_any:
             n_used += 1
+            per_gene_rows.append(rec)
     # MEAN aggregation (not median) to match how baselines/model retrieval is
     # summarized — median of binary precision@1 collapses to 0 and is misleading.
     out = {kk: (float(np.mean(v)) if v else float("nan")) for kk, v in per_gene.items()}
     out["n_genes_used"] = int(n_used)
+    out["parity_filtered"] = eligible_genes is not None
+    if return_per_gene:
+        return out, pd.DataFrame(per_gene_rows)
     return out
 
 
@@ -230,6 +251,64 @@ def hierarchical_bootstrap_ci(
             "n_bootstrap": n_bootstrap}
 
 
+def paired_hierarchical_bootstrap_ci(
+    per_gene_a: pd.DataFrame, per_gene_b: pd.DataFrame, *,
+    value_col="value", gene_col="gene_key", org_col="orgId",
+    n_bootstrap=1000, ci_level=0.95, seed=0,
+) -> dict:
+    """Hierarchical bootstrap CI on the PER-GENE DELTA (a - b).
+
+    Why this and not two marginal CIs. Method A and method B are scored on the SAME
+    genes, so their errors are strongly correlated -- a gene that is intrinsically
+    hard is hard for both. Two marginal CIs throw that pairing away and each inherits
+    the full between-gene variance, so they overlap even when the per-gene difference
+    is consistently positive. Bootstrapping the delta cancels the shared component and
+    is materially more powerful.
+
+    This is the correct test for "does A beat B on the same evaluation set". It is
+    NOT interchangeable with comparing two marginal CIs, and a delta CI that excludes
+    zero is a stronger claim than two CIs that happen to be disjoint.
+
+    Returns {mean_delta, ci_low, ci_high, p_two_sided, excludes_zero, n_genes,
+    n_orgs, n_bootstrap}.
+    """
+    a = per_gene_a[[gene_col, org_col, value_col]].rename(columns={value_col: "_a"})
+    b = per_gene_b[[gene_col, value_col]].rename(columns={value_col: "_b"})
+    m = a.merge(b, on=gene_col, how="inner")
+    if m.empty:
+        return {"mean_delta": float("nan"), "ci_low": float("nan"),
+                "ci_high": float("nan"), "p_two_sided": float("nan"),
+                "excludes_zero": False, "n_genes": 0, "n_orgs": 0,
+                "n_bootstrap": n_bootstrap}
+    m["_d"] = m["_a"] - m["_b"]
+
+    rng = np.random.default_rng(seed)
+    orgs = m[org_col].unique()
+    by_org = {o: m.loc[m[org_col] == o, "_d"].to_numpy() for o in orgs}
+    point = float(m["_d"].mean())
+    boot = np.empty(n_bootstrap)
+    for i in range(n_bootstrap):
+        chosen = rng.choice(orgs, size=len(orgs), replace=True)
+        vals = []
+        for o in chosen:
+            arr = by_org[o]
+            if len(arr):
+                vals.append(arr[rng.integers(0, len(arr), size=len(arr))])
+        allv = np.concatenate(vals) if vals else np.array([np.nan])
+        boot[i] = np.nanmean(allv)
+    alpha = (1 - ci_level) / 2
+    lo = float(np.quantile(boot, alpha))
+    hi = float(np.quantile(boot, 1 - alpha))
+    # two-sided bootstrap p: how often the resampled delta crosses zero
+    frac_le0 = float(np.mean(boot <= 0.0))
+    p = 2.0 * min(frac_le0, 1.0 - frac_le0)
+    return {"mean_delta": point, "ci_low": lo, "ci_high": hi,
+            "p_two_sided": float(min(1.0, p)),
+            "excludes_zero": bool(lo > 0.0 or hi < 0.0),
+            "n_genes": int(len(m)), "n_orgs": int(len(orgs)),
+            "n_bootstrap": n_bootstrap}
+
+
 # ===========================================================================
 # FDR (Benjamini-Hochberg) + bootstrap p-value for a delta
 # ===========================================================================
@@ -301,6 +380,93 @@ def bootstrap_pvalue_delta(
 # ===========================================================================
 # SPLIT-SPECIFIC CHEMISTRY BASELINES (primary split = cold columns)
 # ===========================================================================
+
+def nearest_train_condition_distance(
+    train_df: pd.DataFrame, val_df: pd.DataFrame,
+    cond_features: dict[str, np.ndarray], *,
+    gene_col="gene_key", condition_col="condition_key", orgId_col="orgId",
+    aggregate: str = "median",
+) -> pd.DataFrame:
+    """Per val gene: how far its val conditions sit from its OWN train conditions.
+
+    This is the quantity that decides whether a per-gene lookup can work. chem-kNN
+    predicts gene g at held-out condition c by reading g's measured fit at the train
+    conditions nearest to c. If some train condition of g is chemically adjacent to c,
+    the lookup is close to reading the answer; if g's nearest train condition is far,
+    the lookup must extrapolate and has no special advantage over a learned model.
+
+    Returns one row per val gene: gene_key, orgId, nearest_train_distance,
+    n_val_conditions, n_train_conditions. Distance is cosine on the condition
+    features, minimum over the gene's train conditions, then aggregated (median by
+    default) over the gene's val conditions.
+    """
+    if aggregate not in {"median", "mean", "min"}:
+        raise ValueError(f"aggregate must be median|mean|min, got {aggregate!r}")
+
+    train_by_gene = train_df.groupby(gene_col)[condition_col].agg(set)
+    rows = []
+    for gene, sub in val_df.groupby(gene_col, sort=False):
+        train_conds = [c for c in train_by_gene.get(gene, set()) if c in cond_features]
+        val_conds = [c for c in sub[condition_col].unique() if c in cond_features]
+        if not train_conds or not val_conds:
+            continue
+        tf = np.vstack([cond_features[c] for c in train_conds])
+        vf = np.vstack([cond_features[c] for c in val_conds])
+        d = _cosine_dist_matrix(vf, tf)            # [n_val, n_train]
+        per_val_min = d.min(axis=1)
+        agg = {"median": np.median, "mean": np.mean, "min": np.min}[aggregate]
+        rows.append({
+            "gene_key": gene,
+            "orgId": sub[orgId_col].iloc[0] if orgId_col in sub.columns else "ALL",
+            "nearest_train_distance": float(agg(per_val_min)),
+            "n_val_conditions": len(val_conds),
+            "n_train_conditions": len(train_conds),
+        })
+    return pd.DataFrame(rows)
+
+
+def similarity_stratified_report(
+    per_gene_by_method: dict[str, pd.DataFrame],
+    distances: pd.DataFrame, *,
+    metric_col: str = "ndcg_at_5", gene_col: str = "gene_key",
+    n_buckets: int = 4,
+) -> pd.DataFrame:
+    """Metric by method, stratified by distance-to-nearest-own-train-condition.
+
+    The empirical form of the "is the benchmark rigged?" question. If a per-gene
+    lookup wins only because a random split manufactured near neighbours, its margin
+    must SHRINK as that distance grows, and a learned model should close or reverse
+    the gap in the far bucket. If the lookup wins uniformly across buckets, the
+    memorization explanation is wrong and something else is going on.
+
+    Returns tidy rows: bucket, bucket_lo, bucket_hi, n_genes, method, value.
+    """
+    if not per_gene_by_method:
+        raise ValueError("per_gene_by_method is empty")
+    d = distances.dropna(subset=["nearest_train_distance"]).copy()
+    if d.empty:
+        return pd.DataFrame(columns=["bucket", "bucket_lo", "bucket_hi",
+                                     "n_genes", "method", "value"])
+
+    # quantile buckets; duplicates="drop" guards against a degenerate distribution
+    d["bucket"] = pd.qcut(d["nearest_train_distance"], q=n_buckets,
+                          labels=False, duplicates="drop")
+    rows = []
+    for b, sub in d.groupby("bucket"):
+        genes = set(sub[gene_col])
+        lo = float(sub["nearest_train_distance"].min())
+        hi = float(sub["nearest_train_distance"].max())
+        for method, pg in per_gene_by_method.items():
+            if metric_col not in pg.columns:
+                continue
+            vals = pg.loc[pg[gene_col].isin(genes), metric_col].dropna()
+            rows.append({
+                "bucket": int(b), "bucket_lo": lo, "bucket_hi": hi,
+                "n_genes": int(len(vals)), "method": method,
+                "value": float(vals.mean()) if len(vals) else float("nan"),
+            })
+    return pd.DataFrame(rows)
+
 
 def _cosine_dist_matrix(val_feats: np.ndarray, train_feats: np.ndarray) -> np.ndarray:
     """Pairwise cosine distance, rows=val conditions, cols=train conditions."""

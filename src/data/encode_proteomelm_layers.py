@@ -91,6 +91,30 @@ def encode_one_organism(
     return {L: torch.cat(per_layer[L], dim=0) for L in keep_layers}
 
 
+def _unpack_esmc_bundle(bundle, org: str):
+    """Accept either ESM-C on-disk layout and return (embeddings, group_labels).
+
+    Two formats exist in this project:
+      * the documented bundle: {"embeddings": Tensor[n, d], "group_labels": [...]}
+      * a plain mapping produced by the 2026-07-06 regeneration: {locusId: Tensor[d]}
+
+    The plain mapping is sorted by locusId so the row order is deterministic and
+    reproducible across runs -- dict insertion order is not a stable contract.
+    Labels are emitted as "orgId:locusId" to match the bundle convention.
+    """
+    if isinstance(bundle, dict) and "embeddings" in bundle and "group_labels" in bundle:
+        return bundle["embeddings"], bundle["group_labels"]
+    if isinstance(bundle, dict) and bundle and torch.is_tensor(next(iter(bundle.values()))):
+        keys = sorted(bundle)
+        emb = torch.stack([bundle[k].to(torch.float32) for k in keys])
+        return emb, [f"{org}:{k}" for k in keys]
+    raise ValueError(
+        f"Unrecognised ESM-C bundle layout for {org}: "
+        f"type={type(bundle).__name__}, "
+        f"keys={list(bundle)[:5] if isinstance(bundle, dict) else 'n/a'}"
+    )
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -162,8 +186,7 @@ def main():
 
         log.info("[%d/%d] loading %s", i + 1, len(esmc_files), org)
         bundle = torch.load(esmc_path, map_location="cpu", weights_only=False)
-        esmc_emb = bundle["embeddings"]
-        labels = bundle["group_labels"]
+        esmc_emb, labels = _unpack_esmc_bundle(bundle, org)
         log.info("    encoding %s (n_proteins=%d, batch_size=%d)",
                  org, len(esmc_emb), args.batch_size)
 

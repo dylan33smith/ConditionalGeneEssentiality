@@ -4,8 +4,13 @@
 #   + matrix-factorization baseline, + NDCG@k/precision@k retrieval metrics,
 #   + effect-size-anchored promotion delta, + hierarchical (org→gene) bootstrap,
 #   + multiple-comparison (FDR) budget, + required per-organism breakdown.
+# v3 amended 2026-08-25: the primary metric became ndcg_at_5 on 2026-06-24 but this
+#   file was never updated. Corrected here: the comparable ceiling is the MEAN over
+#   parity-eligible val genes (not the unfiltered median), the promotion delta is
+#   stated on ndcg_at_5, and a claim about the training objective that R-LOSS/R-TOPK
+#   refuted has been retracted. Full record: docs/memory.md 2026-08-25.
 
-contract_id: r_lock_4_v2
+contract_id: r_lock_4_v3
 schema_version: 2
 
 # ---------------------------------------------------------------------------
@@ -125,9 +130,14 @@ baselines:
 noise_floor:
   primary:
     id: per_gene_cross_condition_replicate_spearman
-    measured_value_full_val_23_orgs: 0.3214   # USE THIS — all 23 replicate orgs,
-                                          # real cold-condition val, n=74,804 genes
-    measured_value_high_rep_orgs: 0.358   # 8 high-rep orgs, n=24,337 (subset; higher)
+    # DIAGNOSTIC ONLY (v3, 2026-08-25). Formerly annotated "USE THIS" — that was wrong.
+    # This value is MEDIAN-aggregated over ALL val genes; the model and every baseline
+    # are MEAN-aggregated over PARITY-ELIGIBLE val genes, so it is comparable to nothing
+    # in the standard report. See docs/terms.md:replicate_ceiling_spearman_unfiltered_median.
+    ceiling_spearman_median_unfiltered: 0.3214   # n=74,804 genes
+    # USE THIS — the parity-comparable ceiling: MEAN over parity-eligible val genes.
+    ceiling_spearman_parity_eligible_mean: 0.393                  # n=45,943 genes
+    ceiling_spearman_high_rep_orgs_subset: 0.358   # 8 high-rep orgs, n=24,337 (subset; higher)
                                           # SUPERSEDES the 0.43/0.506 cross-gene proxy
     description: |
       For each eligible val gene with ≥ 2 replicate measurements at ≥ 5 distinct
@@ -157,10 +167,13 @@ reference_baselines_all_org:                # method: [spearman, ndcg@1, ndcg@3,
     is statistically indistinguishable from the deep model (0.130 / 0.422) — the
     deep model's NONLINEARITY buys ~nothing over a bilinear feature factorization.
     BOTH global parametric models lose to the non-parametric chem-kNN (0.485).
-    => the bottleneck is NOT model capacity/expressiveness; it is the OBJECTIVE
-    (pointwise MSE for a ranking task) and/or the local-vs-global nature of the
-    signal (kNN exploits gene-specific chemical-neighborhoods directly). Strongly
-    supports R-LOSS-before-R2.
+    => the bottleneck is NOT model capacity/expressiveness.
+    RETRACTED (v3, 2026-08-25): this note formerly continued "it is the OBJECTIVE
+    (pointwise MSE for a ranking task) ... Strongly supports R-LOSS-before-R2".
+    The objective half was refuted by R-LOSS (2026-06-06) and R-TOPK (2026-06-17):
+    pointwise Huber remained best and every ranking loss, including top-5-truncated
+    NDCG-matched ones, failed to beat the gate. Only the local-vs-global half stands,
+    and 2026-07-06 reframed that as a property of the benchmark, not the model.
     NDCG >> Spearman everywhere (top-of-list agreement is stronger than full-list).
     Denominator caveat: each method scored on the genes it could cover; the
     model-vs-baseline promotion comparison uses the COMMON gene set per run.
@@ -181,14 +194,20 @@ promotion:
   # Delta is anchored to the IMPROVABLE GAP above the STRONG baseline (chem-kNN),
   # NOT to an arbitrary absolute or to CI width.
   # MEASURED 2026-05-25 on the FULL cold-condition val (23 replicate orgs):
-  #   noise_floor (ceiling)              = 0.3214
+  #   noise_floor (ceiling, DIAGNOSTIC median/unfiltered) = 0.3214
+  #   noise_floor (ceiling, PARITY-COMPARABLE mean)       = 0.393
   #   chemistry_null baseline (gate)     = 0.0112  [hier 95% CI -0.0017, 0.0286]
   #   chemistry_kNN baseline (STRONG)    = 0.1694  [hier 95% CI 0.0949, 0.2653]
   #   improvable gap above kNN           = 0.3214 - 0.1694 = 0.1520
   delta_anchor: fraction_of_gap_above_strong_baseline
   anchor_baseline: chemistry_knn          # the gene-specific strong baseline
-  delta_fraction: 0.15                    # 0.15 × 0.152 ≈ 0.023
-  delta_concrete_spearman: 0.023          # promote if Δ-Spearman ≥ 0.023 vs chem-kNN
+  delta_fraction: 0.15
+  # PRIMARY (v3, 2026-08-25): the gate is on ndcg_at_5, evaluated against the
+  # parity-eligible ceiling: 0.15 × (0.658 − 0.481) ≈ 0.026.
+  delta_concrete_ndcg_at_5: 0.026         # promote if Δ-NDCG@5 ≥ 0.026 vs chem-kNN
+  # RETIRED (v3): the former Spearman gate, 0.15 × (0.3214 − 0.1694) ≈ 0.023. Same
+  # formula, but anchored to the DIAGNOSTIC unfiltered-median ceiling above. Superseded.
+  retired_delta_concrete_spearman: 0.023
   delta_note: |
     Two-tier baseline result (full val):
     - chem-NULL (population profile, ignores gene) ≈ 0.011 — near zero; the
@@ -243,5 +262,8 @@ figure_requirements:
     - hierarchical_bootstrap_ci_95
     - h_rank_01_baseline_horizontal_line
     - matrix_factorization_baseline_line
-    - noise_floor_horizontal_line          # measured ≈ 0.358
+    # Plot the PARITY-COMPARABLE ceiling (mean over parity-eligible val genes).
+    # Formerly annotated "measured ≈ 0.358", which is the 8-high-rep-org DIAGNOSTIC
+    # subset, not the 23-organism panel. Corrected v3, 2026-08-25.
+    - noise_floor_horizontal_line
     - cross_org_drift_horizontal_dashed

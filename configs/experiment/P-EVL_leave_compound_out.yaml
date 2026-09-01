@@ -1,0 +1,28 @@
+# @package _global_
+# P-EVL-leave-compound-out — the honest-generalization split (paper item C).
+#
+# The primary condition-holdout split leaves nearly every held-out condition a
+# chemically near neighbour in train (same compound, other concentration/medium/
+# experiment). A per-gene lookup interpolates from that neighbour, so the split
+# rewards retrieval rather than generalization. Holding out whole STRESSOR COMPOUNDS
+# globally removes the neighbour: no training row anywhere contains the compound.
+#
+# All four methods remain applicable (unlike cold_gene), so this is the same
+# four-way comparison on a split that does not hand the lookup its answer.
+#
+#   python -m src.cli.run_experiment +experiment=P-EVL_leave_compound_out
+
+experiment_id: P-EVL_leave_compound_out
+stage_or_tier: R-EVAL
+regime: R
+
+experiment:
+  tag: lco
+  orgs: [ANA3, BFirm, Btheta, Burk376, Caulo, Cola, Cup4G11, Dda3937, Ddia6719,
+         DdiaME23, Dino, DvH, Dyella79, HerbieS, Kang, Keio, Korea, Koxy, MR1,
+         Marino, Methanococcus_JJ, Methanococcus_S2, Miya]
+  split_seed: 0
+  model_seeds: [0, 1, 2]
+  epochs: 8
+  split: leave_compound_out
+  compound_holdout_fraction: 0.20

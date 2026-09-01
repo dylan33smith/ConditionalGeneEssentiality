@@ -15,7 +15,7 @@ import pandas as pd
 import torch
 from omegaconf import DictConfig
 
-from src.ranking.pipeline import prepare_r1_data
+from src.ranking.pipeline import prepare_r1_data, prepare_leave_compound_out_data
 from src.ranking.runner import ArmSpec, run_arm, METHODS
 
 log = logging.getLogger(__name__)
@@ -45,7 +45,20 @@ def main(cfg: DictConfig) -> None:
              tag, LOCKED_LOSS, orgs if orgs else "ALL", split_seed, model_seeds)
     log.info("=" * 64)
 
-    data = prepare_r1_data(orgs, seed=split_seed)
+    # `experiment.split` selects the split protocol. Default reproduces the primary
+    # condition-holdout bit-for-bit, so the regression gate is unaffected.
+    split_name = str(exp.get("split", "condition_holdout"))
+    if split_name == "leave_compound_out":
+        frac = float(exp.get("compound_holdout_fraction", 0.20))
+        log.info("    split=leave_compound_out (fraction=%.2f) — stressor compounds "
+                 "held out GLOBALLY; no train row anywhere contains them", frac)
+        data = prepare_leave_compound_out_data(orgs, seed=split_seed, fraction=frac)
+    elif split_name == "condition_holdout":
+        data = prepare_r1_data(orgs, seed=split_seed)
+    else:
+        raise ValueError(
+            f"unknown experiment.split={split_name!r}; "
+            "expected 'condition_holdout' or 'leave_compound_out'")
     log.info("    train=%d val=%d eligible val genes=%d",
              len(data.train), len(data.val), len(data.eligible_val_genes))
 
